@@ -5,3 +5,4 @@
 2. [[./error.org][常见错误]]   
 3. [[./gentoo.org][gentoo linux]]
 4. [[./network.org][网络]]
+5. [[./algorithms.org][算法]]   
