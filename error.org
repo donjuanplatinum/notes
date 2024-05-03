@@ -1,4 +1,8 @@
+* 大纲
+1. [[#环境问题][环境]]
+
 ** 环境问题
+1. [[#opengl][opengl]]
 *** opengl
 **** 问题
 GLFW Error: GLX: Failed to create context: GLXBadFBConfig
