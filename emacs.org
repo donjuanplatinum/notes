@@ -1,0 +1,216 @@
+* emacs包
+** 主题类
+*** 面板
+1. dashboard
+** 功能类
+*** 补全类
+1. company
+2. company-nginx
+** 游戏类
+1. gameoflife
+2. 2048-game   
+
+** 语言类
+1. rust-mode
+
+
+
+
+** 其他类
+*** 字典
+sdcv
+* emacs键位
+** basic
+*** Search and Replace
+| M-% | 替换模式  |   |
+|     |   |   |
+*** 拼符
+| 进入拼符模式 | C-\ | toggle-input-method |
+|           |     |                     |
+*** move
+| operation | keyboard | command             |
+| 跳转行号    | M-g g    | goto-line           |
+| 下一页      | C-v      | scroll-up-command   |
+| 上一页      | M-v      | scroll-down-command |
+| 交换前后字符 | C-t      | transpose-chars     |
+| 交换前后词  | M-t      | transpose-words     |
+| 交换前后行  | C-x C-t  | transpose-lines     |
+| 向上新建一行 | C-o      | open-line           |
+| 删除连续空行 | C-x C-o  | delete-blank-lines  |
+
+*** theme and view
+| 字号增加 | C-x C-= | text-scale-adjust |
+| 重置字号 | C-x C-0 | text-scale-adjust |
+| 字号减少 | C-x C-- | text-scale-adjust |
+
+*** help
+| operation   | keyboard | command              |
+| 快捷键        | C-h k    | describe-key         |
+| 简要描述快捷键 | C-h c    | describe-key-briefly |
+| 函数         | C-h f    | describe-function    |
+| 变量         | C-h v    | describe-variable    |
+| 帮助的帮助    | C-h ?    | help-for-help        |
+*** 注释与排版
+| M -;  | 快速注释选中块 |   |
+| C-M-\ | 快速排版TAB   | indent-region |
+
+** magit
+| 显示所有选项 | C-x M-g | magit-dispatch |
+** org-mode
+| 折叠小节      | TAB       |   |
+| 折叠所有      | shift TAB |   |
+| 快速输入#+结构 | C-c C-,   | org-insert-structure-template |
+** tab
+| C-x t RET | 选择Tab |   |
+| C-x t 0   | 关闭Tab |   |
+| C-x t 2   | 创建Tab |   |
+| C-x t r   | 重命名Tab |   |
+** doc-view
+适用于pdf-tools等
+| 下一页   | n | doc-view-previous-page |
+| 上一页   | p | doc-view-next-page     |
+| 跳转页数 |   | doc-view-goto-page     |
+* emacs命令
+| cmd   | mean | kbd |
+| imenu | 函数索引  |M-g i |
+* emacs变量
+** mode
+* emacs函数
+* emacs模式
+** 自带输入法
+list-input-methods
+toggle-input-methods
+** buffer-list
+*** 状态栏[CRM]
+| key | mean |
+| .   | 已显示 |
+| %   | 只读  |
+| *   | 已修改 |
+| D   | 待删除 |
+| >   | 待显示 |
+| S   | 待保存 |
+
+*** 按键
+| key | mean                  |
+|-----+-----------------------|
+| m   | 标记缓冲区              |
+| u   | 取消比较                |
+| D   | 关闭标记的缓冲区         |
+| S   | 保存标记的缓冲区         |
+| g   | 更新列表                |
+| O   | 在新窗口中查看缓冲区      |
+| RET | 查看此缓冲区             |
+| `   | 切换列表显示形式         |
+| d   | 标记为待删除             |
+| s   | 标记为待保存             |
+| u   | 去除标记                |
+| x   | 对所有标记执行操作        |
+| %   | 切换只读状态             |
+| 1   | 满屏显示此缓冲区         |
+| o   | 将此缓冲区显示到另一个窗口 |
+| m   | 标记为待显示             |
+| v   | 显示所有待显示           |
+| q   | 退出buffer-list        |
+
+delete-selection-mode 直接替换选择区
+global-display-line-numbers-mode 'open 全局行号
+
+** ibuffer
+*** 设置
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+*** 命令
+**** 筛选
+| /m   | 基于mode分组筛选     |   |
+| /g   | 根据筛选结果创建分组  |   |
+| //   | 回到全部列表         |   |
+| /n   | 基于name分组筛选     |   |
+| /c   | 根据内容分组筛选     |   |
+| /f   | 基于filename分组筛选 |   |
+| />   | 基于buffer size筛选 |   |
+| /<   | 基于buffer size筛选 |   |
+| /\   | 删除所有分组         |   |
+| /SPC | 根据提示筛选         |   |
+| /S   | 保存现有分组         |   |
+| /R   | 恢复保存分组         |   |
+| /X   | 删除保存分组            |   |
+
+**** 被标记的buffer
+
+| D     | 删除标记的buffer      |   |
+| S     | 保存标记的buffer      |   |
+| v     | 查看标记的buffer      |   |
+| T     | 切换标记的buffer为只读 |   |
+| x     | 关闭所有被标记的buffer |   |
+| A/RET | 查看此buffer          |   |
+
+**** 用于标记
+| m   | 标记         |   |
+| t   | 取消所有标记   |   |
+| u   | 取消标记      |   |
+| * u | 标记所有未保存 |   |
+| * r | 标记所有只读      |   |
+** Dired 
+*** keyboard
+| key   | mean             | command                  |
+| C-x d | 启动dired         | dired                    |
+| C     | 复制文件           | dired-do-copy            |
+| d     | 标记待删除         | dired-flag-file-deletion |
+| f     | 编辑此文件         | dired-find-file          |
+| g     | 更新目录           | revert-buffer            |
+| q     | 退出dired         | dired-quit               |
+| R     | 重命名文件         | dired-do-rename          |
+| u     | 去掉待操作标记      | dired-unmark             |
+| x     | 删除所有被标记的文件 | dired-do-flagged-delete  |
+| Z     | 压缩与解压         | dired-do-compress        |
+| >     | 下一个目录         | dired-next-dirline       |
+| <     | 上一个目录         | dired-prev-dirline       |
+
+
+** lsp-mode
+*** 配置
+#+begin_src elisp
+    (use-package lsp-mode
+    :ensure
+    :commands lsp
+    :custom
+    ;; 保存时使用什么进行检查，默认是 "check"，我更推荐 "clippy"
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    (lsp-eldoc-render-all t)
+    (lsp-idle-delay 0.6)
+    (lsp-rust-analyzer-server-display-inlay-hints t)
+    (lsp-rust-analyzer-store-path "~/.emacs.d/rust-analyzer") ;analyzer路径
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+  (use-package lsp-ui
+    :ensuer
+    :commands lsp-ui-mode
+    :custom
+    (lsp-ui-peek-always-show t)
+    (lsp-ui-sideline-show-hover t)
+    (lsp-ui-doc-enable nil))
+#+end_src
+*** 快捷键
+| C-c C-c a | 优化代码 | lsp-execute-code-action |
+| M-.       | 跳转函数,结构体,包等定义处  |                         |
+| M-?       | 列出标记的所有引用          |                         |
+| M-j       | 打开当前模块大纲            |                         |
+|           | 变量集体重构                | lsp-rename              |
+|           | 代码重构,重构为更优美的表达 | lsp-execute-code-action |
+| C-c C-c e | 展开宏                      | lsp-rust-analyzer-expand-macro |
+** hideshow
+hs-minor-mode是用于折叠代码块的模式
+
+全局开启
+#+begin_src lisp
+(setq-default hs-minor-mode t)
+#+end_src
+*** 键位
+| C-c @ C-M-s | 展开所有       |   |
+| C-c @ C-s   | 显示当前代码区 |   |
+| C-c @ C-M-h | 折叠所有代码   |   |
+| C-c @ C-h   | 折叠当前代码区 |   |
+| C-c @ C-c   | 折叠/显示当前代码区     |   |
+** flymake-mode
+** winner-mode
+** flyspell

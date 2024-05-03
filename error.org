@@ -1,0 +1,14 @@
+** 环境问题
+*** opengl
+**** 问题
+GLFW Error: GLX: Failed to create context: GLXBadFBConfig
+#+begin_src
+  Unable to load file texturedMesh.obj with ASSIMP
+  GLFW Error: GLX: Failed to create context: GLXBadFBConfig
+  Failed to create window
+  Failed creating OpenGL window
+#+end_src
+**** solution
+#+begin_src
+  MESA_GL_VERSION_OVERRIDE=4.5 然后再执行命令
+#+end_src
