@@ -762,6 +762,21 @@ zstd - Enable support for ZSTD compression
   net-wireless/lorcon python
 #+end_src
 * 后续
-** 23.0版本
+** 23.0版本更新
 默认合并了/usr (merged-usr)
 在profile中 旧版本需要选择 split-usr
+#+begin_src
+  Select the 23.0 profile corresponding to your current profile, either using
+   "eselect profile" or by manually setting the profile symlink.
+   Note that old profiles are by default split-usr and the 23.0 profiles by
+   default merged-usr. Do NOT change directory scheme now, since this will
+   mess up your system! 
+   Instead, make sure that the new profile has the same property: for example, 
+   OLD default/linux/amd64/17.1  
+        ==>  NEW default/linux/amd64/23.0/split-usr
+             (added "split-usr")
+   OLD default/linux/amd64/17.1/systemd/merged-usr  
+        ==>  NEW default/linux/amd64/23.0/systemd
+             (removed "merged-usr")
+
+#+end_src
