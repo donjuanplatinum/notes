@@ -7,4 +7,5 @@
 3. [[./gentoo.org][gentoo linux]]
 4. [[./network.org][网络]]
 5. [[./algorithms.org][算法]]   
-6. [[./nlp.org][自然语言处理]]
+6. [[./nlp.typ][自然语言处理]]
+7. [[./math.typ][数学]]

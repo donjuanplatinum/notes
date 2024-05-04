@@ -1,0 +1,11 @@
+* Linux
+| [[#命令][command]] |
+|         |
+
+** 命令
+| [[#ssh内网穿透][ssh内网穿透]]        |
+
+*** ssh内网穿透
+#+begin_src shell
+  ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
+#+end_src

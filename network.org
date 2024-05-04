@@ -6,7 +6,7 @@ dns txt记录认证
 #+end_src
 ** nginx
 *** 配置ssl
-#+begin_src
+#+begin_src nginx
 http {
     ssl_certificate /etc/letsencrypt/live/donjuan.lecturify.net/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/donjuan.lecturify.net/privkey.pem;
@@ -14,7 +14,7 @@ http {
 
 #+end_src
 *** 基本反向代理
-#+begin_src
+#+begin_src nginx
      location / {
 	proxy_pass http://127.0.0.1:8008;
 }
@@ -22,7 +22,7 @@ http {
 ** matrix conduit
 [[https://gitlab.com/famedly/conduit][gitlab_conduit]]
 *** conduit
-#+begin_src
+#+begin_src yaml
 version: '3'
 
 services:
@@ -118,7 +118,7 @@ realm=matrix.donjuan.lecturify.net
 #+end_src
 *** element-web
 element_config
-#+begin_src
+#+begin_src yaml
   {
     "default_server_config": {
         "m.homeserver": {
@@ -172,7 +172,7 @@ element_config
 #+end_src
 *** mautrix-telegram
 *** mail
-#+begin_src
+#+begin_src yaml
   {
   "allowed_servers": [
     "matrix.donjuan.lecturify.net"
@@ -194,7 +194,7 @@ element_config
 4. @telegrambot:         
 ** maddy mail
 *** docker-compose.yml
-#+begin_src yml
+#+begin_src yaml
   version: '3'
 
 services:
@@ -253,7 +253,7 @@ smtp使用STARTTLS
   docker network create postgres
 #+end_src
 *** docker-compose
-#+begin_src
+#+begin_src yaml
 version: '3.9'
 services:
   postgres:
@@ -283,7 +283,7 @@ networks:
 #+end_src
 ** trojan
 *** docker-compose
-#+begin_src
+#+begin_src docker-compose
 version: '3'
 services:
   trojan:
@@ -295,7 +295,7 @@ services:
       - ../letsencrypt/live/donjuan.lecturify.net:/etc/certs
 #+end_src
 *** config.json
-#+begin_src
+#+begin_src yaml
   {
     "run_type": "server",
     "local_addr": "0.0.0.0",
@@ -400,7 +400,7 @@ PLUGINS_URL=null
 
 #+end_src
 *** docker-compose.yml
-#+begin_src
+#+begin_src yaml
   version: '3'
 
 services:
