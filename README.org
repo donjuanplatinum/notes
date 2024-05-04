@@ -1,3 +1,4 @@
+
 * Notes
 此仓库记录了平时的笔记
 ** 列表
@@ -6,3 +7,4 @@
 3. [[./gentoo.org][gentoo linux]]
 4. [[./network.org][网络]]
 5. [[./algorithms.org][算法]]   
+6. [[./nlp.org][自然语言处理]]

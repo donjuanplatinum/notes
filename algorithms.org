@@ -44,24 +44,24 @@
 若一个链表到达了尽头 则当为0对待
 *** code
 #+begin_src rust
-    impl Solution {    
-      pub fn add_two_numbers(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {    
-	  let mut head = None;    
-	  let mut current = &mut head;    
-	  let mut carry = 0;    
-	  while l1.is_some() || l2.is_some() || carry ==true {    
-	      if let Some(mut node) =l1 {    
-		  carry += node.val;    
-		  l1 = node.next;    
-	      }    
-	      if let Some(mut node) =l2 {    
-		  carry += node.val;    
-		  l2 = node.next;    
-	      }    
-	      current = &mut current.insert(Box::new(ListeNode::new(carry % 10))).next    
-	  }    
-      }    
-    }
+  impl Solution {    
+    pub fn add_two_numbers(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {    
+	let mut head = None;    
+	let mut current = &mut head;    
+	let mut carry = 0;    
+	while l1.is_some() || l2.is_some() || carry ==true {    
+	    if let Some(mut node) =l1 {    
+		carry += node.val;    
+		l1 = node.next;    
+	    }    
+	    if let Some(mut node) =l2 {    
+		carry += node.val;    
+		l2 = node.next;    
+	    }    
+	    current = &mut current.insert(Box::new(ListeNode::new(carry % 10))).next    
+	}    
+    }    
+  }
 #+end_src
 ** 最长不重复子字符串
 *** 描述
@@ -70,29 +70,29 @@
 使用滑动窗口
 并利用类似计数排序的方法将值保存
 *** code
-#+begin_src
+#+begin_src rust
   pub async fn substring(s: &str) -> usize {
-    let s = s.as_bytes();
-    let mut max = 0;
-    let mut left = 0;
-  //类似计数排序的方法而不用哈希表保存
-    let mut window = [false;128];
-  //开始滑动左边
-    for (right,&c) in s.iter().enumerate() {
-  //将字符串转换为ascii并映射在数组window
-	let c = c as usize;
-  //当数组window中存在这个字符时
-	while window[c] {
-  //摘除滑动窗口左边的值
-	    window[s[left] as usize] = false;
-  //左指针右滑
-	    left += 1;
-	}
-  //映射值
-	window[c] = true;
-	max = max.max(right - left + 1);
-    }
-    max
-}
+      let s = s.as_bytes();
+      let mut max = 0;
+      let mut left = 0;
+    //类似计数排序的方法而不用哈希表保存
+      let mut window = [false;128];
+    //开始滑动左边
+      for (right,&c) in s.iter().enumerate() {
+    //将字符串转换为ascii并映射在数组window
+	  let c = c as usize;
+    //当数组window中存在这个字符时
+	  while window[c] {
+    //摘除滑动窗口左边的值
+	      window[s[left] as usize] = false;
+    //左指针右滑
+	      left += 1;
+	  }
+    //映射值
+	  window[c] = true;
+	  max = max.max(right - left + 1);
+      }
+      max
+  }
 
 #+end_src
