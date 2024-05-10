@@ -780,3 +780,5 @@ zstd - Enable support for ZSTD compression
              (removed "merged-usr")
 
 #+end_src
+** fcitx-rime切换为简体
+F4选择即可

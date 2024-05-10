@@ -1,4 +1,4 @@
-
+[[https://github.com/donjuanplatinum/saying][file:https://img.shields.io/github/commit-activity/w/donjuanplatinum/notes?style=plastic&logoColor=yellow&color=blue.svg]]
 * Notes
 此仓库记录了平时的笔记
 ** 列表
