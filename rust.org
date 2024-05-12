@@ -22,7 +22,7 @@ PhantomData是~零~大小的类型用来标记那些行为像他们拥有一个~
   }
 #+end_src
 
-由于 ~'a~ 在结构中 ~未使用~ 所以实际上它是 ~无约束~ 的 , 所以我们必须有所标记来阐述这种关系 这便是 ~Phantomdata~ 的作用
+由于 ~<'a>~ 在结构中 ~未使用~ 所以实际上它是 ~无约束~ 的 , 所以我们必须有所标记来阐述这种关系 这便是 ~Phantomdata~ 的作用
 
 #+begin_src rust
   use std::marker::Phantomdata;
@@ -34,21 +34,24 @@ PhantomData是~零~大小的类型用来标记那些行为像他们拥有一个~
 #+end_src
 
 于是乎, 生命周期被 ~PhantomData<&'a T>~ 限定 
-**** 标记编译器无法推断的生命周期与所有权
-#+begin_src rust
-  use std::marker::Phantomdata;
+**** 绑定生命周期与所有权
 
-  struct PtrStruct<T> {
-      ptr: *mut T,
-      marker: Phantomdata<T>,
+例如标准库std的 ~LinkedList<T>~
+
+Phantomdata<Box<Node<T>,A>> 告诉编译器 ~LinkedList~ 与 ~Node~ 的所有权与生命周期是相关的 当 ~LinkedList~ 释放时, ~Node~ 也会释放
+#+begin_src rust
+  use std::ptr::NonNull;
+  pub struct LinkedList<T> {
+      head: Option<NonNull<Node<T>>>,
+      tail: Option<NonNull<Node<T>>>,
+      len: usize,
+      alloc: A,
+      marker: Phantomdata<Box<Node<T>,A>>,
   }
-  impl<T> Ptrstruct<T> {
-      fn new(t:T) -> Ptrstruct<T> {
-	  let t = Box::new(t);
-	  Ptrstruct{
-	      ptr: Box::into_raw(t),
-	      marker: Phantomdata,
-	  }
+  struct Node<T> {
+      next: Option<NonNull<Node<T>>>,
+      prev: Option<NonNull<Node<T>>>,
+      element: T,
   }
 #+end_src
 **** 未使用的生命周期参数
@@ -60,7 +63,9 @@ PhantomData是~零~大小的类型用来标记那些行为像他们拥有一个~
       marker: Phantomdata<&'a T>,
   }
 #+end_src
-**** FFI
+**** 未使用的类型数据FFI 
+在这里 ~PhantomData<T>~ 被用来指明一个结构 ~绑定~ 了哪种类型的数据
+
 标记外部指针的类型
 #+begin_src rust
   struct LibraryBook<Book> {

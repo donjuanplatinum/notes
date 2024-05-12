@@ -9,3 +9,4 @@
 5. [[./algorithms.org][算法]]   
 6. [[./nlp.typ][自然语言处理]]
 7. [[./math.typ][数学]]
+8. [[./rust.org][Rust]]
