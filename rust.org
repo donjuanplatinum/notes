@@ -38,6 +38,9 @@ PhantomData是~零~大小的类型用来标记那些行为像他们拥有一个~
 
 例如标准库std的 ~LinkedList<T>~
 
+因为裸指针不包含生命周期和所有权的信息
+
+
 Phantomdata<Box<Node<T>,A>> 告诉编译器 ~LinkedList~ 与 ~Node~ 的所有权与生命周期是相关的 当 ~LinkedList~ 释放时, ~Node~ 也会释放
 #+begin_src rust
   use std::ptr::NonNull;
@@ -54,15 +57,7 @@ Phantomdata<Box<Node<T>,A>> 告诉编译器 ~LinkedList~ 与 ~Node~ 的所有权
       element: T,
   }
 #+end_src
-**** 未使用的生命周期参数
-#+begin_src rust
-  use std::marker::Phantomdata;
-  struct Window<'a,T: 'a> {
-      start: *const T,
-      end: *const T,
-      marker: Phantomdata<&'a T>,
-  }
-#+end_src
+
 **** 未使用的类型数据FFI 
 在这里 ~PhantomData<T>~ 被用来指明一个结构 ~绑定~ 了哪种类型的数据
 
