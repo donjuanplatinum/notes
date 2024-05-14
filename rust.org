@@ -68,3 +68,60 @@ Phantomdata<Box<Node<T>,A>> 告诉编译器 ~LinkedList~ 与 ~Node~ 的所有权
       book_type: Phantomdata<Book>,
   }
 #+end_src
+
+** 数据布局
+在rust中 所有类型都会以 ~字节~ 为单位进行对齐
+*** 尺寸和对齐量
+~所有~ 值都有对齐量和尺寸
+对齐量 指定立哪些地址可以有效的存储此值
+
+对齐量为 n 的值只能存储地址为 n 的倍数的内存地址上
+
+通过 ~align_of_val~ 查看值的对齐量
+#+begin_src rust
+  let a = std::mem::align_of_val(&5i32);
+#+end_src
+
+
+值的尺寸是同类型的值组成的数组中连续两个元素之间的字节偏移量
+
+此偏移量包括了为保持程序项类型内部对齐而对此类型做的对齐填充
+
+通过 ~size_of_val~ 查看值的尺寸
+
+
+
+#+begin_src rust
+  let a = std::mem::size_of_val(&5i32);
+#+end_src
+
+
+若一个类型实现了 ~Sized~ trait 则可以使用 ~size_of~ 与 ~align_of~ 检测类型
+**** 原生类型的布局
+| 类型         |        size_of::<type>() |
+| bool        |                        1 |
+| u8/i8       |                        1 |
+| u16/i16     |                        2 |
+| u32/i32     |                        4 |
+| u64/i64     |                        8 |
+| u128/i128   |                       16 |
+| f32         |                        4 |
+| f64         |                        8 |
+| char        |                        4 |
+| usize/isize | 足以包含目标平台的每个内存地址 |
+
+**** 指针与引用的布局
+指针与引用布局相同
+
+指向固定类型的指针和引用布局与usize相同
+
+指向非固定类型的指针和引用是usize的两倍
+
+**** 数组
+数组的布局使得数组的第 n 个(nth)元素为从数组开始的位置向后偏移 n * 元素类型的尺寸(n * the size of the element's type) 个字节数 数组 [T; n] 的尺寸为 size_of::<T>() * n 对齐量和 T 的对齐量相同
+
+**** 字符串切片 ~str~
+字符串切片是一种 UTF-8 表示形式(representation)的字符序列 它们与 [u8]类型的切片拥有相同的类型布局
+
+**** 元组
+_元组对于其布局没有任何保证_

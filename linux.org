@@ -9,3 +9,10 @@
 #+begin_src shell
   ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
 #+end_src
+
+** 技巧
+*** 每秒将占用最大的进程打印
+#+begin_src shell
+  for ((;;));do ps aux --sort=-%mem;sleep 1;done
+#+end_src
+
