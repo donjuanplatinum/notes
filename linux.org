@@ -11,8 +11,30 @@
 #+end_src
 
 ** 技巧
+*** shell
+**** 判断系统是否存在某些命令
+#+begin_src shell
+  if hash 2>/dev/null emerge; then
+      echo 'system is gentoo'
+      fi
+#+end_src
 *** 每秒将占用最大的进程打印
 #+begin_src shell
   for ((;;));do ps aux --sort=-%mem;sleep 1;done
 #+end_src
 
+*** bash
+**** 判断系统类型
+#+begin_src bash
+  if hash 2>/dev/null emerge; then
+      echo "检测到gentoo系统"
+  fi
+#+end_src
+**** 判断用户输入y/n
+#+begin_src bash
+  echo "请输入y或n"
+  read option
+  if echo "$option" |grep -iq "^y"; then
+      echo "您输入了y"
+  fi
+#+end_src
