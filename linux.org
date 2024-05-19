@@ -2,9 +2,71 @@
 | [[#命令][command]] |
 |         |
 
+** loop设备
+循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
+块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
+#+begin_src shell
+  dd if=/dev/zero of=file.img bs=1MiB count=10
+  sudo losetup /dev/loop4 file.img
+  sudo mkfs -t ext4 /dev/loop4
+  sudo mkdir /myloopdev
+  sudo mount /dev/loop4 /myloopdev
+#+end_src
+*** [[#losetup][losetup命令]]
 ** 命令
-| [[#ssh内网穿透][ssh内网穿透]]        |
+| [[#ssh内网穿透][ssh内网穿透]] |
+| [[#losetup][losetup]] |
+*** losetup
+#+begin_src shell
+  用法：
+ losetup [选项] [<回环设备>]
+ losetup [选项] -f | <回环设备> <文件>
 
+设置和控制回环设备。
+
+选项：
+ -a, --all                     列出所有使用的设备
+ -d, --detach <回环设备>...    断开一台或多台设备
+ -D, --detach-all              断开所有使用的设备
+ -f, --find                    查找第一个未使用的设备
+ -c, --set-capacity <回环设备> 改变设备容量
+ -j, --associated <文件>       列出所有与 <文件> 相关的设备
+ -L, --nooverlap               避免设备间的潜在冲突
+
+ -o, --offset <数字>           在文件偏移量 <数字> 处开始
+     --sizelimit <数字>        设备限制为了文件的<数字>个字节
+ -b, --sector-size <num>       set the logical sector size to <num>
+ -P, --partscan                创建带分区的回环设备
+ -r, --read-only               创建只读的回环设备
+     --direct-io[=<on|off>]    通过 O_DIRECT 打开后备文件
+     --show                    设置后打印设备名(加 -f 选项)
+ -v, --verbose                 详尽模式
+
+ -J, --json                    使用 JSON --list 输出格式
+ -l, --list                    列出所有或指定的信息(默认)
+ -n, --noheadings              --list 输出时不打印标题
+ -O, --output <列>           指定 --list 选项要输出的列
+     --output-all              output all columns
+     --raw                     使用原生 --list 输出格式
+
+ -h, --help                    显示此帮助
+ -V, --version                 显示版本
+
+可用的输出列：
+         NAME  回环设备名
+    AUTOCLEAR  已设置 自动清除 标志
+    BACK-FILE  设备后备文件
+     BACK-INO  后备文件 inode 号
+ BACK-MAJ:MIN  后备文件 主:次 设备号
+      MAJ:MIN  回环设备 主:次 设备号
+       OFFSET  起始位置偏移
+     PARTSCAN  已设置 partscan 标志
+           RO  只读设备
+    SIZELIMIT  文件的大小限制(字节数)
+          DIO  通过直接 IO 访问后备文件
+      LOG-SEC  logical sector size in bytes
+
+#+end_src
 *** ssh内网穿透
 #+begin_src shell
   ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
@@ -37,4 +99,10 @@
   if echo "$option" |grep -iq "^y"; then
       echo "您输入了y"
   fi
+#+end_src
+** 内核
+*** 查看系统调用的编号
+#+begin_src shell
+  cd /usr/include/asm
+  grep _NR_ptrace ./*
 #+end_src

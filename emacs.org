@@ -197,13 +197,15 @@ global-display-line-numbers-mode 'open 全局行号
     (lsp-ui-doc-enable nil))
 #+end_src
 *** 快捷键
-| C-c C-c a | 优化代码 | lsp-execute-code-action |
-| M-.       | 跳转函数,结构体,包等定义处  |                         |
-| M-?       | 列出标记的所有引用          |                         |
-| M-j       | 打开当前模块大纲            |                         |
-|           | 变量集体重构                | lsp-rename              |
-|           | 代码重构,重构为更优美的表达 | lsp-execute-code-action |
-| C-c C-c e | 展开宏                      | lsp-rust-analyzer-expand-macro |
+| C-c C-c a | 优化代码                 | lsp-execute-code-action        |
+| M-.       | 跳转函数,结构体,包等定义处  |                                |
+| M-?       | 列出标记的所有引用         |                                |
+| M-j       | 打开当前模块大纲          |                                |
+|           | 变量集体重构              | lsp-rename                     |
+|           | 代码重构,重构为更优美的表达 | lsp-execute-code-action        |
+| C-c C-c e | 展开宏                   | lsp-rust-analyzer-expand-macro |
+|           | 列出结构的impl           | lsp-find-implementation        |
+|           | 列出变量的类型定义         | lsp-find-type-definition       |
 ** hideshow
 hs-minor-mode是用于折叠代码块的模式
 
