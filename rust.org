@@ -1,5 +1,14 @@
 * Rust
 
+** 类型
+*** Unique<T>
+Unique是原始 ~非空~ 的 *mut T 的包装器
+
+用于标准库的 *Box<T>* *Vec<T>* *String* 和 *HashMap<K,V>* *LinkedList<T,A>* 等
+
+与 ~*mut T~ 不同 ~Unique<T>~ 的行为与 ~as if~ 相同, 它是 ~T~ 的 *实例*
+
+
 ** 标记类型
 标记类型用于提醒编译器采取相应的措施
 *** 幽灵数据std::marker::PhantomData

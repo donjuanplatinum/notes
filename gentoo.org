@@ -278,6 +278,11 @@ games-util/game-device-udev-rules
   emerge --update --deep --newuse @world
 #+end_src 
 *** 特殊需求
+*** 查看包的版本列表 安装特定版本的包
+#+begin_src shell
+  esearch --verbose package
+  emerge jre:1.8
+#+end_src
 **** portage特性
 #+begin_src shell
   man make.conf

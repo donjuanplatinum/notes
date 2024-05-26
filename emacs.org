@@ -63,9 +63,18 @@ sdcv
 ** magit
 | 显示所有选项 | C-x M-g | magit-dispatch |
 ** org-mode
-| 折叠小节      | TAB       |   |
-| 折叠所有      | shift TAB |   |
+| 折叠小节      | TAB       |                               |
+| 折叠所有      | shift TAB |                               |
 | 快速输入#+结构 | C-c C-,   | org-insert-structure-template |
+| 编辑链接      | C-c C-l   | org-insert-link               |
+| 打开链接      | C-c C-o   |                               |
+*** 字体
+* 粗体 *
+ /斜体/
+
+ +删除线+
+
+-下划线-
 ** tab
 | C-x t RET | 选择Tab |   |
 | C-x t 0   | 关闭Tab |   |
