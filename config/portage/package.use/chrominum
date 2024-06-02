@@ -1,0 +1,11 @@
+# required by www-client/chromium-124.0.6367.207::gentoo
+# required by chromium (argument)
+>=net-libs/nodejs-20.12.1 inspector
+# required by www-client/chromium-124.0.6367.207::gentoo[system-toolchain]
+# required by chromium (argument)
+>=virtual/rust-1.77.1 profiler
+# required by virtual/rust-1.77.1::gentoo
+# required by www-client/chromium-124.0.6367.207::gentoo[system-toolchain]
+# required by chromium (argument)
+>=dev-lang/rust-bin-1.77.1 profiler
+
