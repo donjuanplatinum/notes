@@ -59,6 +59,7 @@ $ f(t) = cal(F) ^ (-1) [F(omega)] = frac(1,2 pi) display(attach(integral,t: infi
 
 ==== 离散傅立叶变换(DFT) #label("DFT")
 
+$ display(accent(X, hat)) [k] = sum_0^(N - 1) X [n] e ^ (-i (2 pi) / N n k) $
 
 === 拉普拉斯 #label("拉普拉斯")
 ==== 拉普拉斯变换 #label("拉普拉斯变换")
