@@ -261,6 +261,14 @@ GRUB 可以在运行 grub-mkconfig 命令时检测到其他操作系统并生成
   emerge --ask --newuse sys-boot/os-prober
 #+end_src
 
+*** 4.网络
+**** 静态ip
+/etc/dhcpcd.conf
+#+begin_src shell
+  static ip_address=192.168.0.10/24
+  static routers=192.168.0.1
+  static domain_name_servers=192.168.0.1
+#+end_src
 ** 问题
 *** steam
 **** 激活steam源
@@ -282,6 +290,14 @@ games-util/game-device-udev-rules
    #+end_src
 2. 在vlc设置中更换字体
 ** portage
+*** 降低占用
+#+begin_src shell
+  # Extremely low priority (per above)
+  PORTAGE_SCHEDULING_POLICY="idle"
+  # Lowest priority
+  PORTAGE_NICENESS="19"
+  PORTAGE_IONICE_COMMAND="ionice -c 3 -p \${PID}"
+#+end_src
 *** 更新仓库
 #+begin_src shell
   emerge --sync
