@@ -1,4 +1,10 @@
 * Docker
+| [[#openwrt][Openwrt]]       |
+| [[#Pandoc][pandoc]]        |
+| [[#certbot][Certbot]]       |
+| [[#matrix conduit][Matrix]]        |
+| [[#blessing-skin][Blessing Skin]] |
+| [[#trojan][Trojan]]        |
 ** openwrt
 *** 网卡
 #+begin_src shell
@@ -17,6 +23,7 @@ dns txt记录认证
 ** matrix conduit
 [[https://gitlab.com/famedly/conduit][gitlab_conduit]]
 *** conduit
+**** docker-compose
 #+begin_src yaml
 version: '3'
 
@@ -101,11 +108,12 @@ networks:
    external: true
 #+end_src
 *** heisenbridge
+**** 生成heisenbridge_data/config
 #+begin_src shell
   docker run  --rm -v ./heisenbridge_data:/data docker.nju.edu.cn/hif1/heisenbridge -l heisenbridge  --generate-compat -c /data/config http://conduit:8008
 #+end_src
 *** coturn
-coturn.conf
+**** coturn.conf
 #+begin_src
 use-auth-secret
 static-auth-secret=your secret
@@ -254,4 +262,97 @@ services:
       - PLUGINS_DIR=/app/plugins
 
 #+end_src
-   
+  
+** trojan
+*** docker-compose
+#+begin_src docker-compose
+version: '3'
+services:
+  trojan:
+    container_name: trojan
+    image: trojangfw/trojan
+    network_mode: host
+    volumes:
+      - ./config.json:/config/config.json
+      - ../letsencrypt/live/donjuan.lecturify.net:/etc/certs
+#+end_src
+*** config.json
+#+begin_src yaml
+  {
+    "run_type": "server",
+    "local_addr": "0.0.0.0",
+    "local_port": 443,
+    "remote_addr": "127.0.0.1",
+    "remote_port": 8777,
+    "password": [
+        "password1",
+        "password2"
+    ],
+    "log_level": 1,
+    "ssl": {
+        "cert": "/etc/certs/fullchain.pem",
+        "key": "/etc/certs/privkey.pem",
+        "key_password": "",
+        "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384",
+        "cipher_tls13": "TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384",
+        "prefer_server_cipher": true,
+        "alpn": [
+            "http/1.1"
+        ],
+        "alpn_port_override": {
+            "h2": 81
+        },
+        "reuse_session": true,
+        "session_ticket": false,
+        "session_timeout": 600,
+        "plain_http_response": "",
+        "curves": "",
+        "dhparam": ""
+    },
+    "tcp": {
+        "prefer_ipv4": false,
+        "no_delay": true,
+        "keep_alive": true,
+        "reuse_port": false,
+        "fast_open": false,
+        "fast_open_qlen": 20
+    },
+    "mysql": {
+        "enabled": false,
+        "server_addr": "127.0.0.1",
+        "server_port": 3306,
+        "database": "trojan",
+        "username": "trojan",
+        "password": "",
+        "key": "",
+        "cert": "",
+        "ca": ""
+    }
+}
+#+end_src
+
+** gitea
+*** docker-compose
+#+begin_src yaml
+  version: '3'
+
+services:
+  gitea:
+    container_name: gitea
+    image: docker.nju.edu.cn/gitea/gitea
+    #    network_mode: host
+    networks:
+      postgres:
+    ports:
+      - 3000:3000
+      - 2222:2222
+    volumes:
+      - ./data:/data
+      - ./config:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+networks:
+  postgres:
+    external: true
+
+#+end_src
