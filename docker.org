@@ -1,10 +1,17 @@
 * Docker
+* Docker Cli
+** 拉取所有tag
+#+begin_src shell
+  docker pull -a
+#+end_src
+* 容器
 | [[#openwrt][Openwrt]]       |
 | [[#Pandoc][pandoc]]        |
 | [[#certbot][Certbot]]       |
 | [[#matrix conduit][Matrix]]        |
 | [[#blessing-skin][Blessing Skin]] |
 | [[#trojan][Trojan]]        |
+| [[#gitea][Gitea]]         |
 ** openwrt
 *** 网卡
 #+begin_src shell
@@ -333,26 +340,194 @@ services:
 
 ** gitea
 *** docker-compose
-#+begin_src yaml
+#+begin_src docker-compose
   version: '3'
 
-services:
-  gitea:
-    container_name: gitea
-    image: docker.nju.edu.cn/gitea/gitea
-    #    network_mode: host
-    networks:
-      postgres:
-    ports:
-      - 3000:3000
-      - 2222:2222
-    volumes:
-      - ./data:/data
-      - ./config:/etc/gitea
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-networks:
-  postgres:
-    external: true
+  services:
+    gitea:
+      container_name: gitea
+      image: docker.nju.edu.cn/gitea/gitea
+      #    network_mode: host
+      networks:
+	postgres:
+      ports:
+	- 3000:3000
+	- 2222:2222
+      volumes:
+	- ./data:/data
+	- ./config:/etc/gitea
+	- /etc/timezone:/etc/timezone:ro
+	- /etc/localtime:/etc/localtime:ro
+
+    act_runner:
+      container_name: act_runner
+      image: docker.nju.edu.cn/gitea/act_runner
+      networks:
+	postgres:
+      volumes:
+	- ./config.yaml:/config.yaml
+	- ./act_data:/data
+	- /var/run/docker.sock:/var/run/docker.sock
+      environment:
+	CONFIG_FILE=/config.yaml
+
+  networks:
+    postgres:
+      external: true
 
 #+end_src
+*** act_runner
+**** 创建配置文件
+#+begin_src shell
+  docker run --entrypoint="" --rm -it docker.nju.edu.cn/gitea/act_runner:latest act_runner generate-config > config.yaml
+#+end_src
+**** 配置文件
+#+begin_src yaml
+  # Example configuration file, it's safe to copy this as the default config file without any modification.
+
+  # You don't have to copy this file to your instance,
+  # just run `./act_runner generate-config > config.yaml` to generate a config file.
+
+  log:
+    # The level of logging, can be trace, debug, info, warn, error, fatal
+    level: info
+
+  runner:
+    # Where to store the registration result.
+    file: .runner
+    # Execute how many tasks concurrently at the same time.
+    capacity: 1
+    # Extra environment variables to run jobs.
+    envs:
+      A_TEST_ENV_NAME_1: a_test_env_value_1
+      A_TEST_ENV_NAME_2: a_test_env_value_2
+    # Extra environment variables to run jobs from a file.
+    # It will be ignored if it's empty or the file doesn't exist.
+    env_file: .env
+    # The timeout for a job to be finished.
+    # Please note that the Gitea instance also has a timeout (3h by default) for the job.
+    # So the job could be stopped by the Gitea instance if it's timeout is shorter than this.
+    timeout: 3h
+    # Whether skip verifying the TLS certificate of the Gitea instance.
+    insecure: false
+    # The timeout for fetching the job from the Gitea instance.
+    fetch_timeout: 5s
+    # The interval for fetching the job from the Gitea instance.
+    fetch_interval: 2s
+    # The labels of a runner are used to determine which jobs the runner can run, and how to run them.
+    # Like: "macos-arm64:host" or "ubuntu-latest:docker://gitea/runner-images:ubuntu-latest"
+    # Find more images provided by Gitea at https://gitea.com/gitea/runner-images .
+    # If it's empty when registering, it will ask for inputting labels.
+    # If it's empty when execute `daemon`, will use labels in `.runner` file.
+    labels:
+      - "ubuntu-latest:docker://localhost/donjuan"
+      - "donjuan:docker://git.donjuan.lecturify.net/donjuan/donjuan-workflow:latest"
+  cache:
+    # Enable cache server to use actions/cache.
+    enabled: true
+    # The directory to store the cache data.
+    # If it's empty, the cache data will be stored in $HOME/.cache/actcache.
+    dir: ""
+    # The host of the cache server.
+    # It's not for the address to listen, but the address to connect from job containers.
+    # So 0.0.0.0 is a bad choice, leave it empty to detect automatically.
+    host: ""
+    # The port of the cache server.
+    # 0 means to use a random available port.
+    port: 0
+    # The external cache server URL. Valid only when enable is true.
+    # If it's specified, act_runner will use this URL as the ACTIONS_CACHE_URL rather than start a server by itself.
+    # The URL should generally end with "/".
+    external_server: ""
+
+  container:
+    # Specifies the network to which the container will connect.
+    # Could be host, bridge or the name of a custom network.
+    # If it's empty, act_runner will create a network automatically.
+    network: ""
+    # Whether to use privileged mode or not when launching task containers (privileged mode is required for Docker-in
+  -Docker).
+    privileged: false
+    # And other options to be used when the container is started (eg, --add-host=my.gitea.url:host-gateway).
+    options:
+    # The parent directory of a job's working directory.
+    # NOTE: There is no need to add the first '/' of the path as act_runner will add it automatically. 
+    # If the path starts with '/', the '/' will be trimmed.
+    # For example, if the parent directory is /path/to/my/dir, workdir_parent should be path/to/my/dir
+    # If it's empty, /workspace will be used.
+    workdir_parent:
+    # Volumes (including bind mounts) can be mounted to containers. Glob syntax is supported, see https://github.com/
+  gobwas/glob
+    # You can specify multiple volumes. If the sequence is empty, no volumes can be mounted.
+    # For example, if you only allow containers to mount the `data` volume and all the json files in `/src`, you shou
+  ld change the config to:
+    # valid_volumes:
+    #   - data
+    #   - /src/*.json
+    # If you want to allow any volume, please use the following configuration:
+    # valid_volumes:
+    #   - '**'
+    valid_volumes: []
+    # overrides the docker client host with the specified one.
+    # If it's empty, act_runner will find an available docker host automatically.
+    # If it's "-", act_runner will find an available docker host automatically, but the docker host won't be mounted 
+  to the job containers and service containers.
+    # If it's not empty or "-", the specified docker host will be used. An error will be returned if it doesn't work.
+    docker_host: ""
+    # Pull docker image(s) even if already present
+    force_pull: false
+    # Rebuild docker image(s) even if already present
+    force_rebuild: false
+
+  host:
+    # The parent directory of a job's working directory.
+    # If it's empty, $HOME/.cache/act/ will be used.
+    workdir_parent:
+#+end_src
+**** 注册act
+#+begin_src shell
+  docker exec -it act_runner bash
+  act_runner --config /config.yaml register
+  # token为giteaweb的actions配置中的runner token
+#+end_src
+**** 启动act
+#+begin_src shell
+  act_runner --config /config.yaml daemon
+#+end_src
+*** gitea
+**** 备份与恢复
+***** 备份
+#+begin_src shell
+  docker exec -it gitea bash
+  su git # 以app.ini中指定的用户登录
+  gitea dump
+#+end_src
+也可以使用数据库进行备份
+#+begin_src shell
+  pg_dump -U $USER $DATABASE > gitea-db.sql
+#+end_src
+
+***** 恢复
+#+begin_src shell
+  # 在容器中打开 bash 会话
+  docker exec --user git -it gitea bash
+  # 在容器内解压您的备份文件
+  unzip gitea-dump-1610949662.zip
+  cd gitea-dump-1610949662
+  # 恢复 Gitea 数据
+  mv data/* /data/gitea
+  # 恢复仓库本身
+  mv repos/* /data/git/gitea-repositories/
+  # 调整文件权限
+  chown -R git:git /data
+  # mysql
+  mysql --default-character-set=utf8mb4 -u$USER -p$PASS $DATABASE <gitea-db.sql
+  # sqlite3
+  sqlite3 $DATABASE_PATH <gitea-db.sql
+  # postgres
+  psql -U $USER -d $DATABASE < gitea-db.sql
+  # 重新生成 Git 钩子
+  /usr/local/bin/gitea -c '/data/gitea/conf/app.ini' admin regenerate hooks
+#+end_src
+
+
