@@ -1,8 +1,10 @@
 * Linux
 | [[#命令][命令]] |
 | [[软件][软件]] |
-
 ** 软件
+| [[#Grub][Grub]] |
+| [[#Git][Git]]  |
+
 *** Grub
 **** EFI
 UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。
@@ -28,6 +30,19 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
 #+begin_src shell
   EFI/gentoo/grubx64.EFI # grub无选项的安装位置
   EFI/BOOT/BOOTX64.EFI # grub --removable选项的位置
+#+end_src
+*** Git
+**** 分支 branch
+#+begin_src shell
+  git branch branch_name # 创建分支
+  git checkout branch_name # 检出分支
+  git branch -D branch_name # 删除分支
+  git push origin :branch_name # 删除远程分支
+#+end_src
+**** 合并 merge
+#+begin_src shell
+  git merge # 合并
+  git merge --squash # 压缩合并
 #+end_src
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
