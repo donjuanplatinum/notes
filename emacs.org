@@ -1,38 +1,12 @@
 * 大纲
-1. [[#emacs包][emacs包]]
-2. [[#emacs键位][keboard]]
-3. [[#emacs命令][command]]
-4. [[#emacs函数][functions]]
-5. [[#emacs变量][variables]]
-* emacs包
-** 主题类
-*** 面板
-1. dashboard
-** 功能类
-*** 补全类
-1. company
-2. company-nginx
-** 游戏类
-1. gameoflife
-2. 2048-game   
-
-** 语言类
-1. rust-mode
-
-
-
-
-** 其他类
-*** 字典
-sdcv
+- [[#emacs键位][键位]]
+- [[#emacs模式][模式]]
+- [[#elisp][Elisp]]
 * emacs键位
 ** basic
-*** Search and Replace
-| M-% | 替换模式  |   |
-|     |   |   |
+*** 搜索与替换
 *** 拼符
 | 进入拼符模式 | C-\ | toggle-input-method |
-|           |     |                     |
 *** move
 | operation | keyboard | command             |
 | 跳转行号    | M-g g    | goto-line           |
@@ -44,7 +18,7 @@ sdcv
 | 向上新建一行 | C-o      | open-line           |
 | 删除连续空行 | C-x C-o  | delete-blank-lines  |
 
-*** theme and view
+*** 主题和布局
 | 字号增加 | C-x C-= | text-scale-adjust |
 | 重置字号 | C-x C-0 | text-scale-adjust |
 | 字号减少 | C-x C-- | text-scale-adjust |
@@ -68,33 +42,7 @@ sdcv
 | 快速输入#+结构 | C-c C-,   | org-insert-structure-template |
 | 编辑链接      | C-c C-l   | org-insert-link               |
 | 打开链接      | C-c C-o   |                               |
-*** 字体
-* 粗体 *
- /斜体/
-
- +删除线+
-
--下划线-
-** tab
-| C-x t RET | 选择Tab |   |
-| C-x t 0   | 关闭Tab |   |
-| C-x t 2   | 创建Tab |   |
-| C-x t r   | 重命名Tab |   |
-** doc-view
-适用于pdf-tools等
-| 下一页   | n | doc-view-previous-page |
-| 上一页   | p | doc-view-next-page     |
-| 跳转页数 |   | doc-view-goto-page     |
-* emacs命令
-| cmd   | mean | kbd |
-| imenu | 函数索引  |M-g i |
-* emacs变量
-** mode
-* emacs函数
 * emacs模式
-** 自带输入法
-list-input-methods
-toggle-input-methods
 ** buffer-list
 *** 状态栏[CRM]
 | key | mean |
@@ -181,53 +129,5 @@ global-display-line-numbers-mode 'open 全局行号
 | <     | 上一个目录         | dired-prev-dirline       |
 
 
-** lsp-mode
-*** 配置
-#+begin_src elisp
-    (use-package lsp-mode
-    :ensure
-    :commands lsp
-    :custom
-    ;; 保存时使用什么进行检查，默认是 "check"，我更推荐 "clippy"
-    (lsp-rust-analyzer-cargo-watch-command "clippy")
-    (lsp-eldoc-render-all t)
-    (lsp-idle-delay 0.6)
-    (lsp-rust-analyzer-server-display-inlay-hints t)
-    (lsp-rust-analyzer-store-path "~/.emacs.d/rust-analyzer") ;analyzer路径
-    :config
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-
-  (use-package lsp-ui
-    :ensuer
-    :commands lsp-ui-mode
-    :custom
-    (lsp-ui-peek-always-show t)
-    (lsp-ui-sideline-show-hover t)
-    (lsp-ui-doc-enable nil))
-#+end_src
-*** 快捷键
-| C-c C-c a | 优化代码                 | lsp-execute-code-action        |
-| M-.       | 跳转函数,结构体,包等定义处  |                                |
-| M-?       | 列出标记的所有引用         |                                |
-| M-j       | 打开当前模块大纲          |                                |
-|           | 变量集体重构              | lsp-rename                     |
-|           | 代码重构,重构为更优美的表达 | lsp-execute-code-action        |
-| C-c C-c e | 展开宏                   | lsp-rust-analyzer-expand-macro |
-|           | 列出结构的impl           | lsp-find-implementation        |
-|           | 列出变量的类型定义         | lsp-find-type-definition       |
-** hideshow
-hs-minor-mode是用于折叠代码块的模式
-
-全局开启
-#+begin_src lisp
-(setq-default hs-minor-mode t)
-#+end_src
-*** 键位
-| C-c @ C-M-s | 展开所有       |   |
-| C-c @ C-s   | 显示当前代码区 |   |
-| C-c @ C-M-h | 折叠所有代码   |   |
-| C-c @ C-h   | 折叠当前代码区 |   |
-| C-c @ C-c   | 折叠/显示当前代码区     |   |
-** flymake-mode
-** winner-mode
-** flyspell
+* elisp
+** 操作
