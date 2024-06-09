@@ -44,6 +44,11 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   git merge # 合并
   git merge --squash # 压缩合并
 #+end_src
+**** 缓存 stash
+#+begin_src shell
+  git stash -u -m '本地暂存' # 暂存
+  git stash pop # 弹出
+#+end_src
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
