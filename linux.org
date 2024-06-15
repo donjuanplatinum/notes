@@ -31,6 +31,12 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   EFI/gentoo/grubx64.EFI # grub无选项的安装位置
   EFI/BOOT/BOOTX64.EFI # grub --removable选项的位置
 #+end_src
+**** 引导
+#+begin_src shell
+  set root=(hd0,gpt1) # Windows的EFI分区
+  chainloader /efi/Microsoft/Boot/bootmgfw.efi
+  boot
+#+end_src
 *** Git
 **** 分支 branch
 #+begin_src shell
