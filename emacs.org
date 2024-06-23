@@ -36,12 +36,7 @@
 
 ** magit
 | 显示所有选项 | C-x M-g | magit-dispatch |
-** org-mode
-| 折叠小节      | TAB       |                               |
-| 折叠所有      | shift TAB |                               |
-| 快速输入#+结构 | C-c C-,   | org-insert-structure-template |
-| 编辑链接      | C-c C-l   | org-insert-link               |
-| 打开链接      | C-c C-o   |                               |
+
 * emacs模式
 ** buffer-list
 *** 状态栏[CRM]
@@ -128,6 +123,39 @@ global-display-line-numbers-mode 'open 全局行号
 | >     | 下一个目录         | dired-next-dirline       |
 | <     | 上一个目录         | dired-prev-dirline       |
 
-
+* org-mode
+| 折叠小节        | TAB       |                               |
+| 折叠所有        | shift TAB |                               |
+| 快速输入#+结构   | C-c C-,   | org-insert-structure-template |
+| 编辑链接        | C-c C-l   | org-insert-link               |
+| 打开链接        | C-c C-o   |                               |
+| 向上一个标题     | C-c C-p   |                               |
+| 向下一个标题     | C-c C-n   |                               |
+| 向上一个同级标题 | C-c C-b   |                               |
+| 向下一个同级标题 | C-c C-f   |                               |
+| 向下创建同级标题 | C-RET     |                               |
+** 标记文本
+| 样式    | 语法        | 效果      |
+| 粗体    | \*粗体文本\* | *粗体文本* |
+| 斜体    | \/斜体文本\/ | /斜体文本/ |
+| 下划线   | \_下划线\_   | _下划线_   |
+| 删除线   | \+删除线\+   | +删除线+   |
+| 无需列表 | -或+        |          |
+| 有序列表 | 1.         |          |
+| 行内代码 | \~代码\~    | ~代码~    |
+| 强调    | \=强调\=    | =强调=     |
+** 代码块
+#+begin_src
+\#+begin_src
+代码
+\#+end_src
+#+end_src
+** 链接
+\[\[链接地址\]\[显示内容\]\]
+** 引用
+#+begin_quote
+\#+begin_quote
+\#+end_quote
+#+end_quote
 * elisp
 ** 操作

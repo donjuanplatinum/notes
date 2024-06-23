@@ -1,7 +1,0 @@
-dev-cpp/expected-lite ~amd64
-media-video/obs-studio ~amd64
-net-im/telegram-desktop ~amd64
-media-libs/libtgvoip ~amd64
-media-libs/tg_owt ~amd64
-dev-cpp/cppgir ~amd64
-app-emulation/wine-proton:9.0.1 ~amd64

@@ -23,11 +23,17 @@
 | Openrc              | 一个简洁的init系统            |
 | systemd             | 比openrc臃肿但通用            |
 **** 解压stage3
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/untar.sh :mkdirp yes
+:END:
 #+begin_src shell
   tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 #+end_src
 **** 创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 ***** /etc/portage/repos.conf/gentoo.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/portage/repos.conf/gentoo.conf :mkdirp yes
+:END:
 #+begin_src conf
 [DEFAULT]
 main-repo = gentoo
@@ -35,7 +41,8 @@ main-repo = gentoo
 [gentoo]
 location = /var/db/repos/gentoo
 sync-type = rsync
-sync-uri = rsync://127.0.0.1/repo/gentoo-portage
+#sync-uri = rsync://127.0.0.1/repo/gentoo-portage
+sync-uri = rsync://mirrors.ustc.edu.cn/gentoo-portage
 auto-sync = yes
 sync-rsync-verify-jobs = 1
 sync-rsync-verify-metamanifest = no
@@ -52,6 +59,9 @@ sync-webrsync-verify-signature = no
 
 **** 更改/mnt/gentoo/etc/gentoo/portage/make.conf
 ***** /etc/portage/make.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/etc/portage/make.conf :mkdirp yes
+:END:
 #+begin_src conf
 
 	# These settings were set by the catalyst build script that automatically
@@ -90,6 +100,9 @@ sync-webrsync-verify-signature = no
 #+end_src
 
 **** 挂载文件系统
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/mount.sh :mkdirp yes
+:END:
 #+begin_src shell
 mount --types proc /proc /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys

@@ -11,14 +11,7 @@
 6. [[./nlp.typ][自然语言处理]]
 7. [[./math.typ][数学]]
 8. [[./rust.org][Rust]]
-
-*** 配置文件
-部署
-#+begin_src shell
-  cd config
-  bash deploy.sh
-#+end_src
-1. [[./config/.zshrc][zshrc]]
-2. [[./config/nsd][nsd]]
+9. [[./docker.org][Docker]]
+10. [[./config.org][配置文件]]
 
    

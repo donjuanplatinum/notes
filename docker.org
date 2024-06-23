@@ -12,6 +12,8 @@
 | [[#blessing-skin][Blessing Skin]] |
 | [[#trojan][Trojan]]        |
 | [[#gitea][Gitea]]         |
+| [[#postgres][Postgresql]]    |
+
 ** openwrt
 *** 网卡
 #+begin_src shell
@@ -30,6 +32,9 @@ dns txt记录认证
 ** matrix conduit
 [[https://gitlab.com/famedly/conduit][gitlab_conduit]]
 *** conduit
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/conduit/docker-compose.yaml :mkdirp yes
+:END:
 **** docker-compose
 #+begin_src yaml
 version: '3'
@@ -120,6 +125,9 @@ networks:
   docker run  --rm -v ./heisenbridge_data:/data docker.nju.edu.cn/hif1/heisenbridge -l heisenbridge  --generate-compat -c /data/config http://conduit:8008
 #+end_src
 *** coturn
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/conduit/coturn.conf :mkdirp yes
+:END:
 **** coturn.conf
 #+begin_src
 use-auth-secret
@@ -127,7 +135,9 @@ static-auth-secret=your secret
 realm=matrix.donjuan.lecturify.net
 #+end_src
 *** element-web
-element_config
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/conduit/element_config :mkdirp yes
+:END:
 #+begin_src yaml
   {
     "default_server_config": {
@@ -204,6 +214,9 @@ element_config
 4. @telegrambot:
 ** blessing-skin
 *** .env
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/blessing-skin/.env :mkdirp yes
+:END:
 #+begin_src
   APP_DEBUG=false
 APP_ENV=production
@@ -253,6 +266,9 @@ PLUGINS_URL=null
 
 #+end_src
 *** docker-compose.yml
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/blessing-skin/docker-compose.yaml :mkdirp yes
+:END:
 #+begin_src yaml
   version: '3'
 
@@ -272,6 +288,9 @@ services:
   
 ** trojan
 *** docker-compose
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/trojan/docker-compose.yaml :mkdirp yes
+:END:
 #+begin_src docker-compose
 version: '3'
 services:
@@ -284,6 +303,9 @@ services:
       - ../letsencrypt/live/donjuan.lecturify.net:/etc/certs
 #+end_src
 *** config.json
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/trojan/config.json :mkdirp yes
+:END:
 #+begin_src yaml
   {
     "run_type": "server",
@@ -340,6 +362,9 @@ services:
 
 ** gitea
 *** docker-compose
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/gitea/docker-compose.yaml :mkdirp yes
+:END:
 #+begin_src docker-compose
   version: '3'
 
@@ -531,3 +556,27 @@ services:
 #+end_src
 
 
+** postgres
+docker-compose.yml
+#+begin_src yaml
+    # Use postgres/example user/password credentials
+  version: '3.9'
+
+  services:
+
+    db:
+      image: postgres
+      restart: always
+      # set shared memory limit when using docker-compose
+      shm_size: 128mb
+      # or set shared memory limit when deploy via swarm stack
+      #volumes:
+      #  - type: tmpfs
+      #    target: /dev/shm
+      #    tmpfs:
+      #      size: 134217728 # 128*2^20 bytes = 128Mb
+      volumes:
+	- ./data:/var/lib/postgresql/data
+      environment:
+	POSTGRES_PASSWORD: example
+#+end_src

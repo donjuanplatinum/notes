@@ -1,3 +1,24 @@
+* Config
+** nsd
+*** nsd.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/etc/nsd/nsd.conf :mkdirp yes
+:END:
+#+begin_src conf
+server:
+	hide-version: yes
+	verbosity: 2
+	database: ""
+zone:
+	name: "donjuan.lecturify.net"
+	zonefile: "/etc/nsd/zone/donjuan.lecturify.net.zone"
+#+end_src
+
+*** zone
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/etc/nsd/zone/donjuan.lecturify.net.zone :mkdirp yes
+:END:
+#+begin_src conf
 $ORIGIN donjuan.lecturify.net.
 $TTL 86400
 
@@ -19,3 +40,7 @@ _acme-challenge	3600	IN	TXT	GfSc84PbKo47rfDbLw_vhfHrTfNuB2gxbgsA8owL31Y
 smtp	3600	IN	CNAME	www
 imap	3600	IN	CNAME	www
 pop3	3600	IN	CNAME	www
+
+#+end_src
+
+
