@@ -34,6 +34,8 @@
 | M -;  | 快速注释选中块 |   |
 | C-M-\ | 快速排版TAB   | indent-region |
 
+*** 矩形操作
+| 矩形标记 | C-x SPC | rectangle-mark-mode |
 ** magit
 | 显示所有选项 | C-x M-g | magit-dispatch |
 

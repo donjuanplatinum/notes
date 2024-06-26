@@ -9,6 +9,33 @@ Unique是原始 ~非空~ 的 *mut T 的包装器
 与 ~*mut T~ 不同 ~Unique<T>~ 的行为与 ~as if~ 相同, 它是 ~T~ 的 *实例*
 
 
+** 宏
+
+*** 过程宏 Macro_rules!
+**** 过程宏声明
+#+begin_src rust
+  macro_ruls! 宏名{
+      (匹配) => {
+	  替换
+  }
+  }
+#+end_src
+
+
+**** 元变量 $
+| item     | 程序项              |
+| block    | 块表达式            |
+| stmt     | 语句(不匹配分号)     |
+| pat      | 模式               |
+| expr     | 表达式              |
+| ty       | 类型               |
+| ident    | 标识符或关键字       |
+| path     | 类型表达式形式的路径  |
+| tt       | token树            |
+| meta     | 属性               |
+| lifetime | 生命周期            |
+| vis      | 可能为空的可见性限定符 |
+| literal  | 字面量表达式            |
 ** 标记类型
 标记类型用于提醒编译器采取相应的措施
 *** 幽灵数据std::marker::PhantomData

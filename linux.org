@@ -44,6 +44,7 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   git checkout branch_name # 检出分支
   git branch -D branch_name # 删除分支
   git push origin :branch_name # 删除远程分支
+  git checkout -B branch_name # 切换并重置分支
 #+end_src
 **** 合并 merge
 #+begin_src shell
