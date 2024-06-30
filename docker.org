@@ -5,14 +5,14 @@
   docker pull -a
 #+end_src
 * 容器
-| [[#openwrt][Openwrt]]       |
-| [[#Pandoc][pandoc]]        |
-| [[#certbot][Certbot]]       |
-| [[#matrix conduit][Matrix]]        |
-| [[#blessing-skin][Blessing Skin]] |
-| [[#trojan][Trojan]]        |
-| [[#gitea][Gitea]]         |
-| [[#postgres][Postgresql]]    |
+| [[openwrt][Openwrt]]        |
+| [[Pandoc][pandoc]]         |
+| [[certbot][Certbot]]        |
+| [[matrix conduit][Matrix]]         |
+| [[blessing-skin][Blessing Skin]]  |
+| [[trojan][Trojan]]         |
+| [[gitea][Gitea]]          |
+| [[postgres][Postgresql]]     |
 
 ** openwrt
 *** 网卡
