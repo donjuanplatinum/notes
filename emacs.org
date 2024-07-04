@@ -1,7 +1,4 @@
 * 大纲
-- [[#emacs键位][键位]]
-- [[#emacs模式][模式]]
-- [[#elisp][Elisp]]
 * emacs键位
 ** basic
 *** 搜索与替换

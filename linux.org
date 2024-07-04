@@ -1,10 +1,4 @@
 * Linux
-| [[命令][命令]]  |
-| [[软件][软件]] |
-** 软件
-| [[Grub][Grub]]  |
-| [[Git][Git]]   |
-
 *** Grub
 **** EFI
 UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。
@@ -66,11 +60,7 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   sudo mkdir /myloopdev
   sudo mount /dev/loop4 /myloopdev
 #+end_src
-*** [[#losetup][losetup命令]]
 ** 命令
-| [[#ssh内网穿透][ssh内网穿透]] |
-| [[#losetup][losetup]]   |
-| [[#mount][mount]]     |
 *** losetup
 #+begin_src shell
   用法：
@@ -129,7 +119,7 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
 
 *** mount
 
-** 技巧
+** n技巧
 *** shell
 **** 判断系统是否存在某些命令
 #+begin_src shell
@@ -156,6 +146,10 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   if echo "$option" |grep -iq "^y"; then
       echo "您输入了y"
   fi
+#+end_src
+*** kde创建通知
+#+begin_src shell
+  cargo run --release;kdialog --passivepopup '任务完成' 20
 #+end_src
 ** 内核
 *** 查看系统调用的编号

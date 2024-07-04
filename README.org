@@ -1,4 +1,4 @@
-[[https://github.com/donjuanplatinum/saying][file:https://img.shields.io/github/commit-activity/w/donjuanplatinum/notes?style=plastic&logoColor=yellow&color=blue.svg]]
+[[https://github.com/donjuanplatinum/notes][file:https://img.shields.io/github/commit-activity/w/donjuanplatinum/notes?style=plastic&logoColor=yellow&color=blue.svg]]
 * Notes
 此仓库记录了平时的笔记与配置文件
 ** 列表
@@ -13,5 +13,5 @@
 8. [[./rust.org][Rust]]
 9. [[./docker.org][Docker]]
 10. [[./config.org][配置文件]]
-
-   
+11. [[./software.org][软件]] 
+12. [[./linux.org][linux]]
