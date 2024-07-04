@@ -119,7 +119,7 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
 
 *** mount
 
-** n技巧
+** 技巧
 *** shell
 **** 判断系统是否存在某些命令
 #+begin_src shell

@@ -1,2 +1,25 @@
-* 算法
-** 经验
+* Algori
+** searching
+*** 两数之和
+在序列中寻找和为给定target的数的下标
+#+begin_src rust
+  use core::hash::Hash;
+  use std::collections::HashMap;
+  pub fn two_sum<T: Hash + Eq + Clone + std::ops::Sub<Output=T>>(array: &[T],target:&T) -> Result<(usize,usize),()>
+   {
+      let mut table: HashMap<&T,usize> = HashMap::new();
+      for i in 0..array.len() {
+	  let sub = target.clone() - array[i].clone();
+	  match table.get(&sub) {
+	      Some(index) => {
+		  return Ok((*index,i));
+	      }
+	      None => {
+		  table.insert(&array[i],i);
+	      }
+	  }
+      }
+      return Err(());
+   }
+
+#+end_src
