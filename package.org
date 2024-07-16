@@ -1,0 +1,14 @@
+* 记录遇见的包
+** 和系统及其相关的重要包
+| 包名     | 简介                   | archlinux    | Gentoo | debian |
+| [[https://gitea.treehouse.systems/ariadne/pkgconf][pkgconf]] | 及其重要的package链接用的 | core/pkgconf | dev-util/pkgconf |        |
+|         |                       |              |        |        |
+
+
+** 一些lib
+| 包名       | 简介                                      | archlinux        | Gentoo              | debian        |
+| [[https://www.webkitgtk.org][webkitgtk]] | 网络内容引擎 一个webkit端口 gnome的项目       | extra/webkit2gtk | net-libs/webkit-gtk | libwebkit2gtk |
+| [[https://gitlab.gnome.org/GNOME/librsvg][librsvg]]   | 渲染SVG文件的 *包含librsvg*运行应用程序的必须库 | extra/librsvg    | gnome-base/librsvg  | librsvg2-2    |
+| [[https://wiki.gnome.org/Projects/libsoup][libsoup]]   | gnome的http库                             | extra/libsoup    | net-libs/libsoup    | libsoup       |
+| [[https://gitlab.gnome.org/GNOME/pango][Pango]]     | 显示文本的                                 | extra/pango      | x11-libs/pango      |               |
+|           |                                          |                  |                     |               |

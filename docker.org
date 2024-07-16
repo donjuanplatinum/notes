@@ -4,6 +4,7 @@
 #+begin_src shell
   docker pull -a
 #+end_src
+* Images
 ** openwrt
 *** 网卡
 #+begin_src shell
@@ -275,7 +276,7 @@ services:
       - PLUGINS_DIR=/app/plugins
 
 #+end_src
-  
+
 ** trojan
 *** docker-compose
 :PROPERTIES:
@@ -570,3 +571,15 @@ docker-compose.yml
       environment:
 	POSTGRES_PASSWORD: example
 #+end_src
+
+** overleaf
+ clone
+ #+begin_src shell
+   git clone https://github.com/overleaf/toolkit
+ #+end_src
+ #+begin_src shell
+   cd toolkit
+   ./bin/init
+   ./bin/up
+ #+end_src
+前往http://localhost/launchpad

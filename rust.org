@@ -1,14 +1,59 @@
 * Rust
 
 ** 类型
-*** Unique<T>
-Unique是原始 ~非空~ 的 *mut T 的包装器
+***  Pin
+在rust中 数据默认是Unpin的
 
-用于标准库的 *Box<T>* *Vec<T>* *String* 和 *HashMap<K,V>* *LinkedList<T,A>* 等
+可以看出 在rust中 ~数据的内存地址会在某种情况下发生变化~
 
-与 ~*mut T~ 不同 ~Unique<T>~ 的行为与 ~as if~ 相同, 它是 ~T~ 的 *实例*
+- 说明类型 ~不能有包含自身引用的字段~
+#+begin_src rust
+  #[derive(Default)]
+  pub struct A{
+      a: usize,
+  }
+  impl A {
+      pub fn get_addr(&self)  {
+	  println!("{:?}",self as *const _);
+      }
 
+  }
+  fn main() {
+      let a = A::default();
+      a.get_addr();
+      get_addr_addr(a);
 
+  }
+  pub fn get_addr_addr(a: A) {
+	  a.get_addr();
+  }
+
+#+end_src
+
+此时如果将类型分配到 ~堆~
+
+此时地址不会发生移动 因为移动的是指针 而不是堆上的数据
+#+begin_src rust
+  #[derive(Default)]
+  pub struct A{
+      a: usize,
+  }
+  impl A {
+      pub fn get_addr(&self)  {
+	  println!("{:?}",self as *const _);
+      }
+
+  }
+  fn main() {
+      let a = Box::new(A::default());
+      a.get_addr();
+      get_addr_addr(a);
+
+  }
+  pub fn get_addr_addr(a: Box<A>) {
+	  a.get_addr();
+  }
+#+end_src
 ** 宏
 
 *** 过程宏 Macro_rules!

@@ -12,3 +12,49 @@ GLFW Error: GLX: Failed to create context: GLXBadFBConfig
 #+begin_src
   MESA_GL_VERSION_OVERRIDE=4.5 然后再执行命令
 #+end_src
+*** rust cuda
+#+begin_src shell
+  Compiling tracing-core v0.1.32
+error[E0599]: no method named `cuMemAdvise_v2` found for reference `&'static driver::sys::sys_12010::Lib` in the current scope
+   --> /home/ubuntu/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cudarc-0.11.7/src/driver/result.rs:613:10
+    |
+612 | /     lib()
+613 | |         .cuMemAdvise_v2(dptr, num_bytes, advice, location)
+    | |_________-^^^^^^^^^^^^^^
+    |
+help: there is a method `cuMemAdvise` with a similar name
+    |
+613 |         .cuMemAdvise(dptr, num_bytes, advice, location)
+    |          ~~~~~~~~~~~
+
+error[E0599]: no method named `cuMemPrefetchAsync_v2` found for reference `&'static driver::sys::sys_12010::Lib` in the current scope
+     --> /home/ubuntu/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cudarc-0.11.7/src/driver/result.rs:628:10
+      |
+627   | /     lib()
+628   | |         .cuMemPrefetchAsync_v2(dptr, num_bytes, location, 0, stream)
+      | |_________-^^^^^^^^^^^^^^^^^^^^^
+      |
+help: there is a method `cuMemPrefetchAsync` with a similar name, but with different arguments
+     --> /home/ubuntu/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cudarc-0.11.7/src/driver/sys/sys_12010.rs:13548:5
+      |
+13548 | /     pub unsafe fn cuMemPrefetchAsync(
+13549 | |         &self,
+13550 | |         devPtr: CUdeviceptr,
+13551 | |         count: usize,
+13552 | |         dstDevice: CUdevice,
+13553 | |         hStream: CUstream,
+13554 | |     ) -> CUresult {
+      | |_________________^
+#+end_src
+
+**** solution
+安装cuda12.4
+#+begin_src shell
+  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+  sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb
+  sudo dpkg -i cuda-repo-ubuntu2204-12-4-local_12.4.0-550.54.14-1_amd64.deb
+  sudo cp /var/cuda-repo-ubuntu2204-12-4-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  sudo apt-get update
+  sudo apt-get -y install cuda-toolkit-12-4
+#+end_src

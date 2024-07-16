@@ -6,6 +6,21 @@
 - [[游戏][游戏]]
   - [[RWR小兵步枪][小兵步枪]]
 
+** Wine的基本配置
+
+*** 配置
+#+begin_src emacs-lisp
+  winecfg
+#+end_src
+*** 创建新环境
+#+begin_src shell
+  export WINEPREFIX=~/wine/software winecfg
+  WINEARCH=win32 WINEPREFIX=~/.wine32 winecfg # 32位
+  WINEPREFIX=... LC_ALL=zh_CN.UTF-8 winecfg # 中文
+#+end_src
+
 ** 游戏
 *** RWR小兵步枪
 在rwr_config.exe中修改显示为 ~OpenGL~  否则会导致游戏显示异常
+
+
