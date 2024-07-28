@@ -20,6 +20,10 @@ dns txt记录认证
 #+begin_src shell
   certbot certonly --preferred-challenges dns -d "*.donjuan.lecturify.net" --manual
 #+end_src
+
+#+begin_src shell
+  sudo docker run -v ./letsencrypt:/etc/letsencrypt --rm  -it docker.nju.edu.cn/certbot/certbot  certonly --preferred-challenges dns -d "*.donjuan.lecturify.net" --manual  
+#+end_src
 ** matrix conduit
 [[https://gitlab.com/famedly/conduit][gitlab_conduit]]
 *** conduit
