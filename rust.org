@@ -1,208 +1,45 @@
 * Rust
-
 ** 类型
-***  Pin
-在rust中 数据默认是Unpin的
+** 技巧
+*** [[https://users.rust-lang.org/t/idiomatic-rust-way-to-generate-unique-id/33805][为类型生成唯一ID]]
 
-可以看出 在rust中 ~数据的内存地址会在某种情况下发生变化~
-
-- 说明类型 ~不能有包含自身引用的字段~
+假设有一个类型 ~Tensor~ (事实上这是Candle的Tensor实现)
+**** Tensor
 #+begin_src rust
-  #[derive(Default)]
-  pub struct A{
-      a: usize,
-  }
-  impl A {
-      pub fn get_addr(&self)  {
-	  println!("{:?}",self as *const _);
+  /// Unique identifier for tensors. 张量的唯一ID
+  #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+  pub struct TensorId(usize);
+
+
+  impl TensorId {
+      fn new() -> Self {
+	  // https://users.rust-lang.org/t/idiomatic-rust-way-to-generate-unique-id/33805
+	  use std::sync::atomic;
+	  static COUNTER: atomic::AtomicUsize = atomic::AtomicUsize::new(1);
+	  Self(COUNTER.fetch_add(1, atomic::Ordering::Relaxed))
       }
+  }
+  
 
-  }
-  fn main() {
-      let a = A::default();
-      a.get_addr();
-      get_addr_addr(a);
+	// 技巧: 作为一个Arc指针 所以复制开销很小
+      #[derive(Clone)]
+      /// The core struct for manipulating tensors.
+      /// Tensors are reference counted with [`Arc`] so cloning them is cheap.
+      struct Tensor(Arc<Tensor_>);
 
-  }
-  pub fn get_addr_addr(a: A) {
-	  a.get_addr();
-  }
+
+    impl std::ops::Deref for Tensor {
+	type Target = Tensor_;
+
+	fn deref(&self) -> &Self::Target {
+	    self.0.as_ref()
+	}
+    }
+
+      pub struct Tensor{
+	    id: TensorId,
+	    ...具体内容
+	}
 
 #+end_src
-
-此时如果将类型分配到 ~堆~
-
-此时地址不会发生移动 因为移动的是指针 而不是堆上的数据
-#+begin_src rust
-  #[derive(Default)]
-  pub struct A{
-      a: usize,
-  }
-  impl A {
-      pub fn get_addr(&self)  {
-	  println!("{:?}",self as *const _);
-      }
-
-  }
-  fn main() {
-      let a = Box::new(A::default());
-      a.get_addr();
-      get_addr_addr(a);
-
-  }
-  pub fn get_addr_addr(a: Box<A>) {
-	  a.get_addr();
-  }
-#+end_src
-** 宏
-
-*** 过程宏 Macro_rules!
-**** 过程宏声明
-#+begin_src rust
-  macro_ruls! 宏名{
-      (匹配) => {
-	  替换
-  }
-  }
-#+end_src
-
-
-**** 元变量 $
-| item     | 程序项              |
-| block    | 块表达式            |
-| stmt     | 语句(不匹配分号)     |
-| pat      | 模式               |
-| expr     | 表达式              |
-| ty       | 类型               |
-| ident    | 标识符或关键字       |
-| path     | 类型表达式形式的路径  |
-| tt       | token树            |
-| meta     | 属性               |
-| lifetime | 生命周期            |
-| vis      | 可能为空的可见性限定符 |
-| literal  | 字面量表达式            |
-** 标记类型
-标记类型用于提醒编译器采取相应的措施
-*** 幽灵数据std::marker::PhantomData
-#+begin_src rust
-  pub struct PhantomData<T>
-      where T: ?Sized;
-#+end_src
-PhantomData是~零~大小的类型用来标记那些行为像他们拥有一个~T~的东西
-
-向您的类型添加~Phantomdata<T>~字段将告诉编译器 您的行为就像它存储了T类型的值一样
-
-
-很多时候我们会遇到 ~类型~ 与 ~生命周期~ 在 ~逻辑~ 上与 ~结构~ 相关,但此时这种逻辑并不属于结构体字段的一部分
-
-例如：
-#+begin_src rust
-  struct Iter<'a,T: 'a> {
-      ptr: *const T,
-      end: *const T,
-  }
-#+end_src
-
-由于 ~<'a>~ 在结构中 ~未使用~ 所以实际上它是 ~无约束~ 的 , 所以我们必须有所标记来阐述这种关系 这便是 ~Phantomdata~ 的作用
-
-#+begin_src rust
-  use std::marker::Phantomdata;
-  struct Iter<'a,T: 'a> {
-      ptr: *const T,
-      end: *const T,
-      marker: Phantomdata<&'a T>,
-  }
-#+end_src
-
-于是乎, 生命周期被 ~PhantomData<&'a T>~ 限定 
-**** 绑定生命周期与所有权
-
-例如标准库std的 ~LinkedList<T>~
-
-因为裸指针不包含生命周期和所有权的信息
-
-
-Phantomdata<Box<Node<T>,A>> 告诉编译器 ~LinkedList~ 与 ~Node~ 的所有权与生命周期是相关的 当 ~LinkedList~ 释放时, ~Node~ 也会释放
-#+begin_src rust
-  use std::ptr::NonNull;
-  pub struct LinkedList<T> {
-      head: Option<NonNull<Node<T>>>,
-      tail: Option<NonNull<Node<T>>>,
-      len: usize,
-      alloc: A,
-      marker: Phantomdata<Box<Node<T>,A>>,
-  }
-  struct Node<T> {
-      next: Option<NonNull<Node<T>>>,
-      prev: Option<NonNull<Node<T>>>,
-      element: T,
-  }
-#+end_src
-
-**** 未使用的类型数据FFI 
-在这里 ~PhantomData<T>~ 被用来指明一个结构 ~绑定~ 了哪种类型的数据
-
-标记外部指针的类型
-#+begin_src rust
-  struct LibraryBook<Book> {
-      book_handle: *mut (),
-      book_type: Phantomdata<Book>,
-  }
-#+end_src
-
-** 数据布局
-在rust中 所有类型都会以 ~字节~ 为单位进行对齐
-*** 尺寸和对齐量
-~所有~ 值都有对齐量和尺寸
-对齐量 指定立哪些地址可以有效的存储此值
-
-对齐量为 n 的值只能存储地址为 n 的倍数的内存地址上
-
-通过 ~align_of_val~ 查看值的对齐量
-#+begin_src rust
-  let a = std::mem::align_of_val(&5i32);
-#+end_src
-
-
-值的尺寸是同类型的值组成的数组中连续两个元素之间的字节偏移量
-
-此偏移量包括了为保持程序项类型内部对齐而对此类型做的对齐填充
-
-通过 ~size_of_val~ 查看值的尺寸
-
-
-
-#+begin_src rust
-  let a = std::mem::size_of_val(&5i32);
-#+end_src
-
-
-若一个类型实现了 ~Sized~ trait 则可以使用 ~size_of~ 与 ~align_of~ 检测类型
-**** 原生类型的布局
-| 类型         |        size_of::<type>() |
-| bool        |                        1 |
-| u8/i8       |                        1 |
-| u16/i16     |                        2 |
-| u32/i32     |                        4 |
-| u64/i64     |                        8 |
-| u128/i128   |                       16 |
-| f32         |                        4 |
-| f64         |                        8 |
-| char        |                        4 |
-| usize/isize | 足以包含目标平台的每个内存地址 |
-
-**** 指针与引用的布局
-指针与引用布局相同
-
-指向固定类型的指针和引用布局与usize相同
-
-指向非固定类型的指针和引用是usize的两倍
-
-**** 数组
-数组的布局使得数组的第 n 个(nth)元素为从数组开始的位置向后偏移 n * 元素类型的尺寸(n * the size of the element's type) 个字节数 数组 [T; n] 的尺寸为 size_of::<T>() * n 对齐量和 T 的对齐量相同
-
-**** 字符串切片 ~str~
-字符串切片是一种 UTF-8 表示形式(representation)的字符序列 它们与 [u8]类型的切片拥有相同的类型布局
-
-**** 元组
-_元组对于其布局没有任何保证_
+使用原子计数器 ~atomic~ 来创建唯一的ID

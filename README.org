@@ -1,4 +1,5 @@
 [[https://github.com/donjuanplatinum/notes][file:https://img.shields.io/github/commit-activity/w/donjuanplatinum/notes?style=plastic&logoColor=yellow&color=blue.svg]]
+
 * Notes
 此仓库记录了平时的笔记与配置文件
 ** 列表
@@ -7,7 +8,7 @@
 2. [[./error.org][常见错误]]   
 3. [[./gentoo.org][gentoo linux]]
 4. [[./network.org][网络]]
-5. [[./algorithms.org][算法]]   
+5. [[./algo.org][算法]]   
 6. [[./nlp.typ][自然语言处理]]
 7. [[./math.typ][数学]]
 8. [[./rust.org][Rust]]
