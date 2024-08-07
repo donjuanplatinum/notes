@@ -24,6 +24,56 @@
 
 #+end_src
 
+*** TODO 寻找两个有序数组的中位数
+| 方法            | 时间         | 空间    |
+| 合并数组并计算下标 | O(m+n)      | O(m+n) |
+| 原址寻找下标      | O(m+n)      | O(1)   |
+| 原址+二分查找     | O(log(m+n)) | O(1)   |
+**** 归并
+通过使用 ~归并排序~ 的归并过程 合并两个有序数组 最后找到中位数
+
+*然而,这样其实会浪费不必要的空间O(m+n) 并且时间复杂度O(m+n)*
+#+begin_src rust
+  fn median_element(left: &[i32], right: &[i32]) -> f64 {
+    let mut left_index = 0;
+    let mut right_index = 0;
+    let mut index = 0;
+    let mut result: Vec<i32> = vec![];
+    while left_index < left.len() && right_index < right.len() {
+        if left[left_index] < right[right_index] {
+            result.push(left[left_index].clone());
+            left_index += 1;
+        } else {
+            result.push(right[right_index].clone());
+            right_index += 1;
+        }
+        index += 1;
+    }
+    while left_index < left.len() {
+        result.push(left[left_index].clone());
+        left_index += 1;
+        index += 1;
+    }
+    while right_index < right.len() {
+        result.push(right[right_index].clone());
+        right_index += 1;
+        index += 1;
+    }
+    if result.len() % 2 == 0 {
+        let mid = (result.len() - 1) / 2;
+        let result = (result[mid] as f64 + result[mid + 1] as f64) / 2.0;
+        return result;
+    } else {
+        return result[(result.len() -1) / 2] as f64;
+    }
+}
+#+end_src
+
+
+在此问题中 ~中位数位置~ 是确定的 所以循环的上界也是确定的 可以直接原址的找到中位数 将空间复杂度降低到 ~O(1)~
+
+
+
 ** structue
 *** LinkedList
 **** 链表相加
@@ -105,7 +155,6 @@ pub fn add_two_binary_linkedlist(a: LinkedList<bool>, b: LinkedList<bool>) -> Li
 #+end_src
 
 ** string
-
 *** 无重复字符的最长字串
 使用 ~滑动窗口~ 来解决这个问题
 
@@ -188,3 +237,6 @@ pub fn add_two_binary_linkedlist(a: LinkedList<bool>, b: LinkedList<bool>) -> Li
 }
 
 #+end_src
+
+
+
