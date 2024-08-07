@@ -50,6 +50,60 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
   git stash -u -m '本地暂存' # 暂存
   git stash pop # 弹出
 #+end_src
+
+
+*** lsof
+List Open File 获取被进程打开文件的信息
+
+**** 关键选项
+- 默认: 列出活跃进程的所有打开文件
+- -a: 结果进行AND运算 而非OR
+- -l: 输出UID而不是username
+- -h: help
+- -t: 仅获取PID
+- -U: 获取UNIX Sokcet地址
+- -F: 格式化输出
+  - 例如 -F pcfn (pid,command,文件描述副,文件名)
+**** Example
+#+begin_src shell
+  lsof -i # 打开的网络链接
+  lsof -i 6 # ipv6链接
+  lsof -i # TCP
+  lsof -i # UDP
+  lsof -i :22 # 指定端口
+  lsof -i @192.168.101.1 # 指定地址
+  lsof -i -sTCP:LISTEN # 指定正在LISTEN的TCP
+  lsof -i -sTCP:ESTABLISHED # 已经建立的链接
+  lsof -u donjuan # 用户donjuan打开了什么
+  lsof -u ^donjuan # 取反
+  lsof -c firefox # firefox打开了什么
+  lsof -p 1234=2345 # 进程1234-2345打开了什么
+  lsof -t -c startplasma # 查看start-plasma的PID
+  lsof /mnt # 查看哪些进程使用/mnt
+  lsof +L1 # 链接数为0的文件 (在安全中有特殊意义)
+#+end_src
+**** Options
+***** 基本选项
+#+begin_src shell
+  -a: 结果进行AND运算 而非OR
+  +d 列出当前目录下(不包括子目录)
+  +D 类似传统-R 遍历子目录
+  +L 将链接计数打印在NLINK(+L指定的为开区间)
+  -d 关联的文件描述符
+  -g 组ID GID
+  -N NFS文件
+#+end_src
+***** 输出选项
+#+begin_src shell
+  -F 指定格式
+  -l UID代替username
+  -n 不域名解析
+  -o 列出文件偏移offset
+  -P 列出端口号而不是端口对应的默认服务
+  -s 列出文件大小
+  -r 间隔重复扫描
+#+end_src
+*** TODO strace
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
