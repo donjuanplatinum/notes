@@ -268,6 +268,11 @@ GRUB 可以在运行 grub-mkconfig 命令时检测到其他操作系统并生成
   static routers=192.168.0.1
   static domain_name_servers=192.168.0.1
 #+end_src
+*** 5.时间
+#+begin_src shell
+  sudo emerge net-misc/chrony
+  rc-update add chronyd default
+#+end_src
 ** 问题
 *** steam
 **** 激活steam源

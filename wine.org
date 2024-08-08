@@ -19,6 +19,11 @@
   WINEPREFIX=... LC_ALL=zh_CN.UTF-8 winecfg # 中文
 #+end_src
 
+*** 中文
+直接复制装有windows发行版的字体
+#+begin_src shell
+  rsync -avPh /mnt/Windows/Fonts/* ~/wine/drive_c/Windows/Fonts
+#+end_src
 ** 游戏
 *** RWR小兵步枪
 
