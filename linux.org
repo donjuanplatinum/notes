@@ -210,14 +210,42 @@ List Open File 获取被进程打开文件的信息
   grep _NR_ptrace ./*
 #+end_src
 
-*** /proc
-
+*** TODO /proc
+**** 挂载
+#+begin_src text
+  /etc/fstab
+  proc	  /proc		proc	hidepid=2	0 0
+#+end_src
+***** Hidepid
+procfs提供了 hidepid 的挂载选项 以限制其他用户对 /proc/<pid>的访问  这是一种强化技术，可以使恶意的本地用户更难收集有关其他用户进程的信息
+| 值         | 作用                                                                                                                           |
+| hidepid=0 | 位于 /proc/<pid>/* 的文件将是所有人可读的. 这是默认行为.                                                                              |
+| hidepid=1 | /proc/<pid>目录将对所有人可见, 但是用户仅可以访问他们拥有的 /proc/<pid> 目录. 这将保护例如/proc/<pid>/cmdline等可能包含敏感信息的文件          |
+| hidepid=2 | 与hidepid=1相同 但隐藏其他用户的/proc/<pid>目录. 由于这将对除 root 之外的所有用户隐藏进程信息，因此允许特权用户例如wheel组的用户访问可能会很有用。 |
 **** /proc/version
 保存了内核版本和一些编译信息
 #+begin_src shell
   cat /proc/version
   Linux version 6.6.13-gentoo-x86_64 (root@livecd) (x86_64-pc-linux-gnu-gcc (Gentoo 13.2.1_p20240113-r1 p12) 13.2.1 20240113, GNU ld (Gentoo 2.41 p4) 2.41.0) #1 SMP PREEMPT_DYNAMIC Sun Feb  4 13:22:48 CST 2024
 #+end_src
+
+**** /proc/<pid>/oom_adj
+#+begin_comment
+高版本弃用
+#+end_comment
+设置进程的OOM评分调整值 从 ~-17~ 到 ~+15~ 越高越容易被杀
+
+**** /proc/<pid>/oom_score
+~oom~ 的分数
+
+**** /proc/<pid>/oom_score_adj
+~oom_adj~ 的高版本替代 提供更细腻的控制 从 ~-1000~ 到 ~1000~
+
+*** TODO sysctl
+*** TODO Out Of Memory (OOM)
+OOM Killer是 ~内核的一个进程~ 会根据一个复杂的算法去评估进程OOM分数, 当系统资源严重不足达到一个设置的阈值时 从分数最高的进程开始kill
+
+分数储存在 [[*/proc/<pid>/oom_score][/proc/<pid>/oom_score]] 也可以使用 ~ps -eo pid,comm,oom --sort=-oom |head~ 来查看分数最高的进程
 
 ** 日志
 *** syslog-ng
@@ -416,5 +444,56 @@ Log级别 = 设备号 * 8 + 级别号
        │ tags()                │ Select messages having the │
        │                       │ specified tag.             │
        └───────────────────────┴────────────────────────────┘
+
+#+end_src
+
+**** 配置
+#+begin_src shell
+  @version: 4.6
+#
+# Syslog-ng default configuration file for Gentoo Linux
+
+@include "scl.conf"
+
+options {
+        threaded(yes);
+        chain_hostnames(no);
+        stats(freq(43200));
+        mark_freq(3600);
+};
+
+# 系统信息
+source system_log { system(); };
+destination system_log_output { file("/var/log/system_log"); };
+log { source(system_log); destination(system_log_output); };
+
+# network
+source network { network(); };
+destination network_output { file("/var/log/network_output"); };
+log { source(network); destination(network_output); };
+
+# internal
+source internal_source { internal(); };
+destination internal_out { file("/var/log/internal"); };
+log{ source(internal_source); destination(internal_out); };
+
+# kmsg
+source kmgs { file("/proc/kmsg"); };
+destination kmsg_out { file("/var/log/kmsg_out"); };
+log {source(kmgs); destination(kmsg_out);};
+
+filter f_kernel_crash { 
+    match("kernel panic|Oops| Segmentation fault" value("MESSAGE"));
+};
+
+destination crash_out{file("/var/log/crash"); file("/dev/tty2");};
+log { source(system_log);
+    filter(f_kernel_crash);
+    destination(crash_out);
+};
+# Uncomment the following lines if you want to log to /dev/tty12 or /dev/console
+#destination console_all { file("/dev/tty12"); };
+#destination console_all { file("/dev/console"); };
+#log { source(system_log); destination(console_all); };
 
 #+end_src
