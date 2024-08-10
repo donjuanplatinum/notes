@@ -24,6 +24,7 @@
 #+begin_src shell
   rsync -avPh /mnt/Windows/Fonts/* ~/wine/drive_c/Windows/Fonts
 #+end_src
+
 ** 游戏
 *** RWR小兵步枪
 
@@ -34,3 +35,19 @@
 设置中选择全屏
 
 打开Win32api模式
+* Ryujinx
+** 安装
+#+begin_src shell
+  sudo emerge ryujinx
+#+end_src
+
+** 配置
+*** 放置prod.keys
+#+begin_src
+  ~/.config/Ryujinx/system
+#+end_src
+*** 安装固件firmware
+打开选择Install
+
+** 格式转换
+使用 [[https://github.com/dezem/SAK][SAK转换器]] 来转换格式
