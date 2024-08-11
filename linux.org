@@ -121,22 +121,35 @@ List Open File 获取被进程打开文件的信息
 - -F: 格式化输出
   - 例如 -F pcfn (pid,command,文件描述副,文件名)
 **** Example
+***** 基本
 #+begin_src shell
-  lsof -i # 打开的网络链接
-  lsof -i 6 # ipv6链接
-  lsof -i # TCP
-  lsof -i # UDP
-  lsof -i :22 # 指定端口
-  lsof -i @192.168.101.1 # 指定地址
+  lsof -p PID # 进程打开了什么文件
+  lsof FILE # 文件被什么进程打开
+  lsof -i # 网络文件
+#+end_src
+***** 组合
+#+begin_src shell
+  lsof -i 6 # 打开的ipv6链接
+  lsof -i -s CLOSED # UDP关闭的链接
+  lsof -i :22 # 22号端口的链接
+  lsof -i :1-1024 # 谁使用了1-1024端口
+  lsof -i @192.168.101.1:22 # 指定地址
+  lsof -i UDP # 所有的UDP链接
   lsof -i -sTCP:LISTEN # 指定正在LISTEN的TCP
   lsof -i -sTCP:ESTABLISHED # 已经建立的链接
-  lsof -u donjuan # 用户donjuan打开了什么
-  lsof -u ^donjuan # 取反
+  lsof -u donjuan # 用户donjuan打开了什么文件
+  lsof -a -u donjuan -i # 用户donjuan打开了什么网络文件
+  lsof -u ^donjuan # 取反 除了用户donjuan的其他用户打开了什么文件
   lsof -c firefox # firefox打开了什么
   lsof -p 1234=2345 # 进程1234-2345打开了什么
   lsof -t -c startplasma # 查看start-plasma的PID
   lsof /mnt # 查看哪些进程使用/mnt
   lsof +L1 # 链接数为0的文件 (在安全中有特殊意义)
+  lsof -a -d mem -c firefox # firefox打开的内存映射
+#+end_src
+#+begin_src shell
+  kill $(lsof -t -a -c vim ~/ ) # 杀掉vim使用~下文件的所有的~下的进程
+  lsof -a -i -u www-data # www-data监听了哪些端口 打开了哪些网络链接
 #+end_src
 **** Options
 ***** 基本选项
@@ -145,9 +158,12 @@ List Open File 获取被进程打开文件的信息
   +d 列出当前目录下(不包括子目录)
   +D 类似传统-R 遍历子目录
   +L 将链接计数打印在NLINK(+L指定的为开区间)
-  -d 关联的文件描述符
+  -d 指定打开的文件描述符类型[见文件描述符类型]
   -g 组ID GID
   -N NFS文件
+  -i 网络文件
+  -R 列出PPID
+  -x 跟踪文件系统链接
 #+end_src
 ***** 输出选项
 #+begin_src shell
@@ -159,7 +175,66 @@ List Open File 获取被进程打开文件的信息
   -s 列出文件大小
   -r 间隔重复扫描
 #+end_src
+**** 文件描述符类型
+#+begin_src shell
+  （1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
+（2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
+（3）lnn：library references (AIX);
+（4）err：FD information error (see NAME column);
+（5）jld：jail directory (FreeBSD);
+（6）ltx：shared library text (code and data);
+（7）mxx ：hex memory-mapped type number xx.
+（8）m86：DOS Merge mapped file;
+（9）mem：memory-mapped file;
+（10）mmap：memory-mapped device;
+（11）pd：parent directory;
+（12）rtd：root directory;
+（13）tr：kernel trace file (OpenBSD);
+（14）v86  VP/ix mapped file;
+（15）0：表示标准输入
+（16）1：表示标准输出
+（17）2：表示标准错误
+一般在标准输出、标准错误、标准输入后还跟着文件状态模式：r、w、u等
+（1）u：表示该文件被打开并处于读取/写入模式
+（2）r：表示该文件被打开并处于只读模式
+（3）w：表示该文件被打开并处于
+（4）空格：表示该文件的状态模式为unknow，且没有锁定
+（5）-：表示该文件的状态模式为unknow，且被锁定
+同时在文件状态模式后面，还跟着相关的锁
+（1）N：for a Solaris NFS lock of unknown type;
+（2）r：for read lock on part of the file;
+（3）R：for a read lock on the entire file;
+（4）w：for a write lock on part of the file;（文件的部分写锁）
+（5）W：for a write lock on the entire file;（整个文件的写锁）
+（6）u：for a read and write lock of any length;
+（7）U：for a lock of unknown type;
+（8）x：for an SCO OpenServer Xenix lock on part      of the file;
+（9）X：for an SCO OpenServer Xenix lock on the      entire file;
+（10）space：if there is no lock.
+#+end_src
+**** 文件类型
+#+begin_src shell
+（1）DIR：表示目录
+（2）CHR：表示字符类型
+（3）BLK：块设备类型
+（4）UNIX： UNIX 域套接字
+（5）FIFO：先进先出 (FIFO) 队列
+（6）IPv4：网际协议 (IP) 套接字  
+#+end_src
 *** TODO strace
+Strace可以诊断 调试Linux用户空间
+
+检测进程与内核的交互 系统调用 信号 状态变更等
+
+strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.c][Ptrace]]
+**** 
+*** TODO gdb
+*** TODO pstack
+*** TODO pmap
+*** TODO ipcs
+*** TODO vmstat
+*** TODO top
+*** TODO ps
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
@@ -246,6 +321,8 @@ procfs提供了 hidepid 的挂载选项 以限制其他用户对 /proc/<pid>的�
 OOM Killer是 ~内核的一个进程~ 会根据一个复杂的算法去评估进程OOM分数, 当系统资源严重不足达到一个设置的阈值时 从分数最高的进程开始kill
 
 分数储存在 [[*/proc/<pid>/oom_score][/proc/<pid>/oom_score]] 也可以使用 ~ps -eo pid,comm,oom --sort=-oom |head~ 来查看分数最高的进程
+
+**** 修改OOM分值
 
 ** 日志
 *** syslog-ng
