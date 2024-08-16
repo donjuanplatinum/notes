@@ -228,11 +228,14 @@ Strace可以诊断 调试Linux用户空间
 
 strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.c][Ptrace]]
 **** 
+
+*** TODO objdump/readelf
 *** TODO gdb
 *** TODO pstack
 *** TODO pmap
 *** TODO ipcs
 *** TODO vmstat
+*** TODO iostat
 *** TODO top
 *** TODO ps
 ** loop设备

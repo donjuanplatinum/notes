@@ -550,7 +550,6 @@ services:
   /usr/local/bin/gitea -c '/data/gitea/conf/app.ini' admin regenerate hooks
 #+end_src
 
-
 ** postgres
 docker-compose.yml
 #+begin_src yaml
@@ -587,3 +586,24 @@ docker-compose.yml
    ./bin/up
  #+end_src
 前往http://localhost/launchpad
+
+** archlinux
+
+*** docker-compose.yml
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/docker/archlinux/docker-compose.yaml :mkdirp yes
+:END:
+#+begin_src shell
+version: '3'
+
+services:
+  gitea:
+    container_name: archlinux
+    image: archlinux
+    network_mode: host
+    volumes:
+      - ./mirrorlist:/etc/pacman.d/mirrorlist
+    tty: true
+    stdin_open: true
+
+#+end_src
