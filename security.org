@@ -1,0 +1,33 @@
+** ClamAv
+*** 安装
+#+begin_src shemm
+  sudo emerge clamav
+#+end_src
+
+*** 建立数据库
+**** 安装cvdupdate
+#+begin_src shell
+  pip3 install cvdupdate
+#+end_src
+**** 配置数据库位置
+#+begin_src shell
+  cvd config set --dbdir <your www path>
+#+end_src
+**** 同步
+#+begin_src shell
+  cvd update
+#+end_src
+
+**** 开启服务器
+#+begin_src shell
+  cvd serve
+#+end_src
+
+**** 配置文件
+~/.cvdupdate/config.json
+
+**** 配置freshclam
+/etc/clamav/freshclam.conf
+#+begin_src shell
+  DatabaseMirror http://localhost:8000
+#+end_src

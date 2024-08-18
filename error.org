@@ -58,3 +58,14 @@ help: there is a method `cuMemPrefetchAsync` with a similar name, but with diffe
   sudo apt-get update
   sudo apt-get -y install cuda-toolkit-12-4
 #+end_src
+
+*** python
+**** No module named 'pkg_resources'
+#+begin_src shell
+  pip install distribute
+#+end_src
+
+**** error: invalid command 'dist_info'
+#+begin_src shell
+  pip install setuptools
+#+end_src

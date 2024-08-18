@@ -16,3 +16,5 @@
 10. [[./config.org][配置文件]]
 11. [[./software.org][软件]] 
 12. [[./linux.org][linux]]
+13. [[./js.org][JavaScript]]
+14. [[./security.org][security]]
