@@ -374,6 +374,24 @@ portage下载的源代码的位置
   #+begin_src shell
     eclean-dist
   #+end_src
+*** 查看USE说明
+#+begin_src shell
+  equery uses emacs
+   * Found these USE flags for app-editors/emacs-29.4:
+ U I
+ + + X                   : Add support for X11
+ - - Xaw3d               : Add support for the 3d athena widget set
+ + + acl                 : Add support for Access Control Lists
+ + + alsa                : Add support for media-libs/alsa-lib (Advanced Linux Sound Architecture)
+ - - athena              : Enable the MIT Athena widget set (x11-libs/libXaw)
+ + + cairo               : Enable support for the cairo graphics library
+ + + dbus                : Enable dbus support for anything that needs it (gpsd, gnomemeeting, etc)
+ + + dynamic-loading     : Enable loading of dynamic libraries (modules) at runtime
+ - - games               : Support shared score files for games
+....
+#+end_src
+
+
 ** portage报错
 *** mask
 | ~arch keyword               | 该软件没有经过充分的测试 不能进入稳定分支 请等待一段时间后尝试使用                                                                |
