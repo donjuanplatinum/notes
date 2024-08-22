@@ -12,3 +12,7 @@
 | [[https://wiki.gnome.org/Projects/libsoup][libsoup]]   | gnome的http库                             | extra/libsoup    | net-libs/libsoup    | libsoup       |
 | [[https://gitlab.gnome.org/GNOME/pango][Pango]]     | 显示文本的                                 | extra/pango      | x11-libs/pango      |               |
 |           |                                          |                  |                     |               |
+
+
+
+

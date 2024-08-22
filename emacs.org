@@ -1,4 +1,21 @@
-* 大纲
+* Table                                                              :TOC_10:
+- [[#emacs键位][emacs键位]]
+  - [[#basic][basic]]
+  - [[#magit][magit]]
+- [[#emacs模式][emacs模式]]
+  - [[#buffer-list][buffer-list]]
+  - [[#ibuffer][ibuffer]]
+  - [[#dired][Dired]]
+  - [[#calc][calc]]
+  - [[#imenu][imenu]]
+- [[#org-mode][org-mode]]
+  - [[#标记文本][标记文本]]
+  - [[#代码块][代码块]]
+  - [[#链接][链接]]
+  - [[#引用][引用]]
+- [[#elisp][elisp]]
+  - [[#操作][操作]]
+
 * emacs键位
 ** basic
 *** 搜索与替换
@@ -122,6 +139,11 @@ global-display-line-numbers-mode 'open 全局行号
 | >     | 下一个目录         | dired-next-dirline       |
 | <     | 上一个目录         | dired-prev-dirline       |
 
+** calc
+
+** imenu
+| key   | mean     | command |
+| M-g i | 启动Imenu | imenu   |
 * org-mode
 | 折叠小节        | TAB       |                               |
 | 折叠所有        | shift TAB |                               |

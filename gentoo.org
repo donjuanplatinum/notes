@@ -1,3 +1,80 @@
+* Table                                                               :TOC_8:
+- [[#gentoo][gentoo]]
+  - [[#安装][安装]]
+    - [[#1挂载][1.挂载]]
+    - [[#2stage3][2.stage3]]
+      - [[#关于stage包的区别][关于stage包的区别]]
+      - [[#解压stage3][解压stage3]]
+      - [[#创建mntgentooetcportagereposconfgentooconf][创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf]]
+        - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
+      - [[#更改mntgentooetcgentooportagemakeconf][更改/mnt/gentoo/etc/gentoo/portage/make.conf]]
+        - [[#etcportagemakeconf][/etc/portage/make.conf]]
+      - [[#挂载文件系统][挂载文件系统]]
+      - [[#chroot][chroot]]
+      - [[#emerge-sync][emerge sync]]
+      - [[#eselect][eselect]]
+      - [[#配置use][配置use]]
+      - [[#emerge-update][emerge update]]
+      - [[#时区][时区]]
+        - [[#openrc][openrc]]
+        - [[#systemd][systemd]]
+      - [[#locale-etclocalegen][locale /etc/locale.gen]]
+      - [[#eselect-locale][eselect locale]]
+      - [[#内核][内核]]
+      - [[#rc][rc]]
+      - [[#grub][grub]]
+      - [[#umount][umount]]
+      - [[#kde][kde]]
+      - [[#display-manager][display-manager]]
+      - [[#fcitx][fcitx]]
+        - [[#etcenvironment][/etc/environment]]
+      - [[#服务启动][服务启动]]
+      - [[#kde-1][kde]]
+    - [[#3grub][3.grub]]
+      - [[#sys-bootos-prober][sys-boot/os-prober]]
+    - [[#4网络][4.网络]]
+      - [[#静态ip][静态ip]]
+    - [[#5时间][5.时间]]
+  - [[#问题][问题]]
+    - [[#steam][steam]]
+      - [[#激活steam源][激活steam源]]
+      - [[#开启use-etcportagepackageaccept_keywordssteam][开启use /etc/portage/package.accept_keywords/steam]]
+    - [[#vlc][vlc]]
+      - [[#中文乱码][中文乱码]]
+  - [[#portage][portage]]
+    - [[#安装gentoolkit][安装gentoolkit]]
+    - [[#降低占用][降低占用]]
+    - [[#更新仓库][更新仓库]]
+    - [[#移除软件][移除软件]]
+    - [[#搜索软件][搜索软件]]
+    - [[#安装软件][安装软件]]
+    - [[#查看包][查看包]]
+    - [[#系统更新][系统更新]]
+    - [[#特殊需求][特殊需求]]
+    - [[#查看包的版本列表-安装特定版本的包][查看包的版本列表 安装特定版本的包]]
+      - [[#portage特性][portage特性]]
+      - [[#分布式编译distcc][分布式编译distcc]]
+      - [[#缓冲编译ccache][缓冲编译ccache]]
+        - [[#在makeconf中加入ccache支持][在make.conf中加入ccache支持]]
+        - [[#设置ccache_dir环境变量][设置CCACHE_DIR环境变量]]
+    - [[#varcachedistfiles][/var/cache/distfiles]]
+    - [[#查看use说明][查看USE说明]]
+  - [[#portage报错][portage报错]]
+    - [[#mask][mask]]
+    - [[#use][USE]]
+    - [[#循环依赖][循环依赖]]
+    - [[#profile保护][profile保护]]
+    - [[#测试版本][测试版本]]
+  - [[#配置文件][配置文件]]
+    - [[#use-vardbreposprofilesusedesc][use /var/db/repos/profiles/use.desc]]
+  - [[#部分包配置][部分包配置]]
+    - [[#dev-langrust][dev-lang/rust]]
+    - [[#app-editorsemacs][app-editors/emacs]]
+    - [[#net-wirelesslorcon][net-wireless/lorcon]]
+- [[#后续][后续]]
+  - [[#230版本更新][23.0版本更新]]
+  - [[#fcitx-rime切换为简体][fcitx-rime切换为简体]]
+
 * gentoo
 ** 安装
 *** 1.挂载
@@ -294,6 +371,11 @@ games-util/game-device-udev-rules
    #+end_src
 2. 在vlc设置中更换字体
 ** portage
+
+*** 安装gentoolkit
+#+begin_src shell
+  emerge gentoolkit
+#+end_src
 *** 降低占用
 #+begin_src shell
   # Extremely low priority (per above)
@@ -375,6 +457,7 @@ portage下载的源代码的位置
     eclean-dist
   #+end_src
 *** 查看USE说明
+安装gentoolkit
 #+begin_src shell
   equery uses emacs
    * Found these USE flags for app-editors/emacs-29.4:
@@ -390,7 +473,6 @@ portage下载的源代码的位置
  - - games               : Support shared score files for games
 ....
 #+end_src
-
 
 ** portage报错
 *** mask

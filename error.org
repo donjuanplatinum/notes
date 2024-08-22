@@ -1,3 +1,14 @@
+* Table                                                               :TOC_8:
+  - [[#环境问题][环境问题]]
+    - [[#opengl][opengl]]
+      - [[#问题][问题]]
+      - [[#solution][solution]]
+    - [[#rust-cuda][rust cuda]]
+      - [[#solution-1][solution]]
+    - [[#python][python]]
+      - [[#no-module-named-pkg_resources][No module named 'pkg_resources']]
+      - [[#error-invalid-command-dist_info][error: invalid command 'dist_info']]
+
 ** 环境问题
 *** opengl
 **** 问题
