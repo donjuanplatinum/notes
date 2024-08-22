@@ -145,6 +145,7 @@ global-display-line-numbers-mode 'open 全局行号
 | key   | mean     | command |
 | M-g i | 启动Imenu | imenu   |
 * org-mode
+** 基本
 | 折叠小节        | TAB       |                               |
 | 折叠所有        | shift TAB |                               |
 | 快速输入#+结构   | C-c C-,   | org-insert-structure-template |
@@ -165,6 +166,17 @@ global-display-line-numbers-mode 'open 全局行号
 | 有序列表 | 1.         |          |
 | 行内代码 | \~代码\~    | ~代码~    |
 | 强调    | \=强调\=    | =强调=     |
+
+** 添加TOC Table Of Contents
+打开toc-org-mode
+#+begin_src emacs-lisp
+  toc-org-mode
+#+end_src
+
+为org创建一个标题 并添加TOC标签
+#+begin_src emacs-lisp
+  * Table :TOC_8:
+#+end_src
 ** 代码块
 #+begin_src
 \#+begin_src
