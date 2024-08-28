@@ -1,20 +1,40 @@
-* Table                                                              :TOC_10:
+* Table                                                              :TOC_8:
 - [[#emacs键位][emacs键位]]
   - [[#basic][basic]]
+    - [[#搜索与替换][搜索与替换]]
+    - [[#拼符][拼符]]
+    - [[#move][move]]
+    - [[#主题和布局][主题和布局]]
+    - [[#help][help]]
+    - [[#注释与排版][注释与排版]]
+    - [[#矩形操作][矩形操作]]
+    - [[#buffer操作][buffer操作]]
   - [[#magit][magit]]
 - [[#emacs模式][emacs模式]]
   - [[#buffer-list][buffer-list]]
+    - [[#状态栏crm][状态栏[CRM]]]
+    - [[#按键][按键]]
   - [[#ibuffer][ibuffer]]
+    - [[#设置][设置]]
+    - [[#命令][命令]]
+      - [[#筛选][筛选]]
+      - [[#被标记的buffer][被标记的buffer]]
+      - [[#用于标记][用于标记]]
   - [[#dired][Dired]]
-  - [[#calc][calc]]
+    - [[#keyboard][keyboard]]
   - [[#imenu][imenu]]
 - [[#org-mode][org-mode]]
+  - [[#基本][基本]]
   - [[#标记文本][标记文本]]
+  - [[#添加toc-table-of-contents][添加TOC Table Of Contents]]
   - [[#代码块][代码块]]
   - [[#链接][链接]]
   - [[#引用][引用]]
-- [[#elisp][elisp]]
-  - [[#操作][操作]]
+- [[#calc][Calc]]
+  - [[#basic-1][Basic]]
+    - [[#算数操作][算数操作]]
+    - [[#表示][表示]]
+    - [[#键位][键位]]
 
 * emacs键位
 ** basic
@@ -50,6 +70,9 @@
 
 *** 矩形操作
 | 矩形标记 | C-x SPC | rectangle-mark-mode |
+
+*** buffer操作
+| 重命名buffer | C-x x r | rename-buffer |
 ** magit
 | 显示所有选项 | C-x M-g | magit-dispatch |
 
@@ -139,7 +162,6 @@ global-display-line-numbers-mode 'open 全局行号
 | >     | 下一个目录         | dired-next-dirline       |
 | <     | 上一个目录         | dired-prev-dirline       |
 
-** calc
 
 ** imenu
 | key   | mean     | command |
@@ -190,5 +212,36 @@ global-display-line-numbers-mode 'open 全局行号
 \#+begin_quote
 \#+end_quote
 #+end_quote
-* elisp
-** 操作
+* Calc
+Calc主模式是一个 ~RPN~ 逆波兰计算器 支持线性代数等高端操作
+
+打开Calc ~M-x calc~
+** Basic
+*** 算数操作
+| + | 加        |
+| - | 减        |
+| * | 乘        |
+| / | 除        |
+| ^ | 指数      |
+| & | 倒数      |
+| % | 模(余数)   |
+| n | 正负(乘-1) |
+
+*** 表示
+| 3.14e6                    | 3.14 * 10^6              |
+| _23                       | -23                      |
+| 17:3                      | 17/3                     |
+| 5:3:2                     | 5 + 3/2                  |
+| 16#12C                    | 16进制的12C转换为当前进制基底 |
+| 16#F:C                    | 16进制的F/C转换为当前进制基底 |
+| (2,4)                     | 复数2+4i                  |
+| (2;4)                     | 复数的极坐标(2;theta角)     |
+| [1,2,3]                   | 向量                      |
+| [[1,2,3],[4,5,6],[2,3,5]] | 矩阵                      |
+| [1..4)                    | 前闭后开区间                |
+| 2 +/- 3                   | 均值为2 标准差为3           |
+| 2 mod 3                   | 2对3的模运算               |
+
+
+*** 键位
+| C-d | 弹出栈顶 | calc-pop |

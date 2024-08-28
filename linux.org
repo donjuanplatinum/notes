@@ -2,7 +2,8 @@
 - [[#linux][Linux]]
   - [[#命令][命令]]
     - [[#losetup][losetup]]
-    - [[#ssh内网穿透][ssh内网穿透]]
+    - [[#ssh][ssh]]
+      - [[#ssh内网穿透][ssh内网穿透]]
     - [[#mount][mount]]
     - [[#grub][Grub]]
       - [[#efi][EFI]]
@@ -116,7 +117,8 @@ p     --output-all              output all columns
       LOG-SEC  logical sector size in bytes
 
 #+end_src
-*** ssh内网穿透
+*** TODO ssh
+**** ssh内网穿透
 #+begin_src shell
   ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
 #+end_src
