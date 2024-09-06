@@ -1,0 +1,18 @@
+* 术语                                                                :TOC_8:
+  - [[#network][Network]]
+    - [[#ajax][AJAX]]
+    - [[#alpn][ALPN]]
+    - [[#websokcet][WebSokcet]]
+
+** Network
+*** AJAX
+Async Javascript And Xml
+
+是一种在web应用中通过异步发送HTTP请求 并更新界面中的 ~相关~ 部分 而无需重新加载整个界面的技术
+
+*** ALPN
+应用层协议协商 是一个TLS拓展 用于协商加密链接时 识别 应用层协议
+
+*** WebSokcet
+~WebSocket~ 可以在用户浏览器和服务器之间开启 ~双向交互式通信会话~
+利用此API 可以向服务器发送信息 并接受事件驱动响应 而 ~无需轮询服务器~

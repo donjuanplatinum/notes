@@ -1,0 +1,97 @@
+* Content                                                             :TOC_8:
+- [[#javascript][JavaScript]]
+  - [[#组成][组成]]
+  - [[#数据类型][数据类型]]
+    - [[#原始类型-primitive-type][原始类型 primitive type]]
+  - [[#运算符][运算符]]
+  - [[#语法][语法]]
+    - [[#函数][函数]]
+    - [[#条件][条件]]
+  - [[#事件][事件]]
+- [[#webapi][WebAPI]]
+  - [[#dom-文档对象模型][DOM 文档对象模型]]
+
+* JavaScript
+JS 是一门完备的动态编程语言 当应用于HTML时 可为网站提供动态交互特性
+
+
+** 组成
+- ECMAScript
+  简称ES
+  语法 类型 语句等定义
+- DOM (~D~ ocument ~O~ bject ~M~ odel)
+  文档对象模型 定义与界面交互的API
+- BOM (~B~ rowser ~O~ bject ~M~ odel)
+  浏览器对象模型 定义与浏览器窗口交互的API
+** 数据类型
+| 类型    | 解释           | 示例                                  |
+| String  | 字符串         | let var123 = 'donjuanplatinum';       |
+| Number  | 数字           | let a = 10;                           |
+| Boolean | 布尔           | let a = true;                         |
+| Array   | 数组           | let a = [1,2,3,'你好'];               |
+| Object  | 面向对象的对象 | let a = document.querySelector('h1'); |
+#+begin_quote
+注意 与rust不同的是 数组不要求同类型
+注意 JavaScript所有的类型 包括原始类型都是 ~对象~
+#+end_quote
+*** 原始类型 primitive type
+数值 + 字符串+ bool值
+
+** 运算符
+| 运算符  | 解释                      | 示例                 |
+| +       | 1. 相加数值 2. 拼接字符串 | 6 + 9; "hi" + "you"; |
+| - / *   | 四则运算                  |                      |
+| =       | 赋值                      | let a = "hi";        |
+| == / != | 等于或者不等于            | a == b;              |
+| !       | 非门 NOT                  | !(a==b);               |
+
+** 语法
+*** 函数
+
+#+begin_src js
+  function add(num1,num2) {
+      let result = num1 + num2;
+      return result;
+  }
+#+end_src
+
+*** 条件
+#+begin_src js
+  let a = 123;
+  if a == 123 {
+      alert("123");
+  } else {
+      alert("not123");
+  }
+#+end_src
+
+** TODO 事件
+事件为网页添加交互能力 它捕捉浏览器操作并响应
+
+一个典型的点击事件
+
+#+begin_src js
+  document.querySelector("html").addEventListener("click",
+						  function () {
+						      alert("你点了我");
+						  }
+						 );
+#+end_src
+
+这里选用了 ~html元素~ 然后调用了他的 ~addEventListener~ 方法
+
+#+begin_quote
+其实闭包还可以这么写
+#+end_quote
+#+begin_src js
+    document.querySelector("html").addEventListener("click",
+						  () => {
+						      alert("你点了我");
+						  }
+						 );
+#+end_src
+
+* WebAPI
+** DOM 文档对象模型
+DOM相当于在rust中对html运用反序列化(Deserialize)后生成的对象
+可以通过DOM的函数达到序列化html和反序列化的过程
