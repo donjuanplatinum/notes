@@ -388,6 +388,7 @@ procfs提供了 hidepid 的挂载选项 以限制其他用户对 /proc/<pid>的�
 *** TODO Out Of Memory (OOM)
 OOM Killer是 ~内核的一个进程~ 会根据一个复杂的算法去评估进程OOM分数, 当系统资源严重不足达到一个设置的阈值时 从分数最高的进程开始kill
 
+
 分数储存在 [[*/proc/<pid>/oom_score][/proc/<pid>/oom_score]] 也可以使用 ~ps -eo pid,comm,oom --sort=-oom |head~ 来查看分数最高的进程
 
 **** 修改OOM分值

@@ -1,10 +1,32 @@
+* Table                                                               :TOC_8:
+- [[#wine][Wine]]
+  - [[#wine的基本配置][Wine的基本配置]]
+    - [[#配置][配置]]
+    - [[#创建新环境][创建新环境]]
+    - [[#中文][中文]]
+  - [[#游戏][游戏]]
+    - [[#rwr小兵步枪][RWR小兵步枪]]
+    - [[#美少女万华镜-雪女][美少女万华镜-雪女]]
+    - [[#上古卷轴5][上古卷轴5]]
+      - [[#安装dxvk-否则会闪烁材质][安装DXVK 否则会闪烁材质]]
+- [[#lutris][lutris]]
+- [[#ryujinx][Ryujinx]]
+  - [[#安装][安装]]
+  - [[#配置-1][配置]]
+    - [[#放置prodkeys][放置prod.keys]]
+    - [[#安装固件firmware][安装固件firmware]]
+  - [[#格式转换][格式转换]]
+- [[#dxvk][dxvk]]
+  - [[#gentoo][Gentoo]]
+    - [[#安装-1][安装]]
+      - [[#lutris-1][lutris]]
+      - [[#wine-1][wine]]
+
 * Wine
 记录wine运行某些软件 
 
 在 [[http://protondb.com][ProtonDB]] 中 可以查看可以在wine-proton中游玩的游戏
 
-- [[游戏][游戏]]
-  - [[RWR小兵步枪][小兵步枪]]
 
 ** Wine的基本配置
 
@@ -35,6 +57,12 @@
 设置中选择全屏
 
 打开Win32api模式
+
+*** 上古卷轴5
+
+**** 安装DXVK 否则会闪烁材质
+[[dxvk][DXVK]]
+* TODO lutris
 * Ryujinx
 ** 安装
 #+begin_src shell
@@ -51,3 +79,16 @@
 
 ** 格式转换
 使用 [[https://github.com/dezem/SAK][SAK转换器]] 来转换格式
+
+* dxvk
+** Gentoo
+*** 安装
+**** lutris
+#+begin_src shell
+  ln -s /usr/lib/dxvk ~/.local/share/lutris/runtime/dxvk/system
+#+end_src
+
+**** wine
+#+begin_src shell
+  WINEPREFIX=~/gamewine setup_dxvk.sh install --symlink
+#+end_src
