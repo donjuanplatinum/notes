@@ -63,6 +63,9 @@
       - [[#dest][Dest]]
       - [[#过滤器][过滤器]]
       - [[#配置][配置]]
+- [[#配置-1][配置]]
+  - [[#polkit][polkit]]
+    - [[#配置dolphin挂载文件系统][配置dolphin挂载文件系统]]
 
 * Linux
 ** 命令
@@ -642,4 +645,18 @@ log { source(system_log);
 #destination console_all { file("/dev/console"); };
 #log { source(system_log); destination(console_all); };
 
+#+end_src
+* 配置
+** TODO polkit
+PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 机制）使用的授权 API，为非特权程序（也称为 主题）提供服务。
+
+*** 配置dolphin挂载文件系统
+/etc/polkit-1/rules.d/mount.rules
+#+begin_src
+  polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.udisks2.filesystem-mount-system" &&
+        subject.isInGroup("donjuan")) {
+        return polkit.Result.YES;
+    }
+});
 #+end_src

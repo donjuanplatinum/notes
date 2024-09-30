@@ -8,6 +8,9 @@
     - [[#python][python]]
       - [[#no-module-named-pkg_resources][No module named 'pkg_resources']]
       - [[#error-invalid-command-dist_info][error: invalid command 'dist_info']]
+  - [[#系统问题][系统问题]]
+    - [[#kde][kde]]
+      - [[#policykit-身份验证系统不可用-not-authorized-to-perform-operation][PolicyKit 身份验证系统不可用 Not authorized to perform operation]]
 
 ** 环境问题
 *** opengl
@@ -80,3 +83,8 @@ help: there is a method `cuMemPrefetchAsync` with a similar name, but with diffe
 #+begin_src shell
   pip install setuptools
 #+end_src
+
+** 系统问题
+*** kde
+**** PolicyKit 身份验证系统不可用 Not authorized to perform operation
+[[./linux.org::polkit][Polkit配置]]

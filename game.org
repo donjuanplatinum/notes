@@ -9,6 +9,7 @@
     - [[#美少女万华镜-雪女][美少女万华镜-雪女]]
     - [[#上古卷轴5][上古卷轴5]]
       - [[#安装dxvk-否则会闪烁材质][安装DXVK 否则会闪烁材质]]
+      - [[#安装xact_x64-否则没声音][安装xact_x64 否则没声音]]
 - [[#lutris][lutris]]
 - [[#ryujinx][Ryujinx]]
   - [[#安装][安装]]
@@ -21,6 +22,13 @@
     - [[#安装-1][安装]]
       - [[#lutris-1][lutris]]
       - [[#wine-1][wine]]
+- [[#xbox][xbox]]
+  - [[#安装驱动][安装驱动]]
+    - [[#gentoo-1][gentoo]]
+- [[#gamemode][gamemode]]
+  - [[#安装-2][安装]]
+- [[#xact_x64][xact_x64]]
+  - [[#安装-3][安装]]
 
 * Wine
 记录wine运行某些软件 
@@ -62,6 +70,9 @@
 
 **** 安装DXVK 否则会闪烁材质
 [[dxvk][DXVK]]
+
+**** 安装xact_x64 否则没声音
+
 * TODO lutris
 * Ryujinx
 ** 安装
@@ -81,6 +92,7 @@
 使用 [[https://github.com/dezem/SAK][SAK转换器]] 来转换格式
 
 * dxvk
+可以提升针率 并且诸如[[上古卷轴5][上古卷轴5]]等游戏不安装dxvk会闪烁
 ** Gentoo
 *** 安装
 **** lutris
@@ -91,4 +103,25 @@
 **** wine
 #+begin_src shell
   WINEPREFIX=~/gamewine setup_dxvk.sh install --symlink
+#+end_src
+
+* xbox
+** 安装驱动
+*** gentoo
+#+begin_src shell
+  sudo emerge games-util/xboxdrv
+#+end_src
+
+* gamemode
+** 安装
+#+begin_src shell
+  sudo emerge gamemode
+#+end_src
+
+* xact_x64
+诸如[[上古卷轴5][上古卷轴5]]等游戏不安装会没NPC声音
+
+** 安装
+#+begin_src shell
+  WINEPREFIX=your prefix winetricks xact_x64
 #+end_src

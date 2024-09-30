@@ -74,6 +74,7 @@
 - [[#后续][后续]]
   - [[#230版本更新][23.0版本更新]]
   - [[#fcitx-rime切换为简体][fcitx-rime切换为简体]]
+- [[#注意][注意]]
 
 * gentoo
 ** 安装
@@ -952,3 +953,8 @@ zstd - Enable support for ZSTD compression
 F4选择即可
 
 
+* 注意
+更新后记得执行 因为gentoo有时更新会换一些库的位置 dispatch-conf可以帮助你迁移配置文件
+#+begin_src shell
+  dispatch-conf
+#+end_src
