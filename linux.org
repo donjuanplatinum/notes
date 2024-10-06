@@ -34,6 +34,7 @@
     - [[#iostat][iostat]]
     - [[#top][top]]
     - [[#ps][ps]]
+    - [[#smartmontools][smartmontools]]
   - [[#loop设备][loop设备]]
   - [[#技巧][技巧]]
     - [[#shell][shell]]
@@ -66,6 +67,8 @@
 - [[#配置-1][配置]]
   - [[#polkit][polkit]]
     - [[#配置dolphin挂载文件系统][配置dolphin挂载文件系统]]
+- [[#软件][软件]]
+  - [[#btfs][BTFS]]
 
 * Linux
 ** 命令
@@ -306,6 +309,9 @@ strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.
 *** TODO iostat
 *** TODO top
 *** TODO ps
+
+*** smartmontools
+使用自我监控(Self-Monitoring)、分析(Analysis)和报告(Reporting)三种技术（缩写为S.M.A.R.T或SMART）来管理和监控存储硬件。
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
@@ -646,6 +652,8 @@ log { source(system_log);
 #log { source(system_log); destination(console_all); };
 
 #+end_src
+
+
 * 配置
 ** TODO polkit
 PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 机制）使用的授权 API，为非特权程序（也称为 主题）提供服务。
@@ -660,3 +668,9 @@ PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 
     }
 });
 #+end_src
+
+
+* 软件
+
+** BTFS
+Bittorrent 已经存在了很长时间，它可以从互联网上共享和下载数据。市场上有大量的 GUI 和 CLI 的 Bittorrent 客户端。有时，你不能坐下来等待你的下载完成。你可能想要立即观看内容。这就是 BTFS 这个不起眼的文件系统派上用场的地方。使用 BTFS，你可以将种子文件或磁力链接挂载为目录，然后在文件树中作为只读目录。这些文件的内容将在程序读取时按需下载。由于 BTFS 在 FUSE 之上运行，因此不需要干预 Linux 内核。

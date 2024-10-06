@@ -10,6 +10,8 @@
     - [[#上古卷轴5][上古卷轴5]]
       - [[#安装dxvk-否则会闪烁材质][安装DXVK 否则会闪烁材质]]
       - [[#安装xact_x64-否则没声音][安装xact_x64 否则没声音]]
+    - [[#生化危机][生化危机]]
+    - [[#艾尔登法环][艾尔登法环]]
 - [[#lutris][lutris]]
 - [[#ryujinx][Ryujinx]]
   - [[#安装][安装]]
@@ -22,13 +24,18 @@
     - [[#安装-1][安装]]
       - [[#lutris-1][lutris]]
       - [[#wine-1][wine]]
+- [[#vkd3d][vkd3d]]
+  - [[#gentoo-1][Gentoo]]
+    - [[#安装-2][安装]]
+      - [[#lutris-2][lutris]]
+      - [[#wine-2][wine]]
 - [[#xbox][xbox]]
   - [[#安装驱动][安装驱动]]
-    - [[#gentoo-1][gentoo]]
+    - [[#gentoo-2][gentoo]]
 - [[#gamemode][gamemode]]
-  - [[#安装-2][安装]]
-- [[#xact_x64][xact_x64]]
   - [[#安装-3][安装]]
+- [[#xact_x64][xact_x64]]
+  - [[#安装-4][安装]]
 
 * Wine
 记录wine运行某些软件 
@@ -73,6 +80,16 @@
 
 **** 安装xact_x64 否则没声音
 
+*** 生化危机
+注意 生化危机最好不开dxvk 否则可能出问题
+
+可能出现的错误
+[[./error.org::missing decoder][gstreamer插件缺失]]
+
+*** 艾尔登法环
+艾尔登法环需要EAC支持 以及[[#vkd3d][VKD3D]]
+
+EAC可以通过[[#lutris][Lutris]]的EAC功能 VKD3D同理
 * TODO lutris
 * Ryujinx
 ** 安装
@@ -92,7 +109,8 @@
 使用 [[https://github.com/dezem/SAK][SAK转换器]] 来转换格式
 
 * dxvk
-可以提升针率 并且诸如[[上古卷轴5][上古卷轴5]]等游戏不安装dxvk会闪烁
+可以提升针率 DX9/10/11的调用转换为Vulkan 并且诸如[[上古卷轴5][上古卷轴5]]等游戏不安装dxvk会闪烁
+
 ** Gentoo
 *** 安装
 **** lutris
@@ -105,6 +123,21 @@
   WINEPREFIX=~/gamewine setup_dxvk.sh install --symlink
 #+end_src
 
+* vkd3d
+DX12转换Vulkan 几乎DX12游戏必备 比如[[#艾尔登法环][艾尔登法环]]
+
+注意 VKD3D最好使用Lutris自己安装
+** Gentoo
+*** 安装
+**** lutris
+#+begin_src shell
+  ln -s /usr/lib/vkd3d-proton ~/.local/share/lutris/runtime/vkd3d/版本号
+#+end_src
+
+**** wine
+#+begin_src shell
+  WINEPREFIX=~/gamewine setup_vkd3d_proton.sh install --symlink
+#+end_src
 * xbox
 ** 安装驱动
 *** gentoo

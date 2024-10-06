@@ -3,6 +3,7 @@
 #show enum: set text(green)
 #show strong: set text(yellow)
 = 数学
++ 证明
 + 公式
   - #link(<拉马努金>)[拉马努金]
     + #link(<pi>)[$pi$]

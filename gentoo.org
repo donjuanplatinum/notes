@@ -145,7 +145,7 @@ sync-webrsync-verify-signature = no
   LC_MESSAGES=C.utf8
   GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
   #GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
-  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm"
+  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm ffmpeg"
   VIDEO_CARDS="amdgpu radeonsi"
   MAKEOPTS="-j8"
 
@@ -288,6 +288,7 @@ en_US.UTF-8 UTF-8
 #+begin_src shell
    emerge gui-libs/display-manager-init
    vi /etc/conf.d/xdm
+   vi /etc/conf.d/display-manager
   ->  DISPLAYMANAGER="sddm"
    sudo rc-update add sddm default
 #+end_src

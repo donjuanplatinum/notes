@@ -8,6 +8,10 @@
     - [[#python][python]]
       - [[#no-module-named-pkg_resources][No module named 'pkg_resources']]
       - [[#error-invalid-command-dist_info][error: invalid command 'dist_info']]
+    - [[#wine][wine]]
+    - [[#gstreamer][gstreamer]]
+      - [[#plugins][plugins]]
+        - [[#missing-decoder][missing decoder]]
   - [[#系统问题][系统问题]]
     - [[#kde][kde]]
       - [[#policykit-身份验证系统不可用-not-authorized-to-perform-operation][PolicyKit 身份验证系统不可用 Not authorized to perform operation]]
@@ -84,6 +88,24 @@ help: there is a method `cuMemPrefetchAsync` with a similar name, but with diffe
   pip install setuptools
 #+end_src
 
+*** wine
+*** gstreamer
+**** plugins
+***** missing decoder
+#+begin_src
+ winegstreamer error: decodebin1: 您的 GStreamer 安装缺少插件。
+ winegstreamer error: decodebin1:
+  ../gst-plugins-base-1.22.11/gst/playback/gstdecodebin2.c(4705): 
+                         gst_decode_bin_expose (): /GstBin:bin0/GstDecodeBin:decodebin1:
+ Missing decoder: 
+wmvversion=(int)3, format=(string)WVC1, width=(int)1920, 
+height=(int)1080, 
+
+#+end_src
+解决方案 安装gst-plugins-libav 或者安装gst-plugins-meta 并打开USE=ffmpeg
+#+begin_src shell
+  sudo emerge media-plugins/gst-plugins-libav
+#+end_src
 ** 系统问题
 *** kde
 **** PolicyKit 身份验证系统不可用 Not authorized to perform operation
