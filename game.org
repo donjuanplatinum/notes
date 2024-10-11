@@ -36,6 +36,7 @@
   - [[#安装-3][安装]]
 - [[#xact_x64][xact_x64]]
   - [[#安装-4][安装]]
+- [[#eac][eac]]
 
 * Wine
 记录wine运行某些软件 
@@ -158,3 +159,6 @@ DX12转换Vulkan 几乎DX12游戏必备 比如[[#艾尔登法环][艾尔登法�
 #+begin_src shell
   WINEPREFIX=your prefix winetricks xact_x64
 #+end_src
+
+* eac
+在gentoo中运行EAC需要启用glibc的一个USE [[./gentoo.org::sys-libs/glibc][Glibc]]

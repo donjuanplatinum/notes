@@ -1,12 +1,10 @@
 * Table                                                               :TOC_8:
-- [[#gentoo][gentoo]]
-  - [[#安装][安装]]
+- [[#安装][安装]]
     - [[#1挂载][1.挂载]]
     - [[#2stage3][2.stage3]]
       - [[#关于stage包的区别][关于stage包的区别]]
       - [[#解压stage3][解压stage3]]
       - [[#创建mntgentooetcportagereposconfgentooconf][创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf]]
-        - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
       - [[#更改mntgentooetcgentooportagemakeconf][更改/mnt/gentoo/etc/gentoo/portage/make.conf]]
         - [[#etcportagemakeconf][/etc/portage/make.conf]]
       - [[#挂载文件系统][挂载文件系统]]
@@ -35,13 +33,17 @@
     - [[#4网络][4.网络]]
       - [[#静态ip][静态ip]]
     - [[#5时间][5.时间]]
-  - [[#问题][问题]]
-    - [[#steam][steam]]
-      - [[#激活steam源][激活steam源]]
-      - [[#开启use-etcportagepackageaccept_keywordssteam][开启use /etc/portage/package.accept_keywords/steam]]
-    - [[#vlc][vlc]]
-      - [[#中文乱码][中文乱码]]
-  - [[#portage][portage]]
+- [[#后续][后续]]
+  - [[#230版本更新][23.0版本更新]]
+  - [[#fcitx-rime切换为简体][fcitx-rime切换为简体]]
+  - [[#fcitx-1][fcitx]]
+- [[#注意][注意]]
+- [[#部分包配置][部分包配置]]
+    - [[#dev-langrust][dev-lang/rust]]
+    - [[#app-editorsemacs][app-editors/emacs]]
+    - [[#net-wirelesslorcon][net-wireless/lorcon]]
+    - [[#sys-libsglibc][sys-libs/glibc]]
+- [[#portage][portage]]
     - [[#安装gentoolkit][安装gentoolkit]]
     - [[#降低占用][降低占用]]
     - [[#更新仓库][更新仓库]]
@@ -59,28 +61,20 @@
         - [[#设置ccache_dir环境变量][设置CCACHE_DIR环境变量]]
     - [[#varcachedistfiles][/var/cache/distfiles]]
     - [[#查看use说明][查看USE说明]]
-  - [[#portage报错][portage报错]]
-    - [[#mask][mask]]
-    - [[#use][USE]]
-    - [[#循环依赖][循环依赖]]
-    - [[#profile保护][profile保护]]
-    - [[#测试版本][测试版本]]
-    - [[#block][Block]]
+    - [[#报错][报错]]
+      - [[#mask][mask]]
+      - [[#use][USE]]
+      - [[#循环依赖][循环依赖]]
+      - [[#profile保护][profile保护]]
+      - [[#测试版本][测试版本]]
+      - [[#block][Block]]
       - [[#解决方案][解决方案]]
-  - [[#配置文件][配置文件]]
-    - [[#use-vardbreposprofilesusedesc][use /var/db/repos/profiles/use.desc]]
-  - [[#部分包配置][部分包配置]]
-    - [[#dev-langrust][dev-lang/rust]]
-    - [[#app-editorsemacs][app-editors/emacs]]
-    - [[#net-wirelesslorcon][net-wireless/lorcon]]
-- [[#后续][后续]]
-  - [[#230版本更新][23.0版本更新]]
-  - [[#fcitx-rime切换为简体][fcitx-rime切换为简体]]
-  - [[#fcitx-1][fcitx]]
-- [[#注意][注意]]
+- [[#配置文件][配置文件]]
+  - [[#vardbreposprofilesusedesc][/var/db/repos/profiles/use.desc]]
+  - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
+  - [[#etcportagemakeconf-1][/etc/portage/make.conf]]
 
-* gentoo
-** 安装
+* 安装
 *** 1.挂载
 将根磁盘挂载到/mnt/genoo
 *** 2.stage3
@@ -97,33 +91,7 @@
   tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 #+end_src
 **** 创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-***** /etc/portage/repos.conf/gentoo.conf
-:PROPERTIES:
-:HEADER-ARGS: :tangle tangle/portage/repos.conf/gentoo.conf :mkdirp yes
-:END:
-#+begin_src conf
-[DEFAULT]
-main-repo = gentoo
-
-[gentoo]
-location = /var/db/repos/gentoo
-sync-type = rsync
-#sync-uri = rsync://127.0.0.1/repo/gentoo-portage
-sync-uri = rsync://mirrors.ustc.edu.cn/gentoo-portage
-auto-sync = yes
-sync-rsync-verify-jobs = 1
-sync-rsync-verify-metamanifest = no
-sync-rsync-verify-max-age = 24
-sync-openpgp-key-path = /usr/share/openpgp-keys/gentoo-release.asc
-sync-openpgp-key-refresh-retry-count = 40
-sync-openpgp-key-refresh-retry-overall-timeout = 1200
-sync-openpgp-key-refresh-retry-delay-exp-base = 2
-sync-openpgp-key-refresh-retry-delay-max = 60
-sync-openpgp-key-refresh-retry-delay-mult = 4
-sync-webrsync-verify-signature = no
-	  
-#+end_src
-
+[[gentoo.conf][gentoo.conf]]
 **** 更改/mnt/gentoo/etc/gentoo/portage/make.conf
 ***** /etc/portage/make.conf
 :PROPERTIES:
@@ -148,7 +116,7 @@ sync-webrsync-verify-signature = no
   LC_MESSAGES=C.utf8
   GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
   #GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
-  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm ffmpeg"
+  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm"
   VIDEO_CARDS="amdgpu radeonsi"
   MAKEOPTS="-j8"
 
@@ -300,6 +268,9 @@ en_US.UTF-8 UTF-8
 echo 'app-i18n/fcitx-configtool kcm' > /etc/portage/package.use/fcitx-configtool
 emerge fcitx fcitx-rime fcitx-configtools
 #+end_src
+在键盘->虚拟键盘 选择fcitx5
+
+在输入法->添加输入法 添加中州韵
 ***** /etc/environment
 #+begin_src shell
   #
@@ -356,28 +327,57 @@ GRUB 可以在运行 grub-mkconfig 命令时检测到其他操作系统并生成
   sudo emerge net-misc/chrony
   rc-update add chronyd default
 #+end_src
-** 问题
-*** steam
-**** 激活steam源
-#+begin_src shell
-  emerge --ask --noreplace app-eselect/eselect-repository dev-vcs/git
-  eselect repository enable steam-overlay
-  emaint sync -r steam-overlay
-#+end_src
-**** 开启use /etc/portage/package.accept_keywords/steam
+* 后续
+** 23.0版本更新
+默认合并了/usr (merged-usr)
+在profile中 旧版本需要选择 split-usr
 #+begin_src
-*/*::steam-overlay
-games-util/game-device-udev-rules
-#+end_src
-*** vlc
-**** 中文乱码
-1. 安装字体
-   #+begin_src shell
-     emerge wqy-zenhei
-   #+end_src
-2. 在vlc设置中更换字体
-** portage
+  Select the 23.0 profile corresponding to your current profile, either using
+   "eselect profile" or by manually setting the profile symlink.
+   Note that old profiles are by default split-usr and the 23.0 profiles by
+   default merged-usr. Do NOT change directory scheme now, since this will
+   mess up your system! 
+   Instead, make sure that the new profile has the same property: for example, 
+   OLD default/linux/amd64/17.1  
+        ==>  NEW default/linux/amd64/23.0/split-usr
+             (added "split-usr")
+   OLD default/linux/amd64/17.1/systemd/merged-usr  
+        ==>  NEW default/linux/amd64/23.0/systemd
+             (removed "merged-usr")
 
+#+end_src
+** fcitx-rime切换为简体
+F4选择即可
+
+
+** fcitx
+
+* 注意
+更新后记得执行 因为gentoo有时更新会换一些库的位置 dispatch-conf可以帮助你迁移配置文件
+#+begin_src shell
+  dispatch-conf
+#+end_src
+* 部分包配置
+*** dev-lang/rust
+#+begin_src
+  clippy doc rust-analyzer rust-src rust-fmt
+#+end_src
+*** app-editors/emacs
+#+begin_src
+  app-editors/emacs libxml2 dynamic-loading
+  # libxml2为了一些包的正常使用 dynamic-loading启用动态模块
+#+end_src
+*** net-wireless/lorcon
+#+begin_src
+  net-wireless/lorcon python
+#+end_src
+*** sys-libs/glibc
+#+begin_src
+  sys-libs/glibc hash-sysv-compat
+  # hash-sysv-compat为了支持wine-proton的eac游戏
+#+end_src
+
+* portage
 *** 安装gentoolkit
 #+begin_src shell
   emerge gentoolkit
@@ -480,15 +480,15 @@ portage下载的源代码的位置
 ....
 #+end_src
 
-** portage报错
-*** mask
+*** 报错
+**** mask
 | ~arch keyword               | 该软件没有经过充分的测试 不能进入稳定分支 请等待一段时间后尝试使用                                                                |
 | -arch keyword or -* keyword | 该软件不能在目标机器的架构中工作 如果情况并非如此                                                                              |
 | missing keyword             | 该软件至今还没有在机器的架构中进行过测试 可以咨询相应架构移植小组是否能对它进行测试 查看 /etc/portage/package.accept_keywords 和接受单个软件包的关键字 |
 | package.mask                | 发现该包已损坏或其他问题 被故意标记为请勿使用                                                                                  |
 | profile                     | 该软件不适合当前proifle                                                                                                  |
 | license                     | 不兼容license                                                                                                         |
-*** USE
+**** USE
 portage提示USE需要更改
 #+begin_src shell
   The following USE changes are necessary to proceed:
@@ -496,21 +496,21 @@ portage提示USE需要更改
   >=app-text/feelings-1.0.0 test
 #+end_src
 遇到这种情况 请到/etc/portage/package.use设置包
-*** 循环依赖
+**** 循环依赖
 #+begin_src shell
   !!! Error: circular dependencies: 
   ebuild / net-print/cups-1.1.15-r2 depends on ebuild / app-text/ghostscript-7.05.3-r1
   ebuild / app-text/ghostscript-7.05.3-r1 depends on ebuild / net-print/cups-1.1.15-r2
 #+end_src
 此时应该静待portage更新并反馈bug
-*** profile保护
+**** profile保护
 #+begin_src shell
   !!! Trying to unmerge package(s) in system profile. 'sys-apps/portage'
   !!! This could be damaging to your system.
 #+end_src
 您要求移除系统核心软件包中的一个 它是您的profile中所列出的必需的软件 因此不能从系统中移除 
 
-*** 测试版本
+**** 测试版本
 类似于
 #+begin_src
   masked by: ~amd64 keyword
@@ -518,7 +518,7 @@ portage提示USE需要更改
 
 此时编籍/etc/portage/package.accept_keywords/package
 并添加xxx/package ~amd64
-*** Block
+**** Block
 示例
 #+begin_src shell
 [ebuild  N     ] x11-libs/xcb-imdkit-1.0.9 
@@ -549,49 +549,68 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
 为了使安装得以继续进行，您可以选择不安装这个软件包，或者先将发生冲突的包卸载。
 你也可能会遇到某些特定版本的包被屏蔽的情况，比如<media-video/mplayer-1.0_rc1-r2。在这种情况下，升级到一个更新的版本就能解决问题。 
 
-** 配置文件
-*** use /var/db/repos/profiles/use.desc
-** 部分包配置
-*** dev-lang/rust
-#+begin_src
-  clippy doc rust-analyzer rust-src rust-fmt
-#+end_src
-*** app-editors/emacs
-#+begin_src
-  app-editors/emacs libxml2 dynamic-loading
-  libxml2为了一些包的正常使用 dynamic-loading启用动态模块
-#+end_src
-*** net-wireless/lorcon
-#+begin_src
-  net-wireless/lorcon python
-#+end_src
-* 后续
-** 23.0版本更新
-默认合并了/usr (merged-usr)
-在profile中 旧版本需要选择 split-usr
-#+begin_src
-  Select the 23.0 profile corresponding to your current profile, either using
-   "eselect profile" or by manually setting the profile symlink.
-   Note that old profiles are by default split-usr and the 23.0 profiles by
-   default merged-usr. Do NOT change directory scheme now, since this will
-   mess up your system! 
-   Instead, make sure that the new profile has the same property: for example, 
-   OLD default/linux/amd64/17.1  
-        ==>  NEW default/linux/amd64/23.0/split-usr
-             (added "split-usr")
-   OLD default/linux/amd64/17.1/systemd/merged-usr  
-        ==>  NEW default/linux/amd64/23.0/systemd
-             (removed "merged-usr")
 
+* 配置文件
+** /var/db/repos/profiles/use.desc
+<<gentoo.conf>>
+** /etc/portage/repos.conf/gentoo.conf
+#+begin_src conf
+[DEFAULT]
+main-repo = gentoo
+
+[gentoo]
+location = /var/db/repos/gentoo
+sync-type = rsync
+#sync-uri = rsync://127.0.0.1/repo/gentoo-portage
+sync-uri = rsync://mirrors.ustc.edu.cn/gentoo-portage
+auto-sync = yes
+sync-rsync-verify-jobs = 1
+sync-rsync-verify-metamanifest = no
+sync-rsync-verify-max-age = 24
+sync-openpgp-key-path = /usr/share/openpgp-keys/gentoo-release.asc
+sync-openpgp-key-refresh-retry-count = 40
+sync-openpgp-key-refresh-retry-overall-timeout = 1200
+sync-openpgp-key-refresh-retry-delay-exp-base = 2
+sync-openpgp-key-refresh-retry-delay-max = 60
+sync-openpgp-key-refresh-retry-delay-mult = 4
+sync-webrsync-verify-signature = no
+	  
 #+end_src
-** fcitx-rime切换为简体
-F4选择即可
+<<make.conf>>
+** /etc/portage/make.conf
+#+begin_src conf
+
+	# These settings were set by the catalyst build script that automatically
+  # built this stage.
+  # Please consult /usr/share/portage/config/make.conf.example for a more
+  # detailed example.
+  COMMON_FLAGS="-O2 -pipe"
+  CFLAGS="${COMMON_FLAGS}"
+  CXXFLAGS="${COMMON_FLAGS}"
+  FCFLAGS="${COMMON_FLAGS}"
+  FFLAGS="${COMMON_FLAGS}"
+
+  # NOTE: This stage was built with the bindist Use flag enabled
+
+  # This sets the language of build output to English.
+  # Please keep this setting intact when reporting bugs.
+  LC_MESSAGES=C.utf8
+  GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
+  #GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
+  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm"
+  VIDEO_CARDS="amdgpu radeonsi"
+  MAKEOPTS="-j8"
 
 
-** fcitx
+  # ccache
+  #FEATURES="ccache -test"
+  #CCACHE_DIR="/var/cache/ccache"
 
-* 注意
-更新后记得执行 因为gentoo有时更新会换一些库的位置 dispatch-conf可以帮助你迁移配置文件
-#+begin_src shell
-  dispatch-conf
+  GRUB_PLATFORMS="efi-64"
+
+  ACCEPT_LICENSE="*"
+
+  ALSA_CARDS="hda_intel"
+
+  L10N="en-US zh-CN en zh"
 #+end_src
