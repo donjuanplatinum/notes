@@ -91,6 +91,8 @@
 艾尔登法环需要EAC支持 以及[[#vkd3d][VKD3D]]
 
 EAC可以通过[[#lutris][Lutris]]的EAC功能 VKD3D同理
+
+或者glibc [[eac][eac]]
 * TODO lutris
 * Ryujinx
 ** 安装
