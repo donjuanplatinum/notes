@@ -12,6 +12,7 @@
       - [[#安装xact_x64-否则没声音][安装xact_x64 否则没声音]]
     - [[#生化危机][生化危机]]
     - [[#艾尔登法环][艾尔登法环]]
+    - [[#无人深空][无人深空]]
 - [[#lutris][lutris]]
 - [[#ryujinx][Ryujinx]]
   - [[#安装][安装]]
@@ -93,6 +94,9 @@
 EAC可以通过[[#lutris][Lutris]]的EAC功能 VKD3D同理
 
 或者glibc [[eac][eac]]
+
+*** 无人深空
+需要[[dxvk][DXVK]]
 * TODO lutris
 * Ryujinx
 ** 安装
