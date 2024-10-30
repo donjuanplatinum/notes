@@ -4,6 +4,8 @@
     - [[#losetup][losetup]]
     - [[#ssh][ssh]]
       - [[#ssh内网穿透][ssh内网穿透]]
+        - [[#将外部端口映射到本机][将外部端口映射到本机]]
+        - [[#将本地端口映射到外部][将本地端口映射到外部]]
     - [[#mount][mount]]
     - [[#grub][Grub]]
       - [[#efi][EFI]]
@@ -44,6 +46,8 @@
       - [[#判断系统类型][判断系统类型]]
       - [[#判断用户输入yn][判断用户输入y/n]]
     - [[#kde创建通知][kde创建通知]]
+    - [[#检测进程是否运行][检测进程是否运行]]
+    - [[#发出声音警报][发出声音警报]]
   - [[#内核][内核]]
     - [[#查看系统调用的编号][查看系统调用的编号]]
     - [[#proc][/proc]]
@@ -132,9 +136,12 @@ p     --output-all              output all columns
 #+end_src
 *** TODO ssh
 **** ssh内网穿透
+***** 将外部端口映射到本机
 #+begin_src shell
   ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
 #+end_src
+
+***** TODO 将本地端口映射到外部
 *** TODO mount
 *** Grub
 **** EFI
@@ -361,6 +368,36 @@ strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.
 *** kde创建通知
 #+begin_src shell
   cargo run --release;kdialog --passivepopup '任务完成' 20
+#+end_src
+*** 检测进程是否运行
+#+begin_src shell
+  #!/bin/bash
+
+# 指定要监控的进程ID
+PID_TO_MONITOR=10605
+
+# 无限循环，直到脚本被手动停止
+while true; do
+    # 使用ps命令检查进程是否在运行
+    if ! ps -p $PID_TO_MONITOR > /dev/null; then
+        # 如果进程不在运行，则发送通知并播放声音
+        notify-send "Process $PID_TO_MONITOR has stopped"
+        # 播放一个简单的 beep 声音
+        play -n synth 1 sine 1000
+        sleep 1  # 等待1秒后继续检查
+    fi
+    # 等待一段时间再次检查，避免过度占用CPU资源
+    sleep 5
+done
+
+#+end_src
+tldr
+#+begin_src shell
+  while true ; do if ! ps  -p 10605; then notify-send 'ok';play -n synth 10 sine 1000;break ;fi ;sleep 5;done
+#+end_src
+*** 发出声音警报
+#+begin_src shell
+  play -n synth 1 sine 10000
 #+end_src
 ** 内核
 *** 查看系统调用的编号
