@@ -4,8 +4,8 @@
     - [[#losetup][losetup]]
     - [[#ssh][ssh]]
       - [[#ssh内网穿透][ssh内网穿透]]
+        - [[#将本地端口映射到服务器][将本地端口映射到服务器]]
         - [[#将外部端口映射到本机][将外部端口映射到本机]]
-        - [[#将本地端口映射到外部][将本地端口映射到外部]]
     - [[#mount][mount]]
     - [[#grub][Grub]]
       - [[#efi][EFI]]
@@ -152,12 +152,17 @@ p     --output-all              output all columns
 | -g                      | 允许远端主机连接本地转发的端口                                                                                                                                                                           |                                          |
 
 **** ssh内网穿透
-***** 将外部端口映射到本机
+***** 将本地端口映射到服务器
+将本地的22端口 映射到服务器的9923端口
 #+begin_src shell
-  ssh -Cg -L 外部端口:本地地址:端口 用户@服务器地址 -p ssh地址
+  ssh -CgR 9923:127.0.0.1:22 test@server
 #+end_src
 
-***** TODO 将本地端口映射到外部
+***** 将外部端口映射到本机
+将服务器的80端口 映射到本地的3000端口
+#+begin_src shell
+  ssh -CgL 3000:127.0.0.1:80 test:server
+#+end_src
 *** TODO mount
 *** Grub
 **** EFI
