@@ -118,3 +118,7 @@ height=(int)1080,
 **** 关于Gnome下wayland的问题
 ***** nvidia
 首先安装nvidia驱动 然后rm /usr/lib/udev/rules.d/61-gdm.rules 然后在/etc/gdm/daemon.conf下WaylandEnable=true
+运行软件的时候
+#+begin_src shell
+ __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia COMMAND
+#+end_src

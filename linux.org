@@ -135,6 +135,22 @@ p     --output-all              output all columns
 
 #+end_src
 *** TODO ssh
+|                         |                                                                                                                                                                                                    |                                          |
+| -c                      | 指定加密算法                                                                                                                                                                                          |                                          |
+| -C                      | 压缩数据                                                                                                                                                                                             |                                          |
+| -D                      | 指定本机的Socks监听端口                                                                                                                                                                                |                                          |
+| -f                      | ssh连接在后台运行                                                                                                                                                                                     |                                          |
+| -F                      | 指定配置文件                                                                                                                                                                                          |                                          |
+| -i                      | 指定私钥                                                                                                                                                                                             |                                          |
+| -J                      | 指定跳板                                                                                                                                                                                             | ssh -J root@a,root@b root@c 先通过a到b再到c |
+| -L port:host:hostport   | 将本地机(客户机)的某个端口转发到远端指定机器的指定端口.  工作原理是这样的, 本地机器上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接,该连接就经过安全通道转发出去, 同时远程主机和 host 的  hostport  端口建立连接.(正向代理) | ssh -L port:server:port user@server      |
+| -m                      | 指定校验数据完整性算法                                                                                                                                                                                  |                                          |
+| -N                      | 只端口转发 不执行命令                                                                                                                                                                                  |                                          |
+| -R port:host:hostport   | 将远程主机(服务器)的某个端口转发到本地端指定机器的指定端口.   工作原理是这样的, 远程主机上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接, 该连接就经过安全通道转向出去, 同时本地主机和 host 的 hostport 端口建立连        |                                          |
+| ssh -R 9999:server:9999 |                                                                                                                                                                                                    |                                          |
+| -X                      | X转发                                                                                                                                                                                               |                                          |
+| -g                      | 允许远端主机连接本地转发的端口                                                                                                                                                                           |                                          |
+
 **** ssh内网穿透
 ***** 将外部端口映射到本机
 #+begin_src shell
