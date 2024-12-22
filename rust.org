@@ -4,6 +4,89 @@
   - [[#技巧][技巧]]
     - [[#为类型生成唯一id][为类型生成唯一ID]]
       - [[#tensor][Tensor]]
+    - [[#处理unix的ctrl_c][处理UNIX的ctrl_c]]
+  - [[#库][库]]
+    - [[#core][core]]
+      - [[#primitive-types][Primitive Types]]
+        - [[#never][never]]
+        - [[#array][array]]
+        - [[#bool][bool]]
+        - [[#char][char]]
+        - [[#f32][f32]]
+        - [[#f64][f64]]
+        - [[#fn][fn]]
+        - [[#i8][i8]]
+        - [[#i16][i16]]
+        - [[#i32][i32]]
+        - [[#i64][i64]]
+        - [[#i128][i128]]
+        - [[#isize][isize]]
+        - [[#pointer][pointer]]
+        - [[#reference][reference]]
+        - [[#slice][slice]]
+        - [[#str][str]]
+        - [[#tuple][tuple]]
+        - [[#u8][u8]]
+        - [[#u16][u16]]
+        - [[#u32][u32]]
+        - [[#u64][u64]]
+        - [[#u128][u128]]
+        - [[#unit][unit]]
+        - [[#usize][usize]]
+      - [[#modules][Modules]]
+        - [[#net][net]]
+          - [[#结构体][结构体]]
+            - [[#addrparseerror][AddrParseError]]
+            - [[#ipv4addr][Ipv4Addr]]
+              - [[#impl][impl]]
+              - [[#impl-traits][impl traits]]
+            - [[#ipv6addr][Ipv6Addr]]
+            - [[#socketaddrv4][SocketAddrV4]]
+            - [[#socketaddrv6][SocketAddrv6]]
+          - [[#枚举][枚举]]
+            - [[#ipv6multicastscope][Ipv6MulticastScope]]
+            - [[#ipaddr][IpAddr]]
+            - [[#socketaddr][SocketAddr]]
+    - [[#std][std]]
+      - [[#modules-1][Modules]]
+        - [[#net-1][net]]
+          - [[#结构体-1][结构体]]
+            - [[#incoming][Incoming]]
+            - [[#tcplistener][TcpListener]]
+              - [[#impl-1][impl]]
+            - [[#tcpstream][TcpStream]]
+              - [[#impl-2][impl]]
+            - [[#udpsocket][UdpSocket]]
+          - [[#枚举-1][枚举]]
+            - [[#shutdown][Shutdown]]
+              - [[#read][Read]]
+              - [[#write][Write]]
+              - [[#都关闭][都关闭]]
+          - [[#trait][Trait]]
+            - [[#tosocketaddrs][ToSocketAddrs]]
+        - [[#io][io]]
+          - [[#prelude][prelude]]
+          - [[#结构体-2][结构体]]
+          - [[#枚举-2][枚举]]
+          - [[#trait-1][Trait]]
+            - [[#bufread][BufRead]]
+              - [[#required-methods][required methods]]
+              - [[#provided-methods][provided methods]]
+            - [[#isterminal][IsTerminal]]
+            - [[#read-1][Read]]
+            - [[#seek][Seek]]
+            - [[#write-1][Write]]
+          - [[#函数][函数]]
+          - [[#类型定义][类型定义]]
+    - [[#tokio][tokio]]
+      - [[#模块][模块]]
+    - [[#candle-core][candle-core]]
+      - [[#modules-2][Modules]]
+      - [[#structs][Structs]]
+        - [[#tensor-1][Tensor]]
+          - [[#impl-3][impl]]
+            - [[#randn][randn()]]
+            - [[#examples][Examples]]
 
 * Rust
 ** 类型
@@ -51,3 +134,402 @@
 #+end_src
 使用原子计数器 ~atomic~ 来创建唯一的ID
 
+*** 处理UNIX的ctrl_c
+在
+
+** 库
+*** core
+rust核心库
+**** Primitive Types
+原始类型
+***** never
+!类型
+
+***** array
+固定大小的数组 表示为[T;N] 其中T为元素类型 N为数组大小
+
+***** bool
+布尔类型
+
+***** char
+字符类型
+
+***** f32
+32位浮点
+
+***** f64
+64位浮点类型
+
+***** fn
+函数指针 形如 *fn(usize)-> bool*
+
+***** i8
+8位有符号整型 i16,i32,i64,i128亦是如此
+***** i16
+
+***** i32
+
+***** i64
+
+***** i128
+
+***** isize
+指针大小的有符号整型
+***** pointer
+裸指针*const T \*mut T
+***** reference
+引用 *&T* *&mut T*
+***** slice
+切片[T]
+***** str
+字符串切片
+***** tuple
+元组 *(T,U...)*
+***** u8
+无符号整型 u16 u32 u64 u128亦是如此
+***** u16
+
+***** u32
+
+***** u64
+
+***** u128
+
+***** unit
+()类型
+***** usize
+指针大小无符号整型
+
+**** Modules
+模块
+***** net
+IP通信的网络原语
+****** 结构体
+******* TODO AddrParseError
+解析IP地址或套接字地址时返回的错误
+
+******* Ipv4Addr
+Ipv4地址
+
+******** impl
+
+********* new()
+从四个u8新建一个ipv4
+#+begin_src rust
+  pub const fn new(a:u8,b:u8,c:u8,d:u8) -> Ipv4Addr
+#+end_src
+
+********* octets()
+返回该地址的4个u8
+#+begin_src rust
+  pub const fn octets(&self) -> [u8;4]
+#+end_src
+******** impl traits
+********* FromStr
+
+
+******* TODO Ipv6Addr
+Ipv6地址
+
+******* TODO SocketAddrV4
+Ipv4套接字地址
+******* TODO SocketAddrv6
+Ipv6套接字地址
+
+****** 枚举
+
+******* TODO Ipv6MulticastScope
+ipv6多播地址范围
+
+******* IpAddr
+ip地址 v4或v6
+
+******* SocketAddr
+socket地址 v4或v6
+*** std
+**** Modules
+***** net
+对比core的[[#net][net]]模块的差异内容
+****** 结构体
+******* Incoming
+在[[#tcplistener][TcpListener]]上无限accept的迭代器
+******* TcpListener
+TCP套接字服务器
+******** impl
+********* accept()
+接受一个listener的新传入的连接
+该函数会阻塞线程直到建立TCP连接
+#+begin_src rust
+  pub fn accept(&self) -> Result<(Tcpstream,SocketAddr)>
+#+end_src
+
+********** Examples
+#+begin_src rust
+  use std::net::TcpListener;
+  let listener: TcpListener = TcpListener::bind("127.0.0.1:3000").expect("无法监听");
+  match listener.accept() {
+      Ok((stream,peer_addr)) => println!("net client {peeraddr:?}"),
+      Err(e) => println!("Couldn't get client {e:?}")
+
+  }
+#+end_src
+
+********* bind()
+创建一个新的TcpListener 绑定到函数参数中的地址
+
+当端口为0时则要求操作系统分配端口
+#+begin_src rust
+  pub fn bind<A: ToSocketAddrs>(addr: A) -> Result<TcpListener>
+#+end_src
+********* incoming()
+返回监听地址的迭代器
+#+begin_src rust
+  pub fn incoming(&self) -> Incoming<'_>
+#+end_src
+********** Examples
+#+begin_src rust
+  use std::net::{TcpListener,TcpStream};
+
+  fn main() -> {
+      let listener = TcpListener::bind("127.0.0.1:3000").unwrap();
+      for stream in listener.incoming() {
+	  match stream {
+	      Ok(stream) => {
+
+	  },
+	      Err(e) => {
+		  
+      },
+  }
+#+end_src
+
+********* local_addr()
+返回侦测器监听的套接字
+#+begin_src rust
+  pub fn local_addr(&self) -> Result<SocketAddr>
+#+end_src
+
+********* set_nonblocking()
+将此TCP流移入或移出非阻塞模式
+#+begin_src rust
+  pub fn set_nonblocking(&self,nonblocking: bool) -> Result<()>
+#+end_src
+
+********** Examples
+#+begin_src rust
+  use std::io;
+  use std::net::TcpListener;
+  let listener = TcpListener::bind("127.0.0.1:3000").unwrap();
+  listener.set_nonblocking(true).expect("Cant set nonblocking");
+  
+#+end_src
+
+********* try_clone()
+clone一个监听器
+注意 在一个监听器上设置的选项会影响其他的监听器
+#+begin_src rust
+  pub fn try_clone(&self) -> Result<TcpListener>
+#+end_src
+
+******* TcpStream
+本地套接字与远程套接字的TCP流
+本地套接字与远程套接字的tcp流
+
+可用于读取与写入
+
+drop时会关闭连接
+******** impl
+********* connect()
+打开到远程主机的TCP连接
+#+begin_src rust
+  pub fn connect<A: ToSocketAddrs>(addr: A) -> Result<TcpStream>
+#+end_src
+
+
+
+********* shutdown()
+关闭此连接的 读取 写入 或者都关闭
+取决于[[#shutdown][Shutdown]]的类型
+#+begin_src rust
+  pub fn shutdown(&self,how: Shutdown) -> Result<()>
+#+end_src
+
+********* local_addr()
+返回本地地址
+#+begin_src rust
+  pub fn local_addr(&self) -> Result<SocketAddr>
+#+end_src
+
+********* peer_addr()
+返回远程地址
+#+begin_src rust
+  pub fn peer_addr(&self) -> Result<SocketAddr>
+#+end_src
+
+
+********* set_nonblocking(&self,nonblocking: bool) -> Result<()>
+将此TCP流移入或移出非阻塞模式
+
+********* try_clone()
+clone一个新句柄
+
+********* Write
+从writer中写入缓冲区
+******* UdpSocket
+UDP套接字
+
+****** 枚举
+******* Shutdown
+传给[[#tcplistener][TcpListener]]::shutdown方法的可能值
+
+#+begin_src rust
+  pub enum Shutdown {
+      Read,
+      Write,
+      Both,
+  }
+#+end_src
+
+******** Read
+关闭读取部分
+
+******** Write
+关闭写入部分
+
+******** 都关闭
+****** Trait
+******* ToSocketAddrs
+可转换为SokcetAddr
+
+***** io
+I/O功能
+****** prelude
+#+begin_src rust
+  pub use super::BufRead;
+  pub use super::Read;
+  pub use super::Seek;
+  pub use super::Write;
+#+end_src
+
+****** 结构体
+
+****** 枚举
+
+****** Trait
+******* BufRead
+缓冲读取器
+带有 ~内部缓冲区~ 的Read类型
+支持Read的所有方法
+******** required methods
+
+********* consume()
+调用此函数告诉实现此trait的缓冲区 ~amt~ 个字节已经被消耗 调用read时不应该再返回他们
+#+begin_src rust
+  fn consume(&mut self,amt:usize)
+#+end_src
+
+********* fill_buf()
+
+返回缓冲区内的内容 如果内部缓冲区为空 则使用内部reader中的更多数据填充内部缓冲区
+
+此函数应该与consume方法配对才能正确执行功能
+
+当返回空的缓冲区时 则达到了EOF
+#+begin_src rust
+  fn fill_buf(&mut self) -> Result<&[u8]>
+#+end_src
+
+********** Examples
+#+begin_src rust
+  use std::io;
+  use std::io::prelude::*;
+
+  let stdin = io::stdin();
+  let mut stdin = stdin.lock();
+
+  let buffer = stdin.fill_buf().unwrap();
+  // 使用缓冲区
+  println!("{buffer:?}")
+
+      // 提示buffer已经消耗了length字节 以后不再返回
+      let length = buffer.len();
+  stdin.consume(length);
+#+end_src
+******** provided methods
+
+********* lines()
+返回此reader的各行上的迭代器
+#+begin_src rust
+  fn lines(self) -> Lines<Self> where Self: Sized,
+#+end_src
+迭代器产生io::Result<String>
+
+
+********** Examples
+#+begin_src rust
+  use std::io::{self, BufRead};
+
+  let cursor = io::Cursor::new(b"lorem\nipsum\r\ndolor");
+
+  let mut lines_iter = cursor.lines().map(|l| l.unwrap());
+  assert_eq!(lines_iter.next(), Some(String::from("lorem")));
+  assert_eq!(lines_iter.next(), Some(String::from("ipsum")));
+  assert_eq!(lines_iter.next(), Some(String::from("dolor")));
+  assert_eq!(lines_iter.next(), None);
+#+end_src
+
+********* read_line()
+读取所有字节直到到达换行符(0xA) 并将他们追加到String缓冲区
+#+begin_src rust
+  fn read_line(&mut self,buf: &mut String) -> Result<usize>
+#+end_src
+
+******* IsTerminal
+指定 descriptor/handle 是否指代 terminal/tty
+******* Read
+允许从源读取字节
+实现Read的类型叫做读取器
+常见的读取器有 ~std::fs::File~ ~std::net::TcpStream~ ~std::io::stdin()~ ~std::io::Cursor<&[u8]>~
+******* Seek
+游标
+******* Write
+写入器
+支持字节输出与UTF-8输出
+常见的写入器有 ~std::fs::File~ ~std::net::TcpStream~ ~std::io::stdout()~ ~std::io::stderr()~ ~std::io::Cursor<&mut [u8]>~ ~std::io::Vec<u8>~
+
+****** 函数
+
+****** 类型定义
+*** tokio
+rust的异步运行时
+Tokio 是一个 ~事件驱动~ 的 ~非阻塞 I/O 平台~ ，用于 ~异步~
+
+tokio提供了主要的几个组件
+- 异步任务工具 包括同步原语(sync),通道(channel),timesout,sleeps,duration
+- 异步I/O的API TCP/UDP的socket 文件系统操作 进程与信号管理
+- runtime异步代码运行时  
+**** 模块
+*** candle-core
+
+**** Modules
+
+**** Structs
+
+***** Tensor
+张量
+
+****** impl
+******* randn()
+从指定的均值 ~mean~ 和 标准差 ~std~ 的正态分布中采样得到的值创建一个张量 ~Tensr~
+#+begin_src rust
+  pub fn randn<S: Into<Shape>, T: FloatDtype>(mean: T, std: T, s: S, device: &Device) -> Result<Self>
+#+end_src
+
+******* Examples
+
+#+begin_src rust
+  use candle_core::{Device,Tensor,Result};
+  // 创建一个从均值为0.0 标准差为1.0 的正态分布中随机采样得到的值的张量 并且张量是一个二维张量 具有784行 100列
+    let device = Device::Cpu;
+    let tensor = Tensor::randn(0.0,1.0,(784,100), &device)?;
+#+end_src

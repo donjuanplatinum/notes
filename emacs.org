@@ -35,6 +35,8 @@
     - [[#算数操作][算数操作]]
     - [[#表示][表示]]
     - [[#键位][键位]]
+    - [[#模式][模式]]
+    - [[#运算][运算]]
   - [[#求和][求和]]
 
 * emacs键位
@@ -247,13 +249,19 @@ Calc主模式是一个 ~RPN~ 逆波兰计算器 支持线性代数等高端操�
 *** 键位
 | C-d   | 弹出栈顶   | calc-pop             |
 | a +   | [[#求和][求和]]      | calc-summation       |
-| m M-r | 弧度制模式 | calc-radians-mode    |
 | Q     | 平方根     | calc-sqrt            |
 | P     | Pi       | calc-pi              |
-| ^     | 次方运算   | calc-power           |
 | TAB   | 交换栈顶   | calc-roll-down       |
 | '     | 代数模式   | calc-algebraic-entry |
-| L     | ln自然对数 | calc-ln             |
+| L     | ln自然对数 | calc-ln              |
 
+*** 模式
+| m d   | 角度制 | calc-degrees-mode |
+| m M-r | 弧度制 | calc-radians-mode    |
+
+*** 运算
+| S | sin正弦 | calc-sin |
+| C | cos余弦 | calc-cos |
+| ^ | 次方    | calc-power |
 ** 求和
 a + 触发

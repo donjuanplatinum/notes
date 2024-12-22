@@ -47,6 +47,9 @@
   - [[#frp][frp]]
     - [[#compose-3][compose]]
     - [[#frpsini][frps.ini]]
+  - [[#rustdesk][rustdesk]]
+    - [[#compose-4][compose]]
+  - [[#steamcmd][steamcmd]]
 
 * Docker Cli
 ** 拉取所有tag
@@ -1004,4 +1007,34 @@ dashboard_pwd = password
 subdomain_host = frp.yourdomain
 token = yourtoken
 
+#+end_src
+
+** rustdesk
+key在data下的id_ed25519.pub
+*** compose
+#+begin_src yaml
+  version: '3'
+services:
+  hbbs:
+    container_name: hbbs
+    image: docker.m.daocloud.io/rustdesk/rustdesk-server:latest
+    command: hbbs
+    volumes:
+      - ./data:/root
+    network_mode: "host"
+    restart: unless-stopped
+
+  hbbr:
+    container_name: hbbr
+    image: docker.m.daocloud.io/rustdesk/rustdesk-server:latest
+    command: hbbr
+    volumes:
+      - ./data:/root
+    network_mode: "host"
+    restart: unless-stopped
+
+#+end_src
+** steamcmd
+#+begin_src shell
+  docker run -it -v $PWD:/data steamcmd/steamcmd:latest +login anonymous +force_install_dir /data +app_update 740 +quit
 #+end_src
