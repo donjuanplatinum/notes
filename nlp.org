@@ -1,0 +1,20 @@
+* NLP
+** Linear
+线性层
+y = xW + b
+其中 W是权重 ~weight~ b是偏置 ~bias~
+#+begin_src rust
+  use candle_core::{Result,Tensor};
+  pub struct Linear {
+	weight: Tensor, // 模型权重
+	bias: Option<Tensor>, // 模型偏置
+    }
+  impl Liear {
+      pub fn forward(&self, x: &Tensor) -> Result<Tensor> {
+	  let x = x.matmul(&sel.weight)?;
+	  match &self.bias {
+	      None => Ok(x),
+	      Some(bias) => x.broadcast_add(bias),
+	  }
+  }
+#+end_src

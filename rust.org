@@ -86,7 +86,11 @@
         - [[#tensor-1][Tensor]]
           - [[#impl-3][impl]]
             - [[#randn][randn()]]
-            - [[#examples][Examples]]
+              - [[#examples][Examples]]
+            - [[#matmul][matmul()]]
+            - [[#relu][relu()]]
+              - [[#examples-1][Examples]]
+            - [[#broadcast_add][broadcast_add()]]
 
 * Rust
 ** 类型
@@ -525,11 +529,45 @@ tokio提供了主要的几个组件
   pub fn randn<S: Into<Shape>, T: FloatDtype>(mean: T, std: T, s: S, device: &Device) -> Result<Self>
 #+end_src
 
-******* Examples
+******** Examples
 
 #+begin_src rust
   use candle_core::{Device,Tensor,Result};
   // 创建一个从均值为0.0 标准差为1.0 的正态分布中随机采样得到的值的张量 并且张量是一个二维张量 具有784行 100列
     let device = Device::Cpu;
     let tensor = Tensor::randn(0.0,1.0,(784,100), &device)?;
+#+end_src
+
+******* matmul()
+矩阵乘法
+
+- 左张量的维度为 ~b1, b2, ...,bi , m, k~ 其中m与k分别表示矩阵的行与列
+- 右张量的维度为 ~b1, b2, ...,bi, k, n~ 其中k与n分别表示矩阵的行与列
+- 那么结果是 ~b1, b2, ..., bi, m, n~ 其中m与n分别表示矩阵的行与列 因为m行k列矩阵 乘 k行n列矩阵 结果是 m行n列矩阵
+#+begin_src rust
+  pub fn matmul(&self,rhs: &self) -> Result<Self>
+#+end_src
+
+******* relu()
+修正线性单元
+
+ReLU函数会把所有的负数输入转换为0 将非负输入保持不变
+
+- 非线性 ReLU函数引入非线性特征
+- 稀疏激活 负值变为0 则神经元的激活是稀疏的 
+#+begin_src rust
+  pub fn relu(&self) -> Result<Self>
+#+end_src
+
+******** Examples
+#+begin_src rust
+  例如[[1,2,3,4,-1,-2]] 会变成 [[1,2,3,4,0,0]]
+#+end_src
+
+******* broadcast_add()
+广播并相加
+
+如果self和rhs形状不匹配 那么小的张量会被扩展为足以匹配大张量的形状 再相加
+#+begin_src rust
+  pub fn broadcast_add(&self, rhs: &Self) -> Result<Self>
 #+end_src
