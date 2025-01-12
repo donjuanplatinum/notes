@@ -30,6 +30,7 @@
   - [[#代码块][代码块]]
   - [[#链接][链接]]
   - [[#引用][引用]]
+  - [[#toggle][toggle]]
 - [[#calc][Calc]]
   - [[#basic-1][Basic]]
     - [[#算数操作][算数操作]]
@@ -215,6 +216,11 @@ global-display-line-numbers-mode 'open 全局行号
 \#+begin_quote
 \#+end_quote
 #+end_quote
+
+
+** toggle
+| key         | mean           | command                  |
+| C-c C-x C-v | 显示所有链接的图片 | org-toggle-inline-images |
 * Calc
 Calc主模式是一个 ~RPN~ 逆波兰计算器 支持线性代数等高端操作
 

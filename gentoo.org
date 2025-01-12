@@ -44,21 +44,7 @@
     - [[#net-wirelesslorcon][net-wireless/lorcon]]
     - [[#sys-libsglibc][sys-libs/glibc]]
 - [[#portage][portage]]
-    - [[#安装gentoolkit][安装gentoolkit]]
-    - [[#降低占用][降低占用]]
-    - [[#更新仓库][更新仓库]]
-    - [[#移除软件][移除软件]]
-    - [[#搜索软件][搜索软件]]
-    - [[#安装软件][安装软件]]
-    - [[#查看包][查看包]]
-    - [[#系统更新][系统更新]]
-    - [[#特殊需求][特殊需求]]
-    - [[#查看包的版本列表-安装特定版本的包][查看包的版本列表 安装特定版本的包]]
-      - [[#portage特性][portage特性]]
-      - [[#分布式编译distcc][分布式编译distcc]]
-      - [[#缓冲编译ccache][缓冲编译ccache]]
-        - [[#在makeconf中加入ccache支持][在make.conf中加入ccache支持]]
-        - [[#设置ccache_dir环境变量][设置CCACHE_DIR环境变量]]
+  - [[#emerge][emerge]]
     - [[#varcachedistfiles][/var/cache/distfiles]]
     - [[#查看use说明][查看USE说明]]
     - [[#报错][报错]]
@@ -69,6 +55,8 @@
       - [[#测试版本][测试版本]]
       - [[#block][Block]]
       - [[#解决方案][解决方案]]
+  - [[#gentoolkit][gentoolkit]]
+    - [[#equery][equery]]
 - [[#配置文件][配置文件]]
   - [[#vardbreposprofilesusedesc][/var/db/repos/profiles/use.desc]]
   - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
@@ -378,81 +366,34 @@ F4选择即可
 #+end_src
 
 * portage
-*** 安装gentoolkit
+** emerge
+仓库更新
 #+begin_src shell
-  emerge gentoolkit
+  emerge --sync # 更新仓库
 #+end_src
-*** 降低占用
+删除包
 #+begin_src shell
-  # Extremely low priority (per above)
-  PORTAGE_SCHEDULING_POLICY="idle"
-  # Lowest priority
-  PORTAGE_NICENESS="19"
-  PORTAGE_IONICE_COMMAND="ionice -c 3 -p \${PID}"
-#+end_src
-*** 更新仓库
-#+begin_src shell
-  emerge --sync
-#+end_src
-*** 移除软件
-#+begin_src shell
+  emerge --unmerge package
   emerge --deselect package
-  emerge --update --deep --newuse @world
-  emerge --ask --depclean
+  emerge --depclean
 #+end_src
-*** 搜索软件
+搜索包
 #+begin_src shell
-  emerge --search name //根据名字搜索
-  emerge --searchdesc describe //根据描述搜索
+  emerge --search package # 搜索包名
+  emerge --searchdesc package # 搜索包的描述
 #+end_src
-*** 安装软件
+安装包
 #+begin_src shell
   emerge package
-  emerge --pretend package //查看依赖
-  emerge --fetchonly package //仅下载源代码至/var/cache/distfiles
+  emerge --pretend package # 查看依赖
+  emerge --fetchonly package # 仅下载源代码至/var/cache/distfiles
+  emerge =package-version # 安装指定版本
 #+end_src
-*** 查看包
-#+begin_src shell
-  emerge -vp package //查看包的USE
-#+end_src
-*** 系统更新
+系统更新
 #+begin_src shell
   emerge --update --deep --newuse @world
-#+end_src 
-*** 特殊需求
-*** 查看包的版本列表 安装特定版本的包
-#+begin_src shell
-  esearch --verbose package
-  emerge jre:1.8
-#+end_src
-**** portage特性
-#+begin_src shell
-  man make.conf
 #+end_src
 
-查看FEATURES默认设置
-#+begin_src shell
-  emerge --info |grep ^FEATURES
-#+end_src
-**** 分布式编译distcc
-#+begin_src shell
-  emerge distcc
-  discc-config --set-hosts "host1 host2 host3"
-  rc-update add distccd default
-  /etc/init.d/distccd start
-#+end_src
-**** 缓冲编译ccache
-ccache是一个快速编译器缓存  无论何时编译应用程序 它都将缓存中间结果 以便每当重新编译相同的程序时 编译时间大大减少 第一次运行ccache时 它会比正常编译慢得多  但是后续的重新编译应该更快  ccache只有在相同的应用程序将被重新编译多次 (或相同应用程序的升级频繁发生)时才有用; 因此它通常只对软件开发人员有用
-#+begin_src shell
-  emerge ccache
-#+end_src
-***** 在make.conf中加入ccache支持
-#+begin_src /etc/portage/make.conf
-  FEATURES="ccache"
-  CCACHE_SIZE="2G"
-#+end_src
-***** 设置CCACHE_DIR环境变量
-CCACHE_DIR="/var/tmp/ccache" ccache -s
 *** /var/cache/distfiles
 ${PORTDIR}/distfiles
 
@@ -549,7 +490,21 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
 为了使安装得以继续进行，您可以选择不安装这个软件包，或者先将发生冲突的包卸载。
 你也可能会遇到某些特定版本的包被屏蔽的情况，比如<media-video/mplayer-1.0_rc1-r2。在这种情况下，升级到一个更新的版本就能解决问题。 
 
+** gentoolkit
+安装
+#+begin_src shell
+  emerge gentoolkit
+#+end_src
 
+*** equery
+查看依赖于这个包的所有包
+#+begin_src shell
+  equery depends -D package
+#+end_src
+查看这个包依赖什么包
+#+begin_src shell
+  equery depgraph package
+#+end_src
 * 配置文件
 ** /var/db/repos/profiles/use.desc
 <<gentoo.conf>>

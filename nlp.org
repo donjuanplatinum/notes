@@ -1,8 +1,81 @@
+* Content                                                             :TOC_8:
+- [[#nlp][NLP]]
+  - [[#nn][nn]]
+    - [[#神经元][神经元]]
+    - [[#单层神经网络][单层神经网络]]
+    - [[#激活函数][激活函数]]
+      - [[#sigmoid][Sigmoid]]
+      - [[#tanh][Tanh]]
+      - [[#relu][ReLU]]
+    - [[#linear][Linear]]
+
 * NLP
-** Linear
+  - [[#nn][nn]]
+    - [[#linear][Linear]]
+
+** nn
+神经网络
+*** 神经元
+神经由神经元组成 神经元接受若干数 经过处理后 产生一个输出
+
+$$
+h_{\boldsymbol {w},b} (\boldsymbol {x}) = f(\boldsymbol{w^{T}} \boldsymbol {x} + b)
+$$
+
+$\boldsymbol{w^T} \boldsymbol{x}$ 代表对权重向量$\boldsymbol{w}$与输入向量$\boldsymbol{x}$的点乘
+
+b代表偏置
+
+
+$f()$ 代表激活函数
+
+#+DESCRIPTION: 单个神经元
+[[file:imgs/nn/2024-12-29_13-30-10_20241229_132414.png]]
+
+
+*** 单层神经网络
+#+DESCRIPTION: 单层神经网络
+[[file:imgs/nn/2024-12-29_15-01-43_screenshot.png]]
+
+
+$$
+\boldsymbol{a} = f( \BoldSymbol{W} \boldsymbol{x} + \boldsymbol{b})
+$$
+此时偏重 $\boldsymbol{W}$ 是一个矩阵 偏置 $\boldsymbol{b}$ 是一个向量
+#+DESCRIPTION: 单层神经网络的计算
+[[file:imgs/nn/2024-12-29_15-04-15_screenshot.png]]
+
+ 
+*** 激活函数
+
+**** Sigmoid
+$$
+f(z) = \frac{1}{1+e^{-z}}
+$$
+#+begin_src gnuplot
+  set xrange [-10:10]
+  set yrange [-2:2]
+  set grid
+  set title "Sigmoid(x)"
+  e = 2.718281828
+  f(x) = 1/(1 +  e**-x)
+  plot f(x) w l lt 2
+#+end_src
+
+**** Tanh
+$$
+f(z) = 
+$$
+
+**** ReLU
+$$
+f(x) = max(x,0)
+$$
+*** Linear
 线性层
-y = xW + b
-其中 W是权重 ~weight~ b是偏置 ~bias~
+$y = Wx + b$
+
+其中 W是权重 ~weight~ b是偏置 ~bias~ x是偏置向量
 #+begin_src rust
   use candle_core::{Result,Tensor};
   pub struct Linear {
@@ -18,3 +91,4 @@ y = xW + b
 	  }
   }
 #+end_src
+

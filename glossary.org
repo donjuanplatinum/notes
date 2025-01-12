@@ -3,6 +3,13 @@
     - [[#ajax][AJAX]]
     - [[#alpn][ALPN]]
     - [[#websokcet][WebSokcet]]
+  - [[#linux][Linux]]
+    - [[#ebpf][eBPF]]
+    - [[#bpf][BPF]]
+  - [[#program][Program]]
+    - [[#jit][JIT]]
+  - [[#common][Common]]
+    - [[#hook][Hook]]
 
 ** Network
 *** AJAX
@@ -16,3 +23,25 @@ Async Javascript And Xml
 *** WebSokcet
 ~WebSocket~ 可以在用户浏览器和服务器之间开启 ~双向交互式通信会话~
 利用此API 可以向服务器发送信息 并接受事件驱动响应 而 ~无需轮询服务器~
+
+** Linux
+
+*** eBPF
+eBPF 是一项革命性的技术，起源于 Linux 内核，它可以在特权上下文中（如操作系统内核）运行沙盒程序。它用于安全有效地扩展内核的功能，而无需通过更改内核源代码或加载内核模块的方式来实现。
+
+
+*** BPF
+伯克利包过滤器 (Berkeley Packet Filter)
+
+** Program
+
+*** JIT
+即时编译 Just In Time
+
+** Common
+
+*** Hook
+钩子
+当程序执行到你添加的钩子时 执行钩子程序
+
+

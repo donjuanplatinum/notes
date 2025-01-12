@@ -69,6 +69,8 @@
       - [[#过滤器][过滤器]]
       - [[#配置][配置]]
   - [[#dbus][dbus]]
+  - [[#ebpf][eBPF]]
+    - [[#maps][Maps]]
 - [[#配置-1][配置]]
   - [[#polkit][polkit]]
     - [[#配置dolphin挂载文件系统][配置dolphin挂载文件系统]]
@@ -720,6 +722,45 @@ log { source(system_log);
 
 
 ** TODO dbus
+
+** eBPF
+[[./glossary.org::eBPF][eBPF]]
+对于eBPF的使用 请看[[./rust.org::eBPF][eBPF in Rust]]
+eBPF程序是事件驱动的 当内核或程序到达[[./glossary.org::Hook][Hook]]时运行eBPF程序
+[[file:imgs/Linux/2025-01-12_12-10-12_screenshot.png]]
+
+可以通过创建内核探针(kprobe)和用户探针(uprobe) 以便在内核或用户应用程序的几乎任何位置附加eBPF程序
+
+[[file:imgs/Linux/2025-01-12_19-16-18_screenshot.png]]
+
+
+eBPF是通过bpf系统调用把eBPF程序加载到内核中
+
+[[file:imgs/Linux/2025-01-12_12-16-48_screenshot.png]]
+
+而当程序被加载到内核中时 它被附加到[[./glossary.org::Hook][Hook]]之前需要经过两个步骤:
+
+1. 验证(Verifier)
+   确保eBPF程序可以安全运行
+   - 加载eBPF的进程必须有相应权限 除非启用非特权eBPF 否则只有特权进程可以加载eBPF程序
+   - eBPF程序不会崩溃或者损害系统
+   - eBPF一定会有结束的时候 不会无限循环
+2. [[./glossary.org::JIT]]编译
+   
+
+特性
+- 程序经过验证确保安全进行
+- 在内核任何位置配置Hook
+- 使用JIT编译器
+- 动态增加系统功能  
+
+*** Maps
+eBPF用于存储和检索各种数据结构中的数据
+
+既可以由运行的eBPF访问 也可以通过系统调用从用户空间的其他程序访问
+
+[[file:imgs/eBPF/2025-01-12_19-24-50_screenshot.png]]
+
 * 配置
 ** TODO polkit
 PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 机制）使用的授权 API，为非特权程序（也称为 主题）提供服务。
@@ -734,7 +775,6 @@ PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 
     }
 });
 #+end_src
-
 
 * 软件
 ** 功能
