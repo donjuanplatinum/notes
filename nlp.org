@@ -22,7 +22,7 @@ $$
 h_{\boldsymbol {w},b} (\boldsymbol {x}) = f(\boldsymbol{w^{T}} \boldsymbol {x} + b)
 $$
 
-$\boldsymbol{w^T} \boldsymbol{x}$ 代表对权重向量$\boldsymbol{w}$与输入向量$\boldsymbol{x}$的点乘
+$\boldsymbol{w^T} \boldsymbol{x}$ 代表对权重向量 $\boldsymbol{w}$ 与输入向量 $\boldsymbol{x}$ 的点乘
 
 b代表偏置
 
@@ -64,7 +64,7 @@ $$
 
 **** Tanh
 $$
-f(z) = 
+f(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 $$
 
 **** ReLU
