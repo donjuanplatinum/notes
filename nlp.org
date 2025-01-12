@@ -64,7 +64,7 @@ $$
 
 **** Tanh
 $$
-f(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}
+f(z) = \frac{e^{z}-e^{-z}}{e^{z}+e^{-z}}
 $$
 
 **** ReLU
