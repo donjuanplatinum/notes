@@ -1,0 +1,64 @@
+* Content                                                             :TOC_8:
+- [[#gnuplot][GnuPlot]]
+  - [[#2d绘图][2D绘图]]
+    - [[#绘图选项][绘图选项]]
+    - [[#函数][函数]]
+    - [[#examples][Examples]]
+      - [[#sigmoid][Sigmoid]]
+      - [[#relu][ReLu]]
+
+* GnuPlot
+强大的数学绘图工具 emacs org可用
+
+** 2D绘图
+*** 绘图选项
+| 命令        | 缩写 | 意义                                 |
+| With       | w   | 指定样式                              |
+| Line       | l   | 用线做图                              |
+| Point      | p   | 用点做图                              |
+| LinePoints | lp  | 用点与线做图                           |
+| LineType   | lt  | 线的样式(0虚线 1-7 紫 绿 蓝 橙 黄 靛 红) |
+| LineWidth  | lw  | 线宽                                 |
+| PointType  | pt  | 点样式(颜色与线一致)                    |
+| PointSize  | ps  | 点宽                                 |
+
+*** 函数
+| 函数      | 函数参数  | 意义      |
+| abs(x)   | any     | 绝对值函数 |
+| abs(x)   | complex | 复数的模长 |
+| acos(x)  | any     | sec      |
+| acosh(x) | any     | 反双曲余弦 |
+| arg(x)   | complex | 复数的相位 |
+| asin(x)  | any     | csc      |
+| asinh(x) | any     | 反曲正弦   |
+| atan(x)  | any     | cot      |
+*** Examples
+#+begin_src gnuplot
+  plot sin(x) w lp lt 1 lw 4 # 以点和线做图sinx 线为紫色 宽度为4
+#+end_src
+
+#+begin_src gnuplot
+  set xrange [-10:10]
+  set yrange [-100:100]
+  plot sin(x) w lp lt 1 lw 2 pt 1
+#+end_src
+
+
+**** Sigmoid
+#+begin_src gnuplot
+    set xrange [-50:50]
+  set yrange [-2:2]
+  set title "Sigmoid(x)"
+  set grid
+  e = 2.718281828
+  f(x) = 1/(1 +  e**-x)
+  plot f(x) w l lt 2
+#+end_src
+
+**** ReLu
+#+begin_src gnuplot
+  max(a,b) = (a > b) ? a : b
+  plot (x,0)
+#+end_src
+#+RESULTS:
+

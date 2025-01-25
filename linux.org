@@ -70,7 +70,11 @@
       - [[#配置][配置]]
   - [[#dbus][dbus]]
   - [[#ebpf][eBPF]]
-    - [[#maps][Maps]]
+    - [[#ebpf限制][ebpf限制]]
+    - [[#ebpf_maps][ebpf_Maps]]
+    - [[#ebpf_helper][ebpf_Helper]]
+    - [[#ebpf_权限][ebpf_权限]]
+    - [[#ebpf_验证器][ebpf_验证器]]
 - [[#配置-1][配置]]
   - [[#polkit][polkit]]
     - [[#配置dolphin挂载文件系统][配置dolphin挂载文件系统]]
@@ -754,12 +758,30 @@ eBPF是通过bpf系统调用把eBPF程序加载到内核中
 - 使用JIT编译器
 - 动态增加系统功能  
 
-*** Maps
+
+*** ebpf限制
+ebpf虚拟机拥有如下限制
+- 512 bytes的栈 (尾调用为256bytes)
+- 没有堆分配的接口 只能使用[[ebpf_Maps]]
+*** ebpf_Maps
 eBPF用于存储和检索各种数据结构中的数据
 
 既可以由运行的eBPF访问 也可以通过系统调用从用户空间的其他程序访问
 
 [[file:imgs/eBPF/2025-01-12_19-24-50_screenshot.png]]
+
+*** ebpf_Helper
+
+eBPF不直接调用内核函数 而是调用helper函数
+[[file:imgs/eBPF/2025-01-19_12-42-20_screenshot.png]]
+
+*** ebpf_权限
+除非开启了非特权的eBPF 否则需要root
+
+*** ebpf_验证器
+所有eBPF的程序都会经过验证器
+
+
 
 * 配置
 ** TODO polkit
