@@ -15,6 +15,7 @@
         - [[#f32][f32]]
         - [[#f64][f64]]
         - [[#fn][fn]]
+          - [[#trait][Trait]]
         - [[#i8][i8]]
         - [[#i16][i16]]
         - [[#i32][i32]]
@@ -47,6 +48,34 @@
             - [[#ipv6multicastscope][Ipv6MulticastScope]]
             - [[#ipaddr][IpAddr]]
             - [[#socketaddr][SocketAddr]]
+        - [[#ptr][ptr]]
+          - [[#安全][安全]]
+          - [[#对齐][对齐]]
+          - [[#指针追溯][指针追溯]]
+            - [[#追溯provenance][追溯(Provenance)]]
+            - [[#使用严格追溯][使用严格追溯]]
+          - [[#func][Func]]
+            - [[#null][null()]]
+            - [[#write][write()]]
+            - [[#read][read()]]
+            - [[#copy][copy()]]
+            - [[#drop_in_place][drop_in_place()]]
+            - [[#eq][eq()]]
+            - [[#hash][hash()]]
+            - [[#replace][replace()]]
+            - [[#swap][swap()]]
+        - [[#intrinsics][intrinsics]]
+          - [[#func-1][func]]
+            - [[#write_via_move][write_via_move()]]
+            - [[#forget][forget()]]
+            - [[#needs_drop][needs_drop()]]
+            - [[#transmute][transmute()]]
+            - [[#offset][offset()]]
+            - [[#ptr_offset_from][ptr_offset_from()]]
+            - [[#copy-1][copy()]]
+            - [[#write_bytes][write_bytes()]]
+            - [[#size_of][size_of()]]
+            - [[#min_align_of][min_align_of()]]
     - [[#std][std]]
       - [[#modules-1][Modules]]
         - [[#net-1][net]]
@@ -59,23 +88,23 @@
             - [[#udpsocket][UdpSocket]]
           - [[#枚举-1][枚举]]
             - [[#shutdown][Shutdown]]
-              - [[#read][Read]]
-              - [[#write][Write]]
+              - [[#read-1][Read]]
+              - [[#write-1][Write]]
               - [[#都关闭][都关闭]]
-          - [[#trait][Trait]]
+          - [[#trait-1][Trait]]
             - [[#tosocketaddrs][ToSocketAddrs]]
         - [[#io][io]]
           - [[#prelude][prelude]]
           - [[#结构体-2][结构体]]
           - [[#枚举-2][枚举]]
-          - [[#trait-1][Trait]]
+          - [[#trait-2][Trait]]
             - [[#bufread][BufRead]]
               - [[#required-methods][required methods]]
               - [[#provided-methods][provided methods]]
             - [[#isterminal][IsTerminal]]
-            - [[#read-1][Read]]
+            - [[#read-2][Read]]
             - [[#seek][Seek]]
-            - [[#write-1][Write]]
+            - [[#write-2][Write]]
           - [[#函数][函数]]
           - [[#类型定义][类型定义]]
     - [[#tokio][tokio]]
@@ -86,10 +115,8 @@
         - [[#tensor-1][Tensor]]
           - [[#impl-3][impl]]
             - [[#randn][randn()]]
-              - [[#examples][Examples]]
             - [[#matmul][matmul()]]
             - [[#relu][relu()]]
-              - [[#examples-1][Examples]]
             - [[#broadcast_add][broadcast_add()]]
   - [[#ebpf][eBPF]]
 
@@ -167,7 +194,15 @@ rust核心库
 
 ***** fn
 函数指针 形如 *fn(usize)-> bool*
-
+函数指针指向代码 函数指针可以像函数一样被调用
+默认的ABI是Rust ~extern "Rust" fn()~
+指向C ABI函数的指针 ~extern "C" fn()~
+****** Trait
+- Clone
+- Copy
+- Send
+- Sync
+- Unpin
 ***** i8
 8位有符号整型 i16,i32,i64,i128亦是如此
 ***** i16
@@ -181,9 +216,13 @@ rust核心库
 ***** isize
 指针大小的有符号整型
 ***** pointer
-裸指针*const T \*mut T
+裸指针 *const T \*mut T
+裸指针可以是未对齐的 也可以是[[#null][null]]
+注意 当解引用裸指针时 必须非null且对齐
 ***** reference
 引用 *&T* *&mut T*
+
+
 ***** slice
 切片[T]
 ***** str
@@ -251,6 +290,238 @@ ip地址 v4或v6
 
 ******* SocketAddr
 socket地址 v4或v6
+
+***** ptr
+裸指针
+
+
+****** 安全
+- 所有指针必须valid
+- null是无效的
+- 此模块非原子
+
+****** 对齐
+有效裸指针不一定正确对齐
+正确对齐: *const T 必须与 mem::align_of::<T>() 对齐
+
+****** 指针追溯
+
+******* 追溯(Provenance)
+指针不是简单的整型与地址
+释放后使用是未定义行为
+创建分配时 该分配拥有唯一的原始指针.
+保证分配的原始指针对整个分配具有唯一的访问权限 且只对此分配有唯一的访问权
+Provenance 拥有允许指针访问的字节范围和访问这些字节相关的生命周期
+
+Strict Provenance试图通过解偶rust指针和usize/isize的传统合并 并定义一个语义包含以下信息的指针来解决问题
+- address-space 它是它的一部分
+- 它指向的地址  usize
+- 它所有权的出处 定义了它有权访问的内存
+
+******* 使用严格追溯
+大多数代码不需要更改就已经符合严格追溯
+需要确保如果将地址转换为指针 然后使用该指针指向read/write内存 则需要保留一个具有足够来源来执行read/write本身的指针
+****** Func
+
+******* null()
+创建空指针
+#+begin_src rust
+  pub const fn null<T: ?Sized + Thin>() -> *const T
+#+end_src
+
+******* write()
+用给定值覆盖存储位置 不读取或丢弃旧值
+若违反下列条件 则会发生未定义行为
+- ~dst~ 必须有效
+- ~dst~ 必须正确对齐
+#+begin_src rust
+  pub unsafe fn write<T>(dst: *mut T,src: T)
+#+end_src
+
+write()的内部实现为
+Examples
+#+begin_src rust
+  let mut x = 0;
+  let y = &mut x as *mut i32;
+  let z = 12;
+
+  unsafe {
+      core::ptr::write(y,z);
+      assert_eq!(core::ptr::read(y),12);
+  }
+#+end_src
+~core::mem::swap~ 实现
+#+begin_src rust
+  fn swap<T>(a: &mut T, b: &mut T) {
+      unsafe{
+	  let tmp = core::ptr::read(a);
+	  
+      }
+  }
+#+end_src
+
+******* read()
+从 ~src~ 读取值而不移动它
+#+begin_src rust
+  pub const unsafe fn read<T>(src: *const T) -> T
+#+end_src
+若违反下列条件 则会发生未定义行为
+- ~src~ 必须有效
+- ~src~ 必须正确对齐
+- ~src~ 必须指向 ~T~ 类型的正确初始化值
+
+~read()~ 创建 ~T~ 的按位副本 无论 ~T~ 是否实现 ~Copy~. 若 ~T~ 不是 ~Copy~ 则同时使用返回值和 ~*src~ 可能会违反内存安全
+Examples
+#+begin_src rust
+  let x = 12;
+  let y = &x as *const i32;
+
+  unsafe {
+      assert_eq!(core::ptr::read(y),12);
+  }
+#+end_src
+
+注意 这样会发生未定义错误 因为在//a位置s2会释放一次 //b位置会再释放一次
+#+begin_src rust
+  let mut s = String::from("foo");
+  unsafe {
+      // s2与s指向相同的内存
+      let mut s2: String = core::ptr::read(&s);
+      assert_eq!(s2,"foo");
+  } //a
+  //b
+#+end_src
+此时不会未定义行为 因为write将s覆盖了 *且不会触发s的drop*
+使用 ~mem::forget~ 也可以规避二次drop
+#+begin_src rust
+  let mut s = String::from("foo");
+  unsafe {
+      // s2与s指向相同的内存
+      let mut s2: String = core::ptr::read(&s);
+      assert_eq!(s2,"foo");
+
+      // 这一步是不发生未定义行为所必须的
+      // wirte()将bar覆盖到s 而不会触发它的drop
+      core::ptr::write(&mut s, String::from("bar"));
+  }
+#+end_src
+
+******* copy()
+与 intrinsics::copy() 差不多
+
+******* drop_in_place()
+执行指向值的drop()
+#+begin_src rust
+  pub unsafe fn drop_in_place<T: ?Sized>(to_drop: *mut T)
+#+end_src
+等效于调用 ptr::read() 然后丢弃结果
+
+
+******* eq()
+比较指针是否相等
+#+begin_src rust
+  pub fn eq<T: ?Sized>(a: *const T, b: *const T) -> bool
+#+end_src
+
+******* hash()
+散列指针指向的地址
+#+begin_src rust
+  pub fn hash<T: ?Sized, S: Hasher>(hashee: *const T, into: &mut S)
+#+end_src
+
+******* replace()
+将src移到dst 返回dst先前的值
+两个值都不会丢弃
+#+begin_src rust
+  pub unsafe fn replace<T>(dst: *mut T, src: T) -> T
+#+end_src
+
+******* swap()
+在相同类型的两个可变位置交换值
+#+begin_src rust
+  pub unsafe fn swap<T>(x: *mut T, y: *mut T)
+#+end_src
+***** intrinsics
+编译器内部函数
+
+****** func
+
+******* write_via_move()
+ptr::write()的实现细节
+#+begin_src rust
+  pub unsafe extern "rust-intrinsic" fn write_via_move<T>(ptr: *mut T, value: T)
+#+end_src
+
+******* forget()
+不调用目标值的drop
+#+begin_src rust
+  pub extern "rust-intrinsic" fn forget<T: ?Sized>(_: T)
+#+end_src
+
+******* needs_drop()
+若T需要drop则true 若实现了Copy则false 若既不丢弃也不Copy 则返回值不确定
+#+begin_src rust
+  pub const extern "rust-intrinsic" fn needs_drop<T: ?Sized>() -> bool
+#+end_src
+内部稳定版本为 ~mem::needs_drop()~
+
+******* transmute()
+将一种类型值的位重新解释为另一种类型
+#+begin_src rust
+  pub const unsafe extern "rust-intrinsic" fn transmute<Src, Dst>(src: Src) -> Dst
+#+end_src
+两种类型的值必须有相同的大小
+
+******* offset()
+返回 ~dst+size_of::<T>()*offset~
+#+begin_src rust
+  pub const unsafe extern "rust-intrinsic" fn offset<Ptr,Delta>(dst: Ptr,offset: Delta) -> Ptr
+#+end_src
+
+******* ptr_offset_from()
+返回 ~(ptr-base)/size_of::<T>()~
+#+begin_src rust
+  pub const unsafe extern "rust-intrinsic" fn ptr_offset_from<T>(ptr: *const T,base: *const T
+  ) -> isize
+#+end_src
+
+******* copy()
+将 count * size_of::<T>() 字节从 src 复制到 dst
+~src~ 与 ~dst~ 所指内存可能会重叠
+#+begin_src rust
+  pub const unsafe fn copy<T>(src: *const T,dst: *mut T, count: usize)
+#+end_src
+当可以保证内存不重叠时 可以使用 ~copy_nonoverlapping()~
+
+无论 T 是否实现 Copy, copy() 都会创建 T 的按位副本
+
+******* write_bytes()
+从 dst开始的 count * size_of::<T>() 内存字节设置为 val
+#+begin_src rust
+  pub unsafe fn write_bytes<T>(dst: *mut T, val: u8, count: usize)
+#+end_src
+Examples
+#+begin_src rust
+  let mut vec = vec![0u32;4];
+  unsafe {
+      let vec_ptr = vec.as_mut_ptr();
+      core::ptr::write_bytes(vec_ptr, 0xfe,2);
+
+  }
+  assert_eq!(vec, [0xfefefefe,0xfefefefe,0,0]);
+#+end_src
+
+******* size_of()
+返回类型的大小 以字节为单位
+#+begin_src rust
+  pub const extern "rust-intrinsic" fn size_of<T>() -> usize
+#+end_src
+
+******* min_align_of()
+返回最小对齐方式
+#+begin_src rust
+  pub const "rust-intrinsic" fn min_align_of<T>() -> usize
+#+end_src
 *** std
 **** Modules
 ***** net
@@ -268,7 +539,7 @@ TCP套接字服务器
   pub fn accept(&self) -> Result<(Tcpstream,SocketAddr)>
 #+end_src
 
-********** Examples
+Examples
 #+begin_src rust
   use std::net::TcpListener;
   let listener: TcpListener = TcpListener::bind("127.0.0.1:3000").expect("无法监听");
@@ -291,7 +562,7 @@ TCP套接字服务器
 #+begin_src rust
   pub fn incoming(&self) -> Incoming<'_>
 #+end_src
-********** Examples
+Examples
 #+begin_src rust
   use std::net::{TcpListener,TcpStream};
 
@@ -320,7 +591,7 @@ TCP套接字服务器
   pub fn set_nonblocking(&self,nonblocking: bool) -> Result<()>
 #+end_src
 
-********** Examples
+Examples
 #+begin_src rust
   use std::io;
   use std::net::TcpListener;
@@ -444,7 +715,7 @@ I/O功能
   fn fill_buf(&mut self) -> Result<&[u8]>
 #+end_src
 
-********** Examples
+Examples
 #+begin_src rust
   use std::io;
   use std::io::prelude::*;
@@ -470,7 +741,7 @@ I/O功能
 迭代器产生io::Result<String>
 
 
-********** Examples
+Examples
 #+begin_src rust
   use std::io::{self, BufRead};
 
@@ -530,7 +801,7 @@ tokio提供了主要的几个组件
   pub fn randn<S: Into<Shape>, T: FloatDtype>(mean: T, std: T, s: S, device: &Device) -> Result<Self>
 #+end_src
 
-******** Examples
+Examples
 
 #+begin_src rust
   use candle_core::{Device,Tensor,Result};
@@ -560,7 +831,7 @@ ReLU函数会把所有的负数输入转换为0 将非负输入保持不变
   pub fn relu(&self) -> Result<Self>
 #+end_src
 
-******** Examples
+Examples
 #+begin_src rust
   例如[[1,2,3,4,-1,-2]] 会变成 [[1,2,3,4,0,0]]
 #+end_src

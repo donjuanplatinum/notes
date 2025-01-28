@@ -1,0 +1,44 @@
+* Content                                                             :TOC_8:
+- [[#minecraft][Minecraft]]
+  - [[#fabric][Fabric]]
+  - [[#source-code][Source Code]]
+    - [[#注册表][注册表]]
+  - [[#fabric-api][Fabric API]]
+  - [[#mixin][Mixin]]
+
+* Minecraft
+** Fabric
+Fabric是一系列用于编写Minecraft模组的工具
+| Fabric Loader | 往基于Java的游戏加载修改后的代码的框架           |
+| Fabric Loom   | 用于使用Fabric编写模组的 *构建系统*            |
+| Fabric语言模块  | 使用其他jvm语言                              |
+| Fabric API    | 一系列能让添加或修改Minecraft共同特性更简单的工具 |
+
+** Source Code
+Mojang混淆了Minecraft的源代码 所有的类 方法 字段名称是随机的
+
+但是有一些现成的工具可以帮助我们理解它们
+
+- intermediary映射器 给予Minecraft源码中所有被混淆的对象一个名称  类似filed_10832 method_12991()
+- Yarn 社区驱动的类 变量 方法对照表
+
+*** 注册表
+很多游戏中的特性: 方块 物品 UI 实体 区块生成器 在游戏被加载时会被加载进注册表
+如果你需要添加一些对象到游戏 那么你可能需要注册它
+#+begin_comment
+注意 一些功能是数据驱动的 这就是为什么数据包可以添加一些对象而有些对象不行
+#+end_comment
+数据驱动的内容: 生物群落 纹理 *一些* 区块生成器 制作配方
+
+** Fabric API
+- Fabric loader 加载本身与入口点
+- Fabric API 可选的库 提供常用接口 
+
+** Mixin
+Mixin可以更改Minecraft的代码 但是有冲突风险
+
+作用
+- 添加接口
+- 回调注入
+- 重定向注入
+- 覆写  

@@ -44,7 +44,14 @@
     - [[#sys-libsglibc][sys-libs/glibc]]
 - [[#portage][portage]]
   - [[#emerge][emerge]]
-    - [[#varcachedistfiles][/var/cache/distfiles]]
+    - [[#仓库更新][仓库更新]]
+    - [[#删除包][删除包]]
+    - [[#搜索包][搜索包]]
+    - [[#安装包][安装包]]
+    - [[#系统更新][系统更新]]
+    - [[#包信息查询][包信息查询]]
+    - [[#指定根][指定根]]
+    - [[#清理缓存][清理缓存]]
     - [[#查看use说明][查看USE说明]]
     - [[#报错][报错]]
       - [[#mask][mask]]
@@ -334,42 +341,70 @@ F4选择即可
 
 * portage
 ** emerge
-仓库更新
+*** 仓库更新
 #+begin_src shell
   emerge --sync # 更新仓库
 #+end_src
-删除包
+*** 删除包
 #+begin_src shell
   emerge --unmerge package
   emerge --deselect package
   emerge --depclean
 #+end_src
-搜索包
+*** 搜索包
 #+begin_src shell
   emerge --search package # 搜索包名
   emerge --searchdesc package # 搜索包的描述
 #+end_src
-安装包
+*** 安装包
 #+begin_src shell
   emerge package
   emerge --pretend package # 查看依赖
   emerge --fetchonly package # 仅下载源代码至/var/cache/distfiles
   emerge =package-version # 安装指定版本
 #+end_src
-系统更新
+*** 系统更新
 #+begin_src shell
   emerge --update --deep --newuse @world
 #+end_src
+*** 包信息查询
+#+begin_src shell
+  emerge -vp package
+#+end_src
+你将会看到 类似于
+#+begin_src shell
+  [ebuild  rR    ] kde-plasma/plasma-desktop-6.2.4:6::gentoo  USE="handbook screencast sdl semantic-desktop -debug -ibus -scim -test -webengine" INPUT_DEVICES="-wacom" 0 KiB
 
-*** /var/cache/distfiles
-${PORTDIR}/distfiles
-
-portage下载的源代码的位置
-
-- 清理
-  #+begin_src shell
+#+end_src
+其中在[]里
+#+begin_src 
+  N new包
+  S SLOT安装(并排版本)
+  U 更新
+  D 降级
+  r 重新安装(由于某种原因被强制安装)
+  R 替换(重新安装相同的版本)
+  I 交互式
+  B 由于未解决的冲突被block
+  b 被block 但是自动解决冲突
+#+end_src
+其中在USE后
+#+begin_src
+  -USE 没有激活这个USE
+  USE* 状态转换
+  UES% 新增加的或减少的
+  (USE) 强制的
+  {} 被绑定于FEATURES
+#+end_src
+*** 指定根
+#+begin_src shell
+  emerge --root=DIR # 指定ROOT env
+  emerge --sysroot=DIR # 指定SYSROOT env
+#+end_src
+*** 清理缓存
+#+begin_src shell
     eclean-dist
-  #+end_src
+#+end_src
 *** 查看USE说明
 安装gentoolkit
 #+begin_src shell
