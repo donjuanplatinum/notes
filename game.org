@@ -13,6 +13,7 @@
     - [[#生化危机][生化危机]]
     - [[#艾尔登法环][艾尔登法环]]
     - [[#无人深空][无人深空]]
+    - [[#米塔][米塔]]
 - [[#lutris][lutris]]
 - [[#ryujinx][Ryujinx]]
   - [[#安装][安装]]
@@ -97,6 +98,9 @@ EAC可以通过[[#lutris][Lutris]]的EAC功能 VKD3D同理
 
 *** 无人深空
 需要[[dxvk][DXVK]]
+
+*** 米塔
+直接运行 但是需要中文字体 把windows的fonts复制就行
 * TODO lutris
 * Ryujinx
 ** 安装
