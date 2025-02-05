@@ -7,6 +7,7 @@
         - [[#将本地端口映射到服务器][将本地端口映射到服务器]]
         - [[#将外部端口映射到本机][将外部端口映射到本机]]
     - [[#mount][mount]]
+      - [[#挂载传播类型][挂载传播类型]]
     - [[#grub][Grub]]
       - [[#efi][EFI]]
       - [[#安装][安装]]
@@ -170,6 +171,30 @@ p     --output-all              output all columns
   ssh -CgL 3000:127.0.0.1:80 test:server
 #+end_src
 *** TODO mount
+使用findmnt命令可以查看挂载点类型
+**** 挂载传播类型
+- 共享挂载(shared)
+  #+begin_src shell
+    mount --make-shared
+  #+end_src
+  - 挂载事件会在挂载点之间双向传播
+  - 若/mnt/A挂载了一个设备 那么/mnt/B也会看到这个挂载
+- 从属挂载(slave)
+  #+begin_src shell
+    mount --make-slave
+  #+end_src
+  - 挂载事件单向传播
+  - 如果/mnt/A 是/mnt/B的主挂载点 那么/mnt/A上的挂载事件会传播到B 但B不会传播到A
+- 私有挂载(private)
+  #+begin_src shell
+    mount --make-private
+  #+end_src
+  - 不会传播
+- 不可绑定挂载
+  #+begin_src shell
+    mount --make-unbindable
+  #+end_src
+  - 不可绑定挂载    
 *** Grub
 **** EFI
 UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。

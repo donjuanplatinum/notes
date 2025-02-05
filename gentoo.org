@@ -32,6 +32,7 @@
     - [[#4网络][4.网络]]
       - [[#静态ip][静态ip]]
     - [[#5时间][5.时间]]
+- [[#chroot安装][Chroot安装]]
 - [[#后续][后续]]
   - [[#230版本更新][23.0版本更新]]
   - [[#fcitx-rime切换为简体][fcitx-rime切换为简体]]
@@ -78,6 +79,7 @@
       - [[#wine-proton][wine-proton]]
       - [[#rust][rust]]
       - [[#gcc][gcc]]
+      - [[#libdrm][libdrm]]
 
 * 安装
 *** 1.挂载
@@ -290,6 +292,8 @@ GRUB 可以在运行 grub-mkconfig 命令时检测到其他操作系统并生成
   sudo emerge net-misc/chrony
   rc-update add chronyd default
 #+end_src
+
+* Chroot安装
 * 后续
 ** 23.0版本更新
 默认合并了/usr (merged-usr)
@@ -555,7 +559,7 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/repos.conf/gentoo.conf :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
 [DEFAULT]
 main-repo = gentoo
 
@@ -582,7 +586,7 @@ sync-webrsync-verify-signature = no
 :PROPERTIES:
 :HEADER-ARGS: :tangle use.desc :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   # Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
@@ -997,7 +1001,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/emacs :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   app-editors/emacs libxml2 dynamic-loading json xwidgets
 #+end_src
 
@@ -1005,7 +1009,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/ffmpeg :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   media-video/ffmpeg libass opus vpx
 #+end_src
 
@@ -1013,7 +1017,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/glibc :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   sys-libs/glibc hash-sysv-compat
 #+end_src
 
@@ -1021,7 +1025,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/qbittorrent :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   net-p2p/qbittorrent gui webui
 #+end_src
 
@@ -1029,7 +1033,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/wine-proton :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
   app-emulation/wine-proton osmesa v4l
 #+end_src
 
@@ -1037,7 +1041,7 @@ zstd - Enable support for ZSTD compression
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/rust :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
 dev-lang/rust  clippy doc rust-analyzer rust-src rust-fmt
 dev-lang/rust-bin clippy rust-src rust-analyzer rustfmt
 
@@ -1047,6 +1051,14 @@ dev-lang/rust-bin clippy rust-src rust-analyzer rustfmt
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/portage/package.use/gcc :mkdirp yes
 :END:
-#+begin_src
+#+begin_src shell
 sys-devel/gcc jit
+#+end_src
+
+**** libdrm
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.use/libdrm :mkdirp yes
+:END:
+#+begin_src shell
+  x11-libs/libdrm video_cards_radeon
 #+end_src
