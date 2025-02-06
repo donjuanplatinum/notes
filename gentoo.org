@@ -41,8 +41,6 @@
 - [[#部分包配置][部分包配置]]
     - [[#dev-langrust][dev-lang/rust]]
     - [[#app-editorsemacs][app-editors/emacs]]
-    - [[#net-wirelesslorcon][net-wireless/lorcon]]
-    - [[#sys-libsglibc][sys-libs/glibc]]
 - [[#portage][portage]]
   - [[#emerge][emerge]]
     - [[#仓库更新][仓库更新]]
@@ -80,6 +78,7 @@
       - [[#rust][rust]]
       - [[#gcc][gcc]]
       - [[#libdrm][libdrm]]
+- [[#问题][问题]]
 
 * 安装
 *** 1.挂载
@@ -103,6 +102,11 @@
 :PROPERTIES:
 :HEADER-ARGS: :tangle tangle/mount.sh :mkdirp yes
 :END:
+- /proc是伪文件系统 由linux内核生成 挂载到/mnt/proc
+- /sys是伪文件系统 类似/proc 更结构化
+- /dev是包含全部设备文件的常规文件系统 一部分由linux设备管理器(通常是udev)  管理
+/proc是挂载 /sys /dev /run是绑定挂载
+例如 /mnt/sys就是sys(同一个文件系统的第二个条目) 而/mnt/proc(可以说)是文件系统的新挂载
 #+begin_src shell
 mount --types proc /proc /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
@@ -333,15 +337,8 @@ F4选择即可
   app-editors/emacs libxml2 dynamic-loading
   # libxml2为了一些包的正常使用 dynamic-loading启用动态模块
 #+end_src
-*** net-wireless/lorcon
-#+begin_src
-  net-wireless/lorcon python
-#+end_src
-*** sys-libs/glibc
-#+begin_src
-  sys-libs/glibc hash-sysv-compat
-  # hash-sysv-compat为了支持wine-proton的eac游戏
-#+end_src
+
+
 
 * portage
 ** emerge
@@ -1062,3 +1059,9 @@ sys-devel/gcc jit
 #+begin_src shell
   x11-libs/libdrm video_cards_radeon
 #+end_src
+
+
+* 问题
+- 当遇到编译出错时 可以试着先更新portage包
+- 也可以用equery看看出错包的依赖 然后先更新那些包
+
