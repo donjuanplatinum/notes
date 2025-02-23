@@ -25,6 +25,11 @@
         - [[#pointer][pointer]]
         - [[#reference][reference]]
         - [[#slice][slice]]
+          - [[#impl][impl]]
+            - [[#rotate_left][rotate_left()]]
+              - [[#example][Example]]
+            - [[#rotate_right][rotate_right()]]
+              - [[#example-1][Example]]
         - [[#str][str]]
         - [[#tuple][tuple]]
         - [[#u8][u8]]
@@ -39,7 +44,7 @@
           - [[#结构体][结构体]]
             - [[#addrparseerror][AddrParseError]]
             - [[#ipv4addr][Ipv4Addr]]
-              - [[#impl][impl]]
+              - [[#impl-1][impl]]
               - [[#impl-traits][impl traits]]
             - [[#ipv6addr][Ipv6Addr]]
             - [[#socketaddrv4][SocketAddrV4]]
@@ -82,9 +87,9 @@
           - [[#结构体-1][结构体]]
             - [[#incoming][Incoming]]
             - [[#tcplistener][TcpListener]]
-              - [[#impl-1][impl]]
-            - [[#tcpstream][TcpStream]]
               - [[#impl-2][impl]]
+            - [[#tcpstream][TcpStream]]
+              - [[#impl-3][impl]]
             - [[#udpsocket][UdpSocket]]
           - [[#枚举-1][枚举]]
             - [[#shutdown][Shutdown]]
@@ -113,7 +118,7 @@
       - [[#modules-2][Modules]]
       - [[#structs][Structs]]
         - [[#tensor-1][Tensor]]
-          - [[#impl-3][impl]]
+          - [[#impl-4][impl]]
             - [[#randn][randn()]]
             - [[#matmul][matmul()]]
             - [[#relu][relu()]]
@@ -225,6 +230,34 @@ rust核心库
 
 ***** slice
 切片[T]
+
+****** impl
+
+******* rotate_left()
+原址旋转切片
+#+begin_src rust
+  pub fn rotate_left(&mut self,mid: usize)
+#+end_src
+
+******** Example
+#+begin_src rust
+  let mut a = ['a','b','c','d','e','f'];
+  a.rotate_left(2);
+  assert_eq!(a,['c','d','e','f','a','b']);
+#+end_src
+
+******* rotate_right()
+原址旋转切片 但是mid从右边开始
+#+begin_src rust
+  pub fn rotate_right(&mut self,mid: usize)
+#+end_src
+
+******** Example
+#+begin_src rust
+  let mut a = ['a', 'b', 'c', 'd', 'e', 'f'];
+  a.rotate_right(2);
+  assert_eq!(a, ['e', 'f', 'a', 'b', 'c', 'd']);
+#+end_src
 ***** str
 字符串切片
 ***** tuple

@@ -29,6 +29,7 @@
   - [[#trojan][trojan]]
     - [[#docker-compose-1][docker-compose]]
     - [[#configjson][config.json]]
+    - [[#注意][注意!]]
   - [[#gitea][gitea]]
     - [[#docker-compose-2][docker-compose]]
     - [[#act_runner][act_runner]]
@@ -728,6 +729,8 @@ services:
 }
 #+end_src
 
+*** 注意!
+在cloudflare下的ssl/tls ssl/tls加密设置为完全
 ** gitea
 *** docker-compose
 :PROPERTIES:

@@ -15,6 +15,8 @@
       - [[#滑动窗口][滑动窗口]]
   - [[#sorting][sorting]]
     - [[#merge][merge]]
+  - [[#utils][utils]]
+    - [[#retate][retate]]
 
 * Algori
 ** searching
@@ -265,7 +267,9 @@ pub fn add_two_binary_linkedlist(a: LinkedList<bool>, b: LinkedList<bool>) -> Li
 我们引入一个思考
 能否不创建一个新的容器O(n)?
 那么也就是在merge过程进行原址排序
-此时问题变成了: 如何原址的排序一个以mid为分界的两个有序数组
-- 插入一个元素然后全体后移? 你个勺儿 这样一顿操作下来宇宙都热寂了
-- 将右边的元素使用二分插入排序插入到前面? 
+那么我们可以使用 手摇交换
 
+** utils
+
+*** retate
+手摇交换

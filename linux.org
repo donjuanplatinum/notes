@@ -8,6 +8,7 @@
         - [[#将外部端口映射到本机][将外部端口映射到本机]]
     - [[#mount][mount]]
       - [[#挂载传播类型][挂载传播类型]]
+      - [[#挂载与绑定][挂载与绑定]]
     - [[#grub][Grub]]
       - [[#efi][EFI]]
       - [[#安装][安装]]
@@ -172,6 +173,7 @@ p     --output-all              output all columns
 #+end_src
 *** TODO mount
 使用findmnt命令可以查看挂载点类型
+
 **** 挂载传播类型
 - 共享挂载(shared)
   #+begin_src shell
@@ -195,6 +197,10 @@ p     --output-all              output all columns
     mount --make-unbindable
   #+end_src
   - 不可绑定挂载    
+
+**** 挂载与绑定
+- 普通挂载: 将存储设备挂载到目录树中的路径
+- 绑定挂载: 将文件系统的目录或文件挂载到另一个路径 使两个路径具有相同的内容  
 *** Grub
 **** EFI
 UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。
