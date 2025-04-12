@@ -63,6 +63,10 @@
       - [[#文件描述符类型][文件描述符类型]]
       - [[#文件类型][文件类型]]
     - [[#strace][strace]]
+      - [[#args][args]]
+        - [[#-e-expr][-e expr]]
+          - [[#trace集合][trace集合]]
+      - [[#example-1][example]]
     - [[#objdumpreadelf][objdump/readelf]]
     - [[#gdb][gdb]]
     - [[#pstack][pstack]]
@@ -677,7 +681,7 @@ List Open File 获取被进程打开文件的信息
 - -t: 仅获取PID
 - -U: 获取UNIX Sokcet地址
 - -F: 格式化输出
-  - 例如 -F pcfn (pid,command,文件描述副,文件名)
+- 例如 -F pcfn (pid,command,文件描述副,文件名)
 **** Example
 ***** 基本
 #+begin_src shell
@@ -735,7 +739,7 @@ List Open File 获取被进程打开文件的信息
 #+end_src
 **** 文件描述符类型
 #+begin_src shell
-  （1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
+（1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
 （2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
 （3）lnn：library references (AIX);
 （4）err：FD information error (see NAME column);
@@ -783,8 +787,47 @@ List Open File 获取被进程打开文件的信息
 Strace可以诊断 调试Linux用户空间
 
 检测进程与内核的交互 系统调用 信号 状态变更等
-
+**** args
 strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.c][Ptrace]]
+| -c          | 统计                  |
+| -f          | 追踪fork子进程         |
+| -ff         | 将为每个子进程          |
+| -F          | 追踪vfork调用          |
+| -i          | 输出系统调用入口指针    |
+| -q          |                      |
+| -r          | 输出相对时间           |
+| -t -tt -ttt | 输出的每一行加入时间    |
+| -T          | 显示系统调用所需时间    |
+| -v          | 输出所有调用           |
+| -x          | 十六进制输出非标准字符串 |
+| -xx         | 十六禁止输出所有字符串   |
+| -e expr     | 指定表达式来控制如何追踪 |
+| -p pid      | 追踪指定的进程          |
+| -u user     | 以user身份执行         |
+
+***** -e expr
+| trace   | 指定追踪的系统调用     |
+| abbrev  | 输出系统调用的结果集合  |
+| verbose |                     |
+| raw     | 十六进制显示          |
+| signal  | 指定追踪的信号 默认all |
+
+****** trace集合
+| file    | 与文件相关的系统调用    |
+| process | 与进程相关的系统调用    |
+| network | 与网络相关的系统调用    |
+| signal  | 与信号相关的系统调用    |
+| ipc     | 与进程通讯相关的系统调用 |
+
+**** example
+不追踪sigio信号
+#+begin_src shell
+  strace -e signal=!SIGIO
+#+end_src
+通用用法
+#+begin_src shell
+  strace -o output -T -tt -e trace=file -p pid
+#+end_src
 *** TODO objdump/readelf
 *** TODO gdb
 *** TODO pstack

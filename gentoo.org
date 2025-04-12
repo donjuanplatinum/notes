@@ -82,6 +82,7 @@
       - [[#rust][rust]]
       - [[#gcc][gcc]]
       - [[#libdrm][libdrm]]
+      - [[#librime-lua][librime-lua]]
     - [[#packageaccept_keywords][package.accept_keywords]]
       - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
 - [[#应该安装的包][应该安装的包]]
@@ -1459,6 +1460,13 @@ sys-devel/gcc jit
   x11-libs/libdrm video_cards_radeon
 #+end_src
 
+**** librime-lua
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.use/librime-lua :mkdirp yes
+:END:
+#+begin_src shell
+  app-i18n/librime-lua lua_single_target_lua5-4
+#+end_src
 *** package.accept_keywords
 **** gentoo-zh/xanmod-kernel
 :PROPERTIES:
