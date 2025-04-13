@@ -51,6 +51,9 @@
   - [[#rustdesk][rustdesk]]
     - [[#compose-4][compose]]
   - [[#steamcmd][steamcmd]]
+  - [[#mariadb][mariadb]]
+    - [[#compose-5][compose]]
+    - [[#cli][cli]]
 
 * Docker Cli
 ** 拉取所有tag
@@ -1041,3 +1044,26 @@ services:
 #+begin_src shell
   docker run -it -v $PWD:/data steamcmd/steamcmd:latest +login anonymous +force_install_dir /data +app_update 740 +quit
 #+end_src
+
+** mariadb
+
+*** compose
+
+*** cli
+- 创建数据库
+  #+begin_src sql
+create database 'database';
+  #+end_src
+- 创建用户
+  #+begin_src sql
+create user 'user';
+  #+end_src
+- 修改密码
+  #+begin_src sql
+set password for 'user' = PASSWORD('password');	    
+  #+end_src
+- 授予权限
+  #+begin_src sql
+GRANT ALL PRIVILEGES ON 'database' TO 'user';
+flush privileges;
+  #+end_src
