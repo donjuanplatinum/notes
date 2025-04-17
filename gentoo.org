@@ -6,6 +6,7 @@
       - [[#解压stage3][解压stage3]]
       - [[#创建mntgentooetcportagereposconfgentooconf][创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf]]
       - [[#更改mntgentooetcgentooportagemakeconf][更改/mnt/gentoo/etc/gentoo/portage/make.conf]]
+      - [[#二进制配置mntgentooetcgentooportagebinreposconfgentoobinhostconf][二进制配置/mnt/gentoo/etc/gentoo/portage/binrepos.conf/gentoobinhost.conf]]
       - [[#挂载文件系统][挂载文件系统]]
       - [[#chroot][chroot]]
       - [[#emerge-sync][emerge sync]]
@@ -52,6 +53,7 @@
     - [[#指定根][指定根]]
     - [[#清理缓存][清理缓存]]
     - [[#查看use说明][查看USE说明]]
+    - [[#二进制包操作][二进制包操作]]
     - [[#报错][报错]]
       - [[#mask][mask]]
       - [[#use][USE]]
@@ -66,6 +68,7 @@
   - [[#sys][sys]]
     - [[#etcportagemakeconf][/etc/portage/make.conf]]
     - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
+    - [[#etcportagebinreposconfgentoobinhostconf][/etc/portage/binrepos.conf/gentoobinhost.conf]]
     - [[#etcgenkernelconf][/etc/genkernel.conf]]
   - [[#doc][doc]]
     - [[#vardbreposgentooprofilesusedesc][/var/db/repos/gentoo/profiles/use.desc]]
@@ -99,6 +102,8 @@
 #+end_src
 **** 创建/mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 **** 更改/mnt/gentoo/etc/gentoo/portage/make.conf
+
+**** 二进制配置/mnt/gentoo/etc/gentoo/portage/binrepos.conf/gentoobinhost.conf
 **** 挂载文件系统
 :PROPERTIES:
 :HEADER-ARGS: :tangle tangle/mount.sh :mkdirp yes
@@ -425,6 +430,11 @@ F4选择即可
 ....
 #+end_src
 
+*** 二进制包操作
+#+begin_src shell
+  emerge -g # 从远程下载二进制包 若没有则编译
+  emerge -G # 从远程下载二进制包 若没有则报错
+#+end_src
 *** 报错
 **** mask
 | ~arch keyword               | 该软件没有经过充分的测试 不能进入稳定分支 请等待一段时间后尝试使用                                                                |
@@ -527,7 +537,7 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
   CXXFLAGS="${COMMON_FLAGS}"
   FCFLAGS="${COMMON_FLAGS}"
   FFLAGS="${COMMON_FLAGS}"
-
+  FEATURES="${FEATURES} binpkg-request-signature"
   # NOTE: This stage was built with the bindist Use flag enabled
 
   # This sets the language of build output to English.
@@ -551,6 +561,7 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
   ALSA_CARDS="hda_intel"
 
   L10N="en-US zh-CN en zh"
+  ABI_X86="32 64"	      
 #+end_src
 
 *** /etc/portage/repos.conf/gentoo.conf
@@ -580,6 +591,20 @@ sync-webrsync-verify-signature = no
 
 #+end_src
 
+*** /etc/portage/binrepos.conf/gentoobinhost.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/binrepos.conf/gentoobinhost.conf :mkdirp yes
+:END:
+#+begin_src shell
+  # These settings were set by the catalyst build script that automatically
+# built this stage.
+# Please consider using a local mirror.
+
+[gentoobinhost]
+priority = 1
+sync-uri = https://mirrors.tuna.tsinghua.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64
+
+#+end_src
 *** /etc/genkernel.conf
 :PROPERTIES:
 :HEADER-ARGS: :tangle etc/genkernel.conf :mkdirp yes
