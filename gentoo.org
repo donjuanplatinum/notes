@@ -69,6 +69,7 @@
     - [[#etcportagemakeconf][/etc/portage/make.conf]]
     - [[#etcportagereposconfgentooconf][/etc/portage/repos.conf/gentoo.conf]]
     - [[#etcportagebinreposconfgentoobinhostconf][/etc/portage/binrepos.conf/gentoobinhost.conf]]
+    - [[#etcportagereposconfgentoo-zhconf][/etc/portage/repos.conf/gentoo-zh.conf]]
     - [[#etcgenkernelconf][/etc/genkernel.conf]]
   - [[#doc][doc]]
     - [[#vardbreposgentooprofilesusedesc][/var/db/repos/gentoo/profiles/use.desc]]
@@ -82,6 +83,8 @@
       - [[#rust][rust]]
       - [[#gcc][gcc]]
       - [[#libdrm][libdrm]]
+    - [[#packageaccept_keywords][package.accept_keywords]]
+      - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
 - [[#问题][问题]]
 
 * 安装
@@ -607,6 +610,17 @@ sync-webrsync-verify-signature = no
 priority = 1
 sync-uri = https://mirrors.tuna.tsinghua.edu.cn/gentoo/releases/amd64/binpackages/23.0/x86-64
 
+#+end_src
+*** /etc/portage/repos.conf/gentoo-zh.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/repos.conf/gentoo-zh.conf :mkdirp yes
+:END:
+#+begin_src shell
+  # created by eselect-repo
+[gentoo-zh]
+location = /var/db/repos/gentoo-zh
+sync-type = git
+sync-uri = https://github.com/microcai/gentoo-zh.git
 #+end_src
 *** /etc/genkernel.conf
 :PROPERTIES:
@@ -1448,7 +1462,14 @@ sys-devel/gcc jit
   x11-libs/libdrm video_cards_radeon
 #+end_src
 
-
+*** package.accept_keywords
+**** gentoo-zh/xanmod-kernel
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.accept_keywords/xanmod-kernel :mkdirp yes
+:END:
+#+begin_src shell
+  sys-kernel/xanmod-kernel ~amd64
+#+end_src
 * 问题
 - 当遇到编译出错时 可以试着先更新portage包
 - 也可以用equery看看出错包的依赖 然后先更新那些包
