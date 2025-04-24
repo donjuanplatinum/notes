@@ -50,6 +50,9 @@
     - [[#kde创建通知][kde创建通知]]
     - [[#检测进程是否运行][检测进程是否运行]]
     - [[#发出声音警报][发出声音警报]]
+    - [[#备份系统][备份系统]]
+    - [[#電池管理][電池管理]]
+    - [[#wifi设置][wifi设置]]
   - [[#内核][内核]]
     - [[#查看系统调用的编号][查看系统调用的编号]]
     - [[#proc][/proc]]
@@ -456,6 +459,19 @@ tldr
 *** 发出声音警报
 #+begin_src shell
   play -n synth 1 sine 10000
+#+end_src
+*** 备份系统
+#+begin_src shell
+  sudo tar -cjpvf gentoobackup.tar.gz  --exclude=/run --exclude=/mnt --exclude=/proc/ --exclude=/sys --exclude=/dev --exclude=/var/cache --exclude=/var/tmp --exclude=/tmp --exclude=/home --exclude=/root /
+
+#+end_src
+*** 電池管理
+#+begin_src
+  upower -i $(upower -e)
+#+end_src
+*** wifi设置
+#+begin_src shell
+  nmtui
 #+end_src
 ** 内核
 *** 查看系统调用的编号

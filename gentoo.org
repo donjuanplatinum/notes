@@ -543,7 +543,7 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
   CXXFLAGS="${COMMON_FLAGS}"
   FCFLAGS="${COMMON_FLAGS}"
   FFLAGS="${COMMON_FLAGS}"
-  FEATURES="${FEATURES} binpkg-request-signature"
+  FEATURES="${FEATURES} binpkg-request-signature buildpkg"
   # NOTE: This stage was built with the bindist Use flag enabled
 
   # This sets the language of build output to English.
