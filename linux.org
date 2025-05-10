@@ -1,59 +1,8 @@
 * Table                                                                 :TOC_8:
 - [[#linux][Linux]]
-  - [[#命令][命令]]
-    - [[#losetup][losetup]]
-    - [[#ssh][ssh]]
-      - [[#ssh内网穿透][ssh内网穿透]]
-        - [[#将本地端口映射到服务器][将本地端口映射到服务器]]
-        - [[#将外部端口映射到本机][将外部端口映射到本机]]
-    - [[#mount][mount]]
-      - [[#挂载传播类型][挂载传播类型]]
-      - [[#挂载与绑定][挂载与绑定]]
-    - [[#grub][Grub]]
-      - [[#efi][EFI]]
-      - [[#安装][安装]]
-      - [[#注意][注意]]
-      - [[#引导][引导]]
-    - [[#git][Git]]
-      - [[#分支-branch][分支 branch]]
-      - [[#合并-merge][合并 merge]]
-      - [[#缓存-stash][缓存 stash]]
-    - [[#lsof][lsof]]
-      - [[#关键选项][关键选项]]
-      - [[#example][Example]]
-        - [[#基本][基本]]
-        - [[#组合][组合]]
-      - [[#options][Options]]
-        - [[#基本选项][基本选项]]
-        - [[#输出选项][输出选项]]
-      - [[#文件描述符类型][文件描述符类型]]
-      - [[#文件类型][文件类型]]
-    - [[#strace][strace]]
-    - [[#objdumpreadelf][objdump/readelf]]
-    - [[#gdb][gdb]]
-    - [[#pstack][pstack]]
-    - [[#pmap][pmap]]
-    - [[#ipcs][ipcs]]
-    - [[#vmstat][vmstat]]
-    - [[#iostat][iostat]]
-    - [[#top][top]]
-    - [[#ps][ps]]
-    - [[#smartmontools][smartmontools]]
   - [[#loop设备][loop设备]]
-  - [[#技巧][技巧]]
-    - [[#shell][shell]]
-      - [[#判断系统是否存在某些命令][判断系统是否存在某些命令]]
-    - [[#每秒将占用最大的进程打印][每秒将占用最大的进程打印]]
-    - [[#bash][bash]]
-      - [[#判断系统类型][判断系统类型]]
-      - [[#判断用户输入yn][判断用户输入y/n]]
-    - [[#kde创建通知][kde创建通知]]
-    - [[#检测进程是否运行][检测进程是否运行]]
-    - [[#发出声音警报][发出声音警报]]
-    - [[#备份系统][备份系统]]
-    - [[#電池管理][電池管理]]
-    - [[#wifi设置][wifi设置]]
   - [[#内核][内核]]
+    - [[#编译内核][编译内核]]
     - [[#查看系统调用的编号][查看系统调用的编号]]
     - [[#proc][/proc]]
       - [[#挂载][挂载]]
@@ -84,6 +33,46 @@
   - [[#polkit][polkit]]
     - [[#配置dolphin挂载文件系统][配置dolphin挂载文件系统]]
 - [[#软件][软件]]
+  - [[#命令][命令]]
+    - [[#losetup][losetup]]
+    - [[#ssh][ssh]]
+      - [[#ssh内网穿透][ssh内网穿透]]
+        - [[#将本地端口映射到服务器][将本地端口映射到服务器]]
+        - [[#将外部端口映射到本机][将外部端口映射到本机]]
+    - [[#mount][mount]]
+      - [[#挂载传播类型][挂载传播类型]]
+      - [[#挂载与绑定][挂载与绑定]]
+    - [[#grub][Grub]]
+      - [[#efi][EFI]]
+      - [[#安装][安装]]
+      - [[#注意][注意]]
+      - [[#引导][引导]]
+    - [[#git][Git]]
+      - [[#分支-branch][分支 branch]]
+      - [[#合并-merge][合并 merge]]
+      - [[#缓存-stash][缓存 stash]]
+      - [[#log][log]]
+    - [[#lsof][lsof]]
+      - [[#关键选项][关键选项]]
+      - [[#example][Example]]
+        - [[#基本][基本]]
+        - [[#组合][组合]]
+      - [[#options][Options]]
+        - [[#基本选项][基本选项]]
+        - [[#输出选项][输出选项]]
+      - [[#文件描述符类型][文件描述符类型]]
+      - [[#文件类型][文件类型]]
+    - [[#strace][strace]]
+    - [[#objdumpreadelf][objdump/readelf]]
+    - [[#gdb][gdb]]
+    - [[#pstack][pstack]]
+    - [[#pmap][pmap]]
+    - [[#ipcs][ipcs]]
+    - [[#vmstat][vmstat]]
+    - [[#iostat][iostat]]
+    - [[#top][top]]
+    - [[#ps][ps]]
+    - [[#smartmontools][smartmontools]]
   - [[#功能][功能]]
     - [[#btfs][BTFS]]
   - [[#科学][科学]]
@@ -91,302 +80,22 @@
   - [[#开发][开发]]
     - [[#elf-dissector][elf-dissector]]
     - [[#ktechlab][ktechlab]]
+  - [[#技巧][技巧]]
+    - [[#shell][shell]]
+      - [[#判断系统是否存在某些命令][判断系统是否存在某些命令]]
+    - [[#每秒将占用最大的进程打印][每秒将占用最大的进程打印]]
+    - [[#bash][bash]]
+      - [[#判断系统类型][判断系统类型]]
+      - [[#判断用户输入yn][判断用户输入y/n]]
+    - [[#kde创建通知][kde创建通知]]
+    - [[#检测进程是否运行][检测进程是否运行]]
+    - [[#发出声音警报][发出声音警报]]
+    - [[#备份系统][备份系统]]
+    - [[#電池管理][電池管理]]
+    - [[#wifi设置][wifi设置]]
 
 * Linux
-** 命令
-*** losetup
-#+begin_src shell
-  用法：
- losetup [选项] [<回环设备>]
- losetup [选项] -f | <回环设备> <文件>
 
-设置和控制回环设备。
-
-选项：
- -a, --all                     列出所有使用的设备
- -d, --detach <回环设备>...    断开一台或多台设备
- -D, --detach-all              断开所有使用的设备
- -f, --find                    查找第一个未使用的设备
- -c, --set-capacity <回环设备> 改变设备容量
- -j, --associated <文件>       列出所有与 <文件> 相关的设备
- -L, --nooverlap               避免设备间的潜在冲突
-
- -o, --offset <数字>           在文件偏移量 <数字> 处开始
-     --sizelimit <数字>        设备限制为了文件的<数字>个字节
- -b, --sector-size <num>       set the logical sector size to <num>
- -P, --partscan                创建带分区的回环设备
- -r, --read-only               创建只读的回环设备
-     --direct-io[=<on|off>]    通过 O_DIRECT 打开后备文件
-     --show                    设置后打印设备名(加 -f 选项)
- -v, --verbose                 详尽模式
-
- -J, --json                    使用 JSON --list 输出格式
- -l, --list                    列出所有或指定的信息(默认)
- -n, --noheadings              --list 输出时不打印标题
- -O, --output <列>           指定 --list 选项要输出的列
-p     --output-all              output all columns
-     --raw                     使用原生 --list 输出格式
-
- -h, --help                    显示此帮助
- -V, --version                 显示版本
-
-可用的输出列：
-         NAME  回环设备名
-    AUTOCLEAR  已设置 自动清除 标志
-    BACK-FILE  设备后备文件
-     BACK-INO  后备文件 inode 号
- BACK-MAJ:MIN  后备文件 主:次 设备号
-      MAJ:MIN  回环设备 主:次 设备号
-       OFFSET  起始位置偏移
-     PARTSCAN  已设置 partscan 标志
-           RO  只读设备
-    SIZELIMIT  文件的大小限制(字节数)
-          DIO  通过直接 IO 访问后备文件
-      LOG-SEC  logical sector size in bytes
-
-#+end_src
-*** TODO ssh
-|                         |                                                                                                                                                                                                    |                                          |
-| -c                      | 指定加密算法                                                                                                                                                                                          |                                          |
-| -C                      | 压缩数据                                                                                                                                                                                             |                                          |
-| -D                      | 指定本机的Socks监听端口                                                                                                                                                                                |                                          |
-| -f                      | ssh连接在后台运行                                                                                                                                                                                     |                                          |
-| -F                      | 指定配置文件                                                                                                                                                                                          |                                          |
-| -i                      | 指定私钥                                                                                                                                                                                             |                                          |
-| -J                      | 指定跳板                                                                                                                                                                                             | ssh -J root@a,root@b root@c 先通过a到b再到c |
-| -L port:host:hostport   | 将本地机(客户机)的某个端口转发到远端指定机器的指定端口.  工作原理是这样的, 本地机器上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接,该连接就经过安全通道转发出去, 同时远程主机和 host 的  hostport  端口建立连接.(正向代理) | ssh -L port:server:port user@server      |
-| -m                      | 指定校验数据完整性算法                                                                                                                                                                                  |                                          |
-| -N                      | 只端口转发 不执行命令                                                                                                                                                                                  |                                          |
-| -R port:host:hostport   | 将远程主机(服务器)的某个端口转发到本地端指定机器的指定端口.   工作原理是这样的, 远程主机上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接, 该连接就经过安全通道转向出去, 同时本地主机和 host 的 hostport 端口建立连        |                                          |
-| ssh -R 9999:server:9999 |                                                                                                                                                                                                    |                                          |
-| -X                      | X转发                                                                                                                                                                                               |                                          |
-| -g                      | 允许远端主机连接本地转发的端口                                                                                                                                                                           |                                          |
-
-**** ssh内网穿透
-***** 将本地端口映射到服务器
-将本地的22端口 映射到服务器的9923端口
-#+begin_src shell
-  ssh -CgR 9923:127.0.0.1:22 test@server
-#+end_src
-
-***** 将外部端口映射到本机
-将服务器的80端口 映射到本地的3000端口
-#+begin_src shell
-  ssh -CgL 3000:127.0.0.1:80 test:server
-#+end_src
-*** TODO mount
-使用findmnt命令可以查看挂载点类型
-
-**** 挂载传播类型
-- 共享挂载(shared)
-  #+begin_src shell
-    mount --make-shared
-  #+end_src
-  - 挂载事件会在挂载点之间双向传播
-  - 若/mnt/A挂载了一个设备 那么/mnt/B也会看到这个挂载
-- 从属挂载(slave)
-  #+begin_src shell
-    mount --make-slave
-  #+end_src
-  - 挂载事件单向传播
-  - 如果/mnt/A 是/mnt/B的主挂载点 那么/mnt/A上的挂载事件会传播到B 但B不会传播到A
-- 私有挂载(private)
-  #+begin_src shell
-    mount --make-private
-  #+end_src
-  - 不会传播
-- 不可绑定挂载
-  #+begin_src shell
-    mount --make-unbindable
-  #+end_src
-  - 不可绑定挂载    
-
-**** 挂载与绑定
-- 普通挂载: 将存储设备挂载到目录树中的路径
-- 绑定挂载: 将文件系统的目录或文件挂载到另一个路径 使两个路径具有相同的内容  
-*** Grub
-**** EFI
-UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。
-
-EFI系统分区可以只包含引导加载程序，或者引导加载程序以及支持文件。通常，/boot包含内核以及其他EFI支持文件，而/boot/EFI包含实际的EFI文件，这些文件往往很小。
-
-EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更简单。使用/boot/efi可以将内核和引导加载程序支持文件等文件存储在单独的分区和文件系统或根文件系统本身上；后者要求GRUB可以访问根文件系统并读取所需的文件，这可能并不总是可能的（就像根文件系统加密一样）。
-**** 安装
-#+begin_src shell
-  GRUB_TIMEOUT=10
-  grub install --target=x86_64-efi --removable --efi-directory=/boot # EFI
-  grub install /dev/sda # bios
-#+end_src
-**** 注意
-当使用GRUB引导时 核心映像和模块
-
-具有匹配的版本 通常 运行grub安装就足以
-
-确保这一点
-
-在UEFI平台上，grub安装允许将核心映像放置在
-两个不同的位置：
-#+begin_src shell
-  EFI/gentoo/grubx64.EFI # grub无选项的安装位置
-  EFI/BOOT/BOOTX64.EFI # grub --removable选项的位置
-#+end_src
-**** 引导
-#+begin_src shell
-  set root=(hd0,gpt1) # Windows的EFI分区
-  chainloader /efi/Microsoft/Boot/bootmgfw.efi
-  boot
-#+end_src
-*** Git
-**** 分支 branch
-#+begin_src shell
-  git branch branch_name # 创建分支
-  git checkout branch_name # 检出分支
-  git branch -D branch_name # 删除分支
-  git push origin :branch_name # 删除远程分支
-  git checkout -B branch_name # 切换并重置分支
-#+end_src
-**** 合并 merge
-#+begin_src shell
-  git merge # 合并
-  git merge --squash # 压缩合并
-#+end_src
-**** 缓存 stash
-#+begin_src shell
-  git stash -u -m '本地暂存' # 暂存
-  git stash pop # 弹出
-#+end_src
-
-*** lsof
-List Open File 获取被进程打开文件的信息
-
-**** 关键选项
-- 默认: 列出活跃进程的所有打开文件
-- -a: 结果进行AND运算 而非OR
-- -l: 输出UID而不是username
-- -h: help
-- -t: 仅获取PID
-- -U: 获取UNIX Sokcet地址
-- -F: 格式化输出
-  - 例如 -F pcfn (pid,command,文件描述副,文件名)
-**** Example
-***** 基本
-#+begin_src shell
-  lsof -p PID # 进程打开了什么文件
-  lsof FILE # 文件被什么进程打开
-  lsof -i # 网络文件
-#+end_src
-***** 组合
-#+begin_src shell
-  lsof -i 6 # 打开的ipv6链接
-  lsof -i -s CLOSED # UDP关闭的链接
-  lsof -i :22 # 22号端口的链接
-  lsof -i :1-1024 # 谁使用了1-1024端口
-  lsof -i @192.168.101.1:22 # 指定地址
-  lsof -i UDP # 所有的UDP链接
-  lsof -i -sTCP:LISTEN # 指定正在LISTEN的TCP
-  lsof -i -sTCP:ESTABLISHED # 已经建立的链接
-  lsof -u donjuan # 用户donjuan打开了什么文件
-  lsof -a -u donjuan -i # 用户donjuan打开了什么网络文件
-  lsof -u ^donjuan # 取反 除了用户donjuan的其他用户打开了什么文件
-  lsof -c firefox # firefox打开了什么
-  lsof -p 1234=2345 # 进程1234-2345打开了什么
-  lsof -t -c startplasma # 查看start-plasma的PID
-  lsof /mnt # 查看哪些进程使用/mnt
-  lsof +L1 # 链接数为0的文件 (在安全中有特殊意义)
-  lsof -a -d mem -c firefox # firefox打开的内存映射
-#+end_src
-#+begin_src shell
-  kill $(lsof -t -a -c vim ~/ ) # 杀掉vim使用~下文件的所有的~下的进程
-  lsof -a -i -u www-data # www-data监听了哪些端口 打开了哪些网络链接
-#+end_src
-**** Options
-***** 基本选项
-#+begin_src shell
-  -a: 结果进行AND运算 而非OR
-  +d 列出当前目录下(不包括子目录)
-  +D 类似传统-R 遍历子目录
-  +L 将链接计数打印在NLINK(+L指定的为开区间)
-  -d 指定打开的文件描述符类型[见文件描述符类型]
-  -g 组ID GID
-  -N NFS文件
-  -i 网络文件
-  -R 列出PPID
-  -x 跟踪文件系统链接
-#+end_src
-***** 输出选项
-#+begin_src shell
-  -F 指定格式
-  -l UID代替username
-  -n 不域名解析
-  -o 列出文件偏移offset
-  -P 列出端口号而不是端口对应的默认服务
-  -s 列出文件大小
-  -r 间隔重复扫描
-#+end_src
-**** 文件描述符类型
-#+begin_src shell
-  （1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
-（2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
-（3）lnn：library references (AIX);
-（4）err：FD information error (see NAME column);
-（5）jld：jail directory (FreeBSD);
-（6）ltx：shared library text (code and data);
-（7）mxx ：hex memory-mapped type number xx.
-（8）m86：DOS Merge mapped file;
-（9）mem：memory-mapped file;
-（10）mmap：memory-mapped device;
-（11）pd：parent directory;
-（12）rtd：root directory;
-（13）tr：kernel trace file (OpenBSD);
-（14）v86  VP/ix mapped file;
-（15）0：表示标准输入
-（16）1：表示标准输出
-（17）2：表示标准错误
-一般在标准输出、标准错误、标准输入后还跟着文件状态模式：r、w、u等
-（1）u：表示该文件被打开并处于读取/写入模式
-（2）r：表示该文件被打开并处于只读模式
-（3）w：表示该文件被打开并处于
-（4）空格：表示该文件的状态模式为unknow，且没有锁定
-（5）-：表示该文件的状态模式为unknow，且被锁定
-同时在文件状态模式后面，还跟着相关的锁
-（1）N：for a Solaris NFS lock of unknown type;
-（2）r：for read lock on part of the file;
-（3）R：for a read lock on the entire file;
-（4）w：for a write lock on part of the file;（文件的部分写锁）
-（5）W：for a write lock on the entire file;（整个文件的写锁）
-（6）u：for a read and write lock of any length;
-（7）U：for a lock of unknown type;
-（8）x：for an SCO OpenServer Xenix lock on part      of the file;
-（9）X：for an SCO OpenServer Xenix lock on the      entire file;
-（10）space：if there is no lock.
-#+end_src
-**** 文件类型
-#+begin_src shell
-（1）DIR：表示目录
-（2）CHR：表示字符类型
-（3）BLK：块设备类型
-（4）UNIX： UNIX 域套接字
-（5）FIFO：先进先出 (FIFO) 队列
-（6）IPv4：网际协议 (IP) 套接字  
-#+end_src
-*** TODO strace
-Strace可以诊断 调试Linux用户空间
-
-检测进程与内核的交互 系统调用 信号 状态变更等
-
-strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.c][Ptrace]]
-*** TODO objdump/readelf
-*** TODO gdb
-*** TODO pstack
-*** TODO pmap
-*** TODO ipcs
-*** TODO vmstat
-*** TODO iostat
-*** TODO top
-*** TODO ps
-
-*** smartmontools
-使用自我监控(Self-Monitoring)、分析(Analysis)和报告(Reporting)三种技术（缩写为S.M.A.R.T或SMART）来管理和监控存储硬件。
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
@@ -398,82 +107,21 @@ strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.
   sudo mount /dev/loop4 /myloopdev
 #+end_src
 
-** 技巧
-*** shell
-**** 判断系统是否存在某些命令
-#+begin_src shell
-  if hash 2>/dev/null emerge; then
-      echo 'system is gentoo'
-      fi
-#+end_src
-*** 每秒将占用最大的进程打印
-#+begin_src shell
-  for ((;;));do ps aux --sort=-%mem;sleep 1;done
-#+end_src
-
-*** bash
-**** 判断系统类型
-#+begin_src bash
-  if hash 2>/dev/null emerge; then
-      echo "检测到gentoo系统"
-  fi
-#+end_src
-**** 判断用户输入y/n
-#+begin_src bash
-  echo "请输入y或n"
-  read option
-  if echo "$option" |grep -iq "^y"; then
-      echo "您输入了y"
-  fi
-#+end_src
-*** kde创建通知
-#+begin_src shell
-  cargo run --release;kdialog --passivepopup '任务完成' 20
-#+end_src
-*** 检测进程是否运行
-#+begin_src shell
-  #!/bin/bash
-
-# 指定要监控的进程ID
-PID_TO_MONITOR=10605
-
-# 无限循环，直到脚本被手动停止
-while true; do
-    # 使用ps命令检查进程是否在运行
-    if ! ps -p $PID_TO_MONITOR > /dev/null; then
-        # 如果进程不在运行，则发送通知并播放声音
-        notify-send "Process $PID_TO_MONITOR has stopped"
-        # 播放一个简单的 beep 声音
-        play -n synth 1 sine 1000
-        sleep 1  # 等待1秒后继续检查
-    fi
-    # 等待一段时间再次检查，避免过度占用CPU资源
-    sleep 5
-done
-
-#+end_src
-tldr
-#+begin_src shell
-  while true ; do if ! ps  -p 10605; then notify-send 'ok';play -n synth 10 sine 1000;break ;fi ;sleep 5;done
-#+end_src
-*** 发出声音警报
-#+begin_src shell
-  play -n synth 1 sine 10000
-#+end_src
-*** 备份系统
-#+begin_src shell
-  sudo tar -cjpvf gentoobackup.tar.gz  --exclude=/run --exclude=/mnt --exclude=/proc/ --exclude=/sys --exclude=/dev --exclude=/var/cache --exclude=/var/tmp --exclude=/tmp --exclude=/home --exclude=/root /
-
-#+end_src
-*** 電池管理
-#+begin_src
-  upower -i $(upower -e)
-#+end_src
-*** wifi设置
-#+begin_src shell
-  nmtui
-#+end_src
 ** 内核
+*** 编译内核
+配置内核
+[[./config.org::.config][.config]]
+
+编译内核与模块
+#+begin_src shell
+  make all
+#+end_src
+
+安装模块与内核
+#+begin_src shell
+  make INSTALL_MOD_STRIP=1 modules_install
+  make install
+#+end_src
 *** 查看系统调用的编号
 #+begin_src shell
   cd /usr/include/asm
@@ -846,6 +494,304 @@ PolicyKit 工具是一个框架，它提供了一个由特权程序（也称为 
 #+end_src
 
 * 软件
+** 命令
+*** losetup
+#+begin_src shell
+  用法：
+ losetup [选项] [<回环设备>]
+ losetup [选项] -f | <回环设备> <文件>
+
+设置和控制回环设备。
+
+选项：
+ -a, --all                     列出所有使用的设备
+ -d, --detach <回环设备>...    断开一台或多台设备
+ -D, --detach-all              断开所有使用的设备
+ -f, --find                    查找第一个未使用的设备
+ -c, --set-capacity <回环设备> 改变设备容量
+ -j, --associated <文件>       列出所有与 <文件> 相关的设备
+ -L, --nooverlap               避免设备间的潜在冲突
+
+ -o, --offset <数字>           在文件偏移量 <数字> 处开始
+     --sizelimit <数字>        设备限制为了文件的<数字>个字节
+ -b, --sector-size <num>       set the logical sector size to <num>
+ -P, --partscan                创建带分区的回环设备
+ -r, --read-only               创建只读的回环设备
+     --direct-io[=<on|off>]    通过 O_DIRECT 打开后备文件
+     --show                    设置后打印设备名(加 -f 选项)
+ -v, --verbose                 详尽模式
+
+ -J, --json                    使用 JSON --list 输出格式
+ -l, --list                    列出所有或指定的信息(默认)
+ -n, --noheadings              --list 输出时不打印标题
+ -O, --output <列>           指定 --list 选项要输出的列
+p     --output-all              output all columns
+     --raw                     使用原生 --list 输出格式
+
+ -h, --help                    显示此帮助
+ -V, --version                 显示版本
+
+可用的输出列：
+         NAME  回环设备名
+    AUTOCLEAR  已设置 自动清除 标志
+    BACK-FILE  设备后备文件
+     BACK-INO  后备文件 inode 号
+ BACK-MAJ:MIN  后备文件 主:次 设备号
+      MAJ:MIN  回环设备 主:次 设备号
+       OFFSET  起始位置偏移
+     PARTSCAN  已设置 partscan 标志
+           RO  只读设备
+    SIZELIMIT  文件的大小限制(字节数)
+          DIO  通过直接 IO 访问后备文件
+      LOG-SEC  logical sector size in bytes
+
+#+end_src
+*** TODO ssh
+|                         |                                                                                                                                                                                                    |                                          |
+| -c                      | 指定加密算法                                                                                                                                                                                          |                                          |
+| -C                      | 压缩数据                                                                                                                                                                                             |                                          |
+| -D                      | 指定本机的Socks监听端口                                                                                                                                                                                |                                          |
+| -f                      | ssh连接在后台运行                                                                                                                                                                                     |                                          |
+| -F                      | 指定配置文件                                                                                                                                                                                          |                                          |
+| -i                      | 指定私钥                                                                                                                                                                                             |                                          |
+| -J                      | 指定跳板                                                                                                                                                                                             | ssh -J root@a,root@b root@c 先通过a到b再到c |
+| -L port:host:hostport   | 将本地机(客户机)的某个端口转发到远端指定机器的指定端口.  工作原理是这样的, 本地机器上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接,该连接就经过安全通道转发出去, 同时远程主机和 host 的  hostport  端口建立连接.(正向代理) | ssh -L port:server:port user@server      |
+| -m                      | 指定校验数据完整性算法                                                                                                                                                                                  |                                          |
+| -N                      | 只端口转发 不执行命令                                                                                                                                                                                  |                                          |
+| -R port:host:hostport   | 将远程主机(服务器)的某个端口转发到本地端指定机器的指定端口.   工作原理是这样的, 远程主机上分配了一个 socket 侦听 port 端口, 一旦这个端口上有了连接, 该连接就经过安全通道转向出去, 同时本地主机和 host 的 hostport 端口建立连        |                                          |
+| ssh -R 9999:server:9999 |                                                                                                                                                                                                    |                                          |
+| -X                      | X转发                                                                                                                                                                                               |                                          |
+| -g                      | 允许远端主机连接本地转发的端口                                                                                                                                                                           |                                          |
+
+**** ssh内网穿透
+***** 将本地端口映射到服务器
+将本地的22端口 映射到服务器的9923端口
+#+begin_src shell
+  ssh -CgR 9923:127.0.0.1:22 test@server
+#+end_src
+
+***** 将外部端口映射到本机
+将服务器的80端口 映射到本地的3000端口
+#+begin_src shell
+  ssh -CgL 3000:127.0.0.1:80 test:server
+#+end_src
+*** TODO mount
+使用findmnt命令可以查看挂载点类型
+
+**** 挂载传播类型
+- 共享挂载(shared)
+  #+begin_src shell
+    mount --make-shared
+  #+end_src
+  - 挂载事件会在挂载点之间双向传播
+  - 若/mnt/A挂载了一个设备 那么/mnt/B也会看到这个挂载
+- 从属挂载(slave)
+  #+begin_src shell
+    mount --make-slave
+  #+end_src
+  - 挂载事件单向传播
+  - 如果/mnt/A 是/mnt/B的主挂载点 那么/mnt/A上的挂载事件会传播到B 但B不会传播到A
+- 私有挂载(private)
+  #+begin_src shell
+    mount --make-private
+  #+end_src
+  - 不会传播
+- 不可绑定挂载
+  #+begin_src shell
+    mount --make-unbindable
+  #+end_src
+  - 不可绑定挂载    
+
+**** 挂载与绑定
+- 普通挂载: 将存储设备挂载到目录树中的路径
+- 绑定挂载: 将文件系统的目录或文件挂载到另一个路径 使两个路径具有相同的内容  
+*** Grub
+**** EFI
+UEFI系统从其efi系统分区（ESP）上的efi文件引导。EFI系统分区可以是任何大小，并考虑到实现方面的考虑。
+
+EFI系统分区可以只包含引导加载程序，或者引导加载程序以及支持文件。通常，/boot包含内核以及其他EFI支持文件，而/boot/EFI包含实际的EFI文件，这些文件往往很小。
+
+EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更简单。使用/boot/efi可以将内核和引导加载程序支持文件等文件存储在单独的分区和文件系统或根文件系统本身上；后者要求GRUB可以访问根文件系统并读取所需的文件，这可能并不总是可能的（就像根文件系统加密一样）。
+**** 安装
+#+begin_src shell
+  GRUB_TIMEOUT=10
+  grub install --target=x86_64-efi --removable --efi-directory=/boot # EFI
+  grub install /dev/sda # bios
+#+end_src
+**** 注意
+当使用GRUB引导时 核心映像和模块
+
+具有匹配的版本 通常 运行grub安装就足以
+
+确保这一点
+
+在UEFI平台上，grub安装允许将核心映像放置在
+两个不同的位置：
+#+begin_src shell
+  EFI/gentoo/grubx64.EFI # grub无选项的安装位置
+  EFI/BOOT/BOOTX64.EFI # grub --removable选项的位置
+#+end_src
+**** 引导
+#+begin_src shell
+  set root=(hd0,gpt1) # Windows的EFI分区
+  chainloader /efi/Microsoft/Boot/bootmgfw.efi
+  boot
+#+end_src
+*** Git
+**** 分支 branch
+#+begin_src shell
+  git branch branch_name # 创建分支
+  git checkout branch_name # 检出分支
+  git branch -D branch_name # 删除分支
+  git push origin :branch_name # 删除远程分支
+  git checkout -B branch_name # 切换并重置分支
+#+end_src
+**** 合并 merge
+#+begin_src shell
+  git merge # 合并
+  git merge --squash # 压缩合并
+#+end_src
+**** 缓存 stash
+#+begin_src shell
+  git stash -u -m '本地暂存' # 暂存
+  git stash pop # 弹出
+#+end_src
+**** log
+查看所有提交(包括无分支提交)
+#+begin_src shell
+  git log --reflog
+#+end_src
+*** lsof
+List Open File 获取被进程打开文件的信息
+
+**** 关键选项
+- 默认: 列出活跃进程的所有打开文件
+- -a: 结果进行AND运算 而非OR
+- -l: 输出UID而不是username
+- -h: help
+- -t: 仅获取PID
+- -U: 获取UNIX Sokcet地址
+- -F: 格式化输出
+  - 例如 -F pcfn (pid,command,文件描述副,文件名)
+**** Example
+***** 基本
+#+begin_src shell
+  lsof -p PID # 进程打开了什么文件
+  lsof FILE # 文件被什么进程打开
+  lsof -i # 网络文件
+#+end_src
+***** 组合
+#+begin_src shell
+  lsof -i 6 # 打开的ipv6链接
+  lsof -i -s CLOSED # UDP关闭的链接
+  lsof -i :22 # 22号端口的链接
+  lsof -i :1-1024 # 谁使用了1-1024端口
+  lsof -i @192.168.101.1:22 # 指定地址
+  lsof -i UDP # 所有的UDP链接
+  lsof -i -sTCP:LISTEN # 指定正在LISTEN的TCP
+  lsof -i -sTCP:ESTABLISHED # 已经建立的链接
+  lsof -u donjuan # 用户donjuan打开了什么文件
+  lsof -a -u donjuan -i # 用户donjuan打开了什么网络文件
+  lsof -u ^donjuan # 取反 除了用户donjuan的其他用户打开了什么文件
+  lsof -c firefox # firefox打开了什么
+  lsof -p 1234=2345 # 进程1234-2345打开了什么
+  lsof -t -c startplasma # 查看start-plasma的PID
+  lsof /mnt # 查看哪些进程使用/mnt
+  lsof +L1 # 链接数为0的文件 (在安全中有特殊意义)
+  lsof -a -d mem -c firefox # firefox打开的内存映射
+#+end_src
+#+begin_src shell
+  kill $(lsof -t -a -c vim ~/ ) # 杀掉vim使用~下文件的所有的~下的进程
+  lsof -a -i -u www-data # www-data监听了哪些端口 打开了哪些网络链接
+#+end_src
+**** Options
+***** 基本选项
+#+begin_src shell
+  -a: 结果进行AND运算 而非OR
+  +d 列出当前目录下(不包括子目录)
+  +D 类似传统-R 遍历子目录
+  +L 将链接计数打印在NLINK(+L指定的为开区间)
+  -d 指定打开的文件描述符类型[见文件描述符类型]
+  -g 组ID GID
+  -N NFS文件
+  -i 网络文件
+  -R 列出PPID
+  -x 跟踪文件系统链接
+#+end_src
+***** 输出选项
+#+begin_src shell
+  -F 指定格式
+  -l UID代替username
+  -n 不域名解析
+  -o 列出文件偏移offset
+  -P 列出端口号而不是端口对应的默认服务
+  -s 列出文件大小
+  -r 间隔重复扫描
+#+end_src
+**** 文件描述符类型
+#+begin_src shell
+  （1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
+（2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
+（3）lnn：library references (AIX);
+（4）err：FD information error (see NAME column);
+（5）jld：jail directory (FreeBSD);
+（6）ltx：shared library text (code and data);
+（7）mxx ：hex memory-mapped type number xx.
+（8）m86：DOS Merge mapped file;
+（9）mem：memory-mapped file;
+（10）mmap：memory-mapped device;
+（11）pd：parent directory;
+（12）rtd：root directory;
+（13）tr：kernel trace file (OpenBSD);
+（14）v86  VP/ix mapped file;
+（15）0：表示标准输入
+（16）1：表示标准输出
+（17）2：表示标准错误
+一般在标准输出、标准错误、标准输入后还跟着文件状态模式：r、w、u等
+（1）u：表示该文件被打开并处于读取/写入模式
+（2）r：表示该文件被打开并处于只读模式
+（3）w：表示该文件被打开并处于
+（4）空格：表示该文件的状态模式为unknow，且没有锁定
+（5）-：表示该文件的状态模式为unknow，且被锁定
+同时在文件状态模式后面，还跟着相关的锁
+（1）N：for a Solaris NFS lock of unknown type;
+（2）r：for read lock on part of the file;
+（3）R：for a read lock on the entire file;
+（4）w：for a write lock on part of the file;（文件的部分写锁）
+（5）W：for a write lock on the entire file;（整个文件的写锁）
+（6）u：for a read and write lock of any length;
+（7）U：for a lock of unknown type;
+（8）x：for an SCO OpenServer Xenix lock on part      of the file;
+（9）X：for an SCO OpenServer Xenix lock on the      entire file;
+（10）space：if there is no lock.
+#+end_src
+**** 文件类型
+#+begin_src shell
+（1）DIR：表示目录
+（2）CHR：表示字符类型
+（3）BLK：块设备类型
+（4）UNIX： UNIX 域套接字
+（5）FIFO：先进先出 (FIFO) 队列
+（6）IPv4：网际协议 (IP) 套接字  
+#+end_src
+*** TODO strace
+Strace可以诊断 调试Linux用户空间
+
+检测进程与内核的交互 系统调用 信号 状态变更等
+
+strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.c][Ptrace]]
+*** TODO objdump/readelf
+*** TODO gdb
+*** TODO pstack
+*** TODO pmap
+*** TODO ipcs
+*** TODO vmstat
+*** TODO iostat
+*** TODO top
+*** TODO ps
+
+*** smartmontools
+使用自我监控(Self-Monitoring)、分析(Analysis)和报告(Reporting)三种技术（缩写为S.M.A.R.T或SMART）来管理和监控存储硬件。
 ** 功能
 *** BTFS
 Bittorrent 已经存在了很长时间，它可以从互联网上共享和下载数据。市场上有大量的 GUI 和 CLI 的 Bittorrent 客户端。有时，你不能坐下来等待你的下载完成。你可能想要立即观看内容。这就是 BTFS 这个不起眼的文件系统派上用场的地方。使用 BTFS，你可以将种子文件或磁力链接挂载为目录，然后在文件树中作为只读目录。这些文件的内容将在程序读取时按需下载。由于 BTFS 在 FUSE 之上运行，因此不需要干预 Linux 内核。
@@ -873,3 +819,78 @@ ELF 解析器对于以下任务很有用：
 
 *** ktechlab
 KTechLab 是一个开源的电子设计与仿真软件，旨在提供一个直观易用的平台，让用户能够设计电路、编写控制逻辑以及进行仿真实验。它支持多种电路元素和编程语言，特别适合教育和初学者，同时也适用于高级用户的复杂项目。KTechLab以它的灵活性、可扩展性以及丰富的内置功能而著称，鼓励社区贡献，不断进化。
+** 技巧
+*** shell
+**** 判断系统是否存在某些命令
+#+begin_src shell
+  if hash 2>/dev/null emerge; then
+      echo 'system is gentoo'
+      fi
+#+end_src
+*** 每秒将占用最大的进程打印
+#+begin_src shell
+  for ((;;));do ps aux --sort=-%mem;sleep 1;done
+#+end_src
+
+*** bash
+**** 判断系统类型
+#+begin_src bash
+  if hash 2>/dev/null emerge; then
+      echo "检测到gentoo系统"
+  fi
+#+end_src
+**** 判断用户输入y/n
+#+begin_src bash
+  echo "请输入y或n"
+  read option
+  if echo "$option" |grep -iq "^y"; then
+      echo "您输入了y"
+  fi
+#+end_src
+*** kde创建通知
+#+begin_src shell
+  cargo run --release;kdialog --passivepopup '任务完成' 20
+#+end_src
+*** 检测进程是否运行
+#+begin_src shell
+  #!/bin/bash
+
+# 指定要监控的进程ID
+PID_TO_MONITOR=10605
+
+# 无限循环，直到脚本被手动停止
+while true; do
+    # 使用ps命令检查进程是否在运行
+    if ! ps -p $PID_TO_MONITOR > /dev/null; then
+        # 如果进程不在运行，则发送通知并播放声音
+        notify-send "Process $PID_TO_MONITOR has stopped"
+        # 播放一个简单的 beep 声音
+        play -n synth 1 sine 1000
+        sleep 1  # 等待1秒后继续检查
+    fi
+    # 等待一段时间再次检查，避免过度占用CPU资源
+    sleep 5
+done
+
+#+end_src
+tldr
+#+begin_src shell
+  while true ; do if ! ps  -p 10605; then notify-send 'ok';play -n synth 10 sine 1000;break ;fi ;sleep 5;done
+#+end_src
+*** 发出声音警报
+#+begin_src shell
+  play -n synth 1 sine 10000
+#+end_src
+*** 备份系统
+#+begin_src shell
+  sudo tar -cjpvf gentoobackup.tar.gz  --exclude=/run --exclude=/mnt --exclude=/proc/ --exclude=/sys --exclude=/dev --exclude=/var/cache --exclude=/var/tmp --exclude=/tmp --exclude=/home --exclude=/root /
+
+#+end_src
+*** 電池管理
+#+begin_src
+  upower -i $(upower -e)
+#+end_src
+*** wifi设置
+#+begin_src shell
+  nmtui
+#+end_src

@@ -40,8 +40,7 @@
   - [[#fcitx-1][fcitx]]
 - [[#注意][注意]]
 - [[#部分包配置][部分包配置]]
-    - [[#dev-langrust][dev-lang/rust]]
-    - [[#app-editorsemacs][app-editors/emacs]]
+    - [[#www-clientgoogle-chrome][www-client/google-chrome]]
 - [[#portage][portage]]
   - [[#emerge][emerge]]
     - [[#仓库更新][仓库更新]]
@@ -85,7 +84,15 @@
       - [[#libdrm][libdrm]]
     - [[#packageaccept_keywords][package.accept_keywords]]
       - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
+- [[#应该安装的包][应该安装的包]]
 - [[#问题][问题]]
+- [[#ebuild][Ebuild]]
+  - [[#标准变量variables][标准变量(variables)]]
+  - [[#ebuild定义变量][Ebuild定义变量]]
+    - [[#src_uri][SRC_URI]]
+    - [[#required_use][REQUIRED_USE]]
+  - [[#用户环境][用户环境]]
+  - [[#skelebuild中文][skel.ebuild中文]]
 
 * 安装
 *** 1.挂载
@@ -340,18 +347,8 @@ F4选择即可
   dispatch-conf
 #+end_src
 * 部分包配置
-*** dev-lang/rust
-#+begin_src
-  clippy doc rust-analyzer rust-src rust-fmt
-#+end_src
-*** app-editors/emacs
-#+begin_src
-  app-editors/emacs libxml2 dynamic-loading
-  # libxml2为了一些包的正常使用 dynamic-loading启用动态模块
-#+end_src
-
-
-
+*** www-client/google-chrome
+安装好后在chrome://flags中Preferred Ozone platform选择wayland
 * portage
 ** emerge
 *** 仓库更新
@@ -1470,7 +1467,277 @@ sys-devel/gcc jit
 #+begin_src shell
   sys-kernel/xanmod-kernel ~amd64
 #+end_src
+* 应该安装的包
+#+begin_src shell
+  fcitx-gtk
+#+end_src
 * 问题
 - 当遇到编译出错时 可以试着先更新portage包
 - 也可以用equery看看出错包的依赖 然后先更新那些包
+* Ebuild
+** 标准变量(variables)
+| P                   | 软件包名称-版本 ${PN}-${PV} eg. vim-6.3                                                                                |
+| PN                  | 仅包名称 eg. vim                                                                                                      |
+| PV                  | 包版本 eg. 6.3                                                                                                       |
+| PR                  | 修订                                                                                                                 |
+| PVR                 | 版本-修订 ${PV}-${PR} eg. 6.3-r1                                                                                      |
+| PF                  | 包名称-版本-修订 ${PN}-${PVR} eg. vim-6.3-r1                                                                           |
+| A                   | 包所有的源代码文件(不包括USE关闭的)                                                                                      |
+| CATEGORY            | 包的类别 eg. app-editors/emacs的app-editors                                                                           |
+| FILESDIR            | 包目录的files/的文件 用于一些patch或者其他                                                                               |
+| WORKDIR             | ebuild根构建目录的路径 eg.${PORTAGE_BUILDDIR}/work                                                                     |
+| T                   | ebuild可能使用的临时目录路径 eg.${PORTAGE_BUILDDIR}/temp                                                                |
+| D                   | 临时安装目录的路径 eg. ${PORTAGE_BUILDDIR}/image                                                                       |
+| HOME                | 临时目录的路径 供ebuild调用的任何可你呢个读取或修改主目录的程序用 eg. ${PORTAGE_BUILDDIR}/homedir                            |
+| ROOT                | 软件包要合并到根目录的绝对路径 仅在pkg_*阶段允许                                                                           |
+| DISTDIR             | 包含存储为包获取的所有文件的目录的路径                                                                                    |
+| EPREFIX             | PREFIX安装的规范化PREFIX前缀路径                                                                                       |
+| ED                  | ${D%/}${EPREFIX}/ 的简写                                                                                             |
+| EROOT               | ${ROOT%/}${EPREFIX}/ 的简写                                                                                          |
+| SYSROOT             | (EAPI=7)包含构建依赖的根目录的绝对路径                                                                                   |
+| ESYSROOT            | (EAPI=7)${SYSROOT%/}${EPREFIX}/ 的简写                                                                               |
+| BROOT               | (EAPI=7)包含所满足的构建依赖项的根目录的绝对路径BDEPEND，通常是可执行构建工具。                                               |
+| MERGE_TYPE          | 正在合并的软件包类型(类似portage feature的buildpkg): source代表源代码 binary是否安装ebuild构建的二进制包 buildonly仅构建不安装 |
+| REPLACING_VERSIONS  | 此软件包的所有版本(PVR)的空格分格列表                                                                                    |
+| REPLACED_BY_VERSION | 若此软件包作为安装的一部分被卸载 则返回软件版本(PVR)                                                                       |
+** Ebuild定义变量
+| EAPI         | EAPI版本                                                          |
+| DESCRIPTION  | (必须)软件包的简短描述 <=80字                                        |
+| HOMEPAGE     | (必须)软件包主页 缺省值:https://wiki.gentoo.org/wiki/No_homepage    |
+| SRC_URI      | 软件包URI列表                                                      |
+| LICENSE      | 许可                                                              |
+| SLOT         | (必须)包的SLOT                                                     |
+| KEYWORDS     | 包的keywords                                                      |
+| IUSE         | ebuild中所有USE(不包括arch)                                        |
+| REQUIRED_USE | 必须满足的USE                                                      |
+| PROPERTIES   | 空格分格的属性列表 支持条件语法 :interactive live test_network        |
+| RESTRICT     | 空格分格的要限制的portage功能列表 :fetch mirror strip test userpriv  |
+| DEPEND       | 构建依赖表                                                         |
+| BDEPEND      | (EAPI=7) CBUILD依赖表                                             |
+| RDEPEND      | 运行时依赖表                                                       |
+| PDEPEND      | 合并后要安装的包列表                                                |
+| S            | 临时的构建目录路径 由src_compile,src_install使用 默认:${WORKDIR}/${P} |
+| DOCS         | src_install默认安装的文档文件列表                                  |
+| HTML_DOCS    | einstalldocs要递归安装的文档列表                                           |
 
+
+
+*** SRC_URI
+可以条件性的下载源码
+#+begin_src shell
+  SRC_URI = " https://example.com/files/${P}-core.tar.bz2
+	  x86? (https://example.com/files/${P}-sse-asm.tar.bz2)
+  "
+#+end_src
+也可以重命名
+#+begin_src shell
+  SRC_URI = "https://example.com/files/${PV}.tar.gz -> ${P}.tar.gz"
+#+end_src
+也可以定义多个下载源
+#+begin_src shell
+  github https://github.com https://ghproxy.net
+  SRC_URI="mirror://github/${PN}/${P}.tar.gz"
+#+end_src
+*** REQUIRED_USE
+USE关系
+
+如果foo 则不能有bar
+#+begin_src shell
+  REQUIRED_USE = " foo? (!bar) "
+#+end_src
+
+如果foo 则有必须bar 或 baz 或 quux 至少一个
+#+begin_src shell
+  REQUIRED_USE = "foo? (|| (bar baz quux))"
+#+end_src
+
+必须foo bar gaz中至少一个
+#+begin_src shell
+  REQUIRED_USE = "|| (bar baz quux)"
+#+end_src
+
+必须foo bar gaz中一个 不能多
+#+begin_src shell
+  REQUIRED_USE = " ^^ （ foo bar baz ）"
+#+end_src
+
+必须一个或零个 不能多
+#+begin_src shell
+  REQUIRED_USE = " ?? (a b c)"
+#+end_src
+** 用户环境
+** skel.ebuild中文
+#+begin_src shell
+  # 版权所有 1999-2025 Gentoo 作者
+# 根据 GNU 通用公共许可证 v2 条款分发
+
+# 注意：此文件中的注释仅用于说明和文档。
+# 它们不应该出现在你的最终生产 ebuild 中。请
+# 记得在提交或确认你的 ebuild 之前删除它们。
+# 但并不意味着您不能添加自己的评论。
+
+# EAPI 变量告诉正在使用的 ebuild 格式。
+# 建议您使用理事会批准的最新 EAPI。
+# PMS 包含所有 EAPI 的规范。Eclasses 将对此进行测试
+# 如果他们需要使用并非所有 EAPI 都通用的功能，则变量。
+# 如果 eclass 不支持最新的 EAPI，则使用以前的 EAPI。
+EAPI=8
+
+
+# 继承列出要从中继承函数的 eclass。例如，ebuild
+# 需要 autotools.eclass 中的 eautoreconf 函数将无法工作
+# 没有下面这一行：
+# inherit autotools
+#
+# Eclasses 倾向于列出如何正确使用其功能的描述。
+# 查看 eclass/ 目录以获取更多示例。
+
+# 该包的简短一行描述。
+DESCRIPTION="这是一个示例骨架 ebuild 文件"
+
+# 主页，Portage 不直接使用，但方便开发人员参考
+HOMEPAGE="https://foo.example.org/"
+
+# 指向任何所需的源；这些将由
+# 搬运。
+SRC_URI="ftp://foo.example.org/${P}.tar.gz"
+
+# 源目录；可以找到源的目录（自动
+# 解压后）放在 ${WORKDIR} 中。S 的默认值是 ${WORKDIR}/${P}
+# 如果你不需要改变它，请将 S= 行从 ebuild 中移除
+# 保持整洁。
+#S="${WORKDIR}/${P}"
+
+
+# 软件包的许可证。这必须与
+# licenses/ 目录。对于复杂的许可证组合，请参阅开发者
+# 请参阅 gentoo.org 上的文档以了解详细信息。
+LICENSE=""
+
+# SLOT 变量用于告诉 Portage 是否可以保留多个
+# 同时安装同一软件包的多个版本。例如，
+# 如果我们有 libfoo-1.2.2 和 libfoo-1.3.2（不兼容）
+# 对于 1.2.2 版本，最好指示 Portage 不要删除
+# 如果我们决定升级到 libfoo-1.3.2，则需要使用 libfoo-1.2.2。为此，
+# 我们在 libfoo-1.2.2 中指定 SLOT="1.2"，在 libfoo-1.3.2 中指定 SLOT="1.3"。
+# emerge clean 了解 SLOT，并将保留最新版本
+#每个 SLOT 的数量并删除其他所有内容。
+# 注意，如果可能的话，普通应用程序应该使用 SLOT="0"，因为
+# 一次只能安装一个版本。
+# 不要使用 SLOT=""，因为 SLOT 变量不能为空。
+SLOT="0"
+
+# 使用关键词，我们可以在 ebuild 内部记录屏蔽信息
+# 而不是依赖外部的 package.mask 文件。现在，你
+# 应该为每个 ebuild 设置 KEYWORDS 变量，以便它包含
+# ebuild 适用的所有架构的名称。
+# 所有官方架构都可以在 arch.list 文件中找到
+# 位于 profiles/ 目录中。通常你应该只设置这个
+# 改为“~amd64”。体系结构前面的 ~ 表示
+# 软件包是新的，在测试证明之前应该被认为是不稳定的
+# 它的稳定性。所以，如果你已经确认你的 ebuild 可以在
+# amd64 和 ppc，您需要指定：
+# 关键词="~amd64 ~ppc"
+# 一旦软件包稳定下来，~ 前缀就会被删除。
+# 对于二进制包，使用 -* 然后列出 bin 包的 archs
+# 存在。如果该包是针对 x86 二进制包的，那么
+# KEYWORDS 应设置如下：KEYWORDS="-* x86"
+# 不要使用 KEYWORDS="*"；这在 ebuild 上下文中无效。
+KEYWORDS="~amd64"
+
+# ebuild 中利用的所有 USE 标志的综合列表，
+# 有一些例外，例如 ARCH 特定标志，如“amd64”或“ppc”。
+# 如果 ebuild 不使用任何 USE 标志，则不需要。
+IUSE="gnome X"
+
+# 以空格分隔的要限制的 portage 功能列表。man 5 ebuild
+# 了解详细信息。通常不需要。
+#RESTRICT="剥离"
+
+
+# 运行时依赖项。必须将其定义为运行所依赖的任何内容。
+# 例子：
+# SSL？（>=dev-libs/openssl-1.0.2q:0=）
+#>=dev-lang/perl-5.24.3-r1
+# 建议使用上面显示的 >= 语法，以反映您
+# 在您测试软件包时，它已安装在您的系统上。然后
+# 希望其他用户不会因为没有正确版本的
+# 依赖项。
+#RDEPEND=""
+
+# 需要与系统二进制兼容的构建时依赖项
+# 正在构建（CHOST）。其中包括我们链接的库。
+# 如果需要相同的运行时依赖来编译，则以下内容有效。
+#DEPEND="${RDEPEND}"
+
+# 在 emerge 过程中执行的构建时依赖项，以及
+# 仅需存在于原生构建系统 (CBUILD) 中。例如：
+#BDEPEND="虚拟/pkgconfig"
+
+
+# 下面的 src_configure 函数是 portage 默认实现的，因此
+# 仅当您需要不同的行为时才需要调用它。
+#src_configure() {
+# 大多数开源包使用 GNU autoconf 进行配置。
+# 运行 configure 的默认、最快（也是首选）方式是：
+#econf
+#
+# 您可以使用类似于以下几行来
+# 在编译之前配置你的包。“|| die”部分
+如果命令失败，最后的#将停止构建过程。
+# 您应该在构建过程中的关键命令末尾使用它
+# 过程。（提示：大多数命令都很关键，例如构建
+# 如果不成功，进程应该中止。）
+#./配置 \
+# --host=${CHOST} \
+# --prefix=/usr\
+# --infodir=/usr/share/info \
+# --mandir=/usr/share/man ||死
+# 注意上面 --infodir 和 --mandir 的用法。这是为了让
+# 此软件包符合 FHS 2.2 标准。更多信息，请参阅
+# https://wiki.linuxfoundation.org/lsb/fhs
+#}
+
+# 下面的 src_compile 函数是 portage 默认实现的，因此
+# 如果您需要不同的行为，您只需调用它。
+#src_compile() {
+# emake 是一个使用并行调用标准 GNU make 的脚本
+# 构建选项以实现更快的构建（尤其是在 SMP 系统上）。
+# 先尝试 emake。它可能不适用于某些软件包，因为
+# 一些 makefile 存在与并行性相关的错误，在这种情况下，
+# 使用 emake -j1 将 make 限制为单个进程。-j1 是一个
+# 向其他人提供视觉线索，表明 makefile 存在错误，
+# 解决了。
+
+#emake
+#}
+
+# 下面的 src_install 函数是 portage 默认实现的，因此
+# 如果您需要不同的行为，您只需调用它。
+#src_install() {
+# 你必须*亲自验证*此技巧是否无法安装
+# DESTDIR 之外的任何内容；通过阅读和
+# 了解 Makefile 的安装部分。
+# 这是首选的安装方式。
+#emake DESTDIR="${D}" 安装
+
+# 当你使用 emake 失败时，不要只使用 make。
+# 最好修复 Makefile 以允许正确的并行化。
+# 如果失败了，请使用“emake -j1”，它仍然比 make 更好。
+
+# 对于没有正确使用 DESTDIR 的 Makefile，设置
+# 前缀通常是一种替代方案。但是如果你这样做，那么
+# 您还需要指定 mandir 和 infodir，因为它们是
+# 传递给 ./configure 作为绝对路径（覆盖前缀
+# 环境）。
+#emake \
+# 前缀="${D}"/usr \
+# mandir="${D}" /usr/share/man \
+# infodir="${D}"/usr/share/info \
+# libdir="${D}"/usr/$(get_libdir) \
+＃ 安装
+# 再次验证 Makefile！我们不希望出现任何问题
+# 在 ${D} 之外。
+#}
+
+#+end_src

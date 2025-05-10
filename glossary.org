@@ -10,6 +10,7 @@
     - [[#jit][JIT]]
   - [[#common][Common]]
     - [[#hook][Hook]]
+    - [[#xdg][xdg]]
 
 ** Network
 *** AJAX
@@ -45,3 +46,8 @@ eBPF 是一项革命性的技术，起源于 Linux 内核，它可以在特权�
 当程序执行到你添加的钩子时 执行钩子程序
 
 
+*** xdg
+X Desktop Group
+- 描述了环境变量$XDG_RUNTIME_DIR 及其默认值
+- xdg-dekstop-portal接口为文件访问 打开uri 打印等 提供标准api
+- 管理和使用特定MIME类型的默认程序    

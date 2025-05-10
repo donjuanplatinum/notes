@@ -15,6 +15,7 @@
   - [[#系统问题][系统问题]]
     - [[#kde][kde]]
       - [[#policykit-身份验证系统不可用-not-authorized-to-perform-operation][PolicyKit 身份验证系统不可用 Not authorized to perform operation]]
+      - [[#fcitx漏字][fcitx漏字]]
     - [[#gnome][gnome]]
       - [[#关于gnome下wayland的问题][关于Gnome下wayland的问题]]
         - [[#nvidia][nvidia]]
@@ -115,7 +116,8 @@ height=(int)1080,
 *** kde
 **** PolicyKit 身份验证系统不可用 Not authorized to perform operation
 [[./linux.org::polkit][Polkit配置]]
-
+**** fcitx漏字
+安装fcitx-gtk
 *** gnome
 **** 关于Gnome下wayland的问题
 ***** nvidia

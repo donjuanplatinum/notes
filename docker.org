@@ -54,6 +54,8 @@
   - [[#mariadb][mariadb]]
     - [[#compose-5][compose]]
     - [[#cli][cli]]
+  - [[#mail-server][mail-server]]
+    - [[#compose-6][compose]]
 
 * Docker Cli
 ** 拉取所有tag
@@ -1067,3 +1069,47 @@ set password for 'user' = PASSWORD('password');
 GRANT ALL PRIVILEGES ON 'database' TO 'user';
 flush privileges;
   #+end_src
+
+** mail-server
+*** compose
+#+begin_export yaml
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    # Provide the FQDN of your mail server here (Your DNS MX record should point to this value)
+    # hostname: mail.example.com
+    domainname: donplat.top
+      #    env_file: mailserver.env
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    ports:
+      - "25:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP (implicit TLS)
+      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "993:993"  # IMAP4 (implicit TLS)
+    volumes:
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-state/:/var/mail-state/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/letsencrypt/:/etc/letsencrypt
+    environment:
+      - SSL_TYPE=manual
+      - SSL_CERT_PATH=/etc/letsencrypt/live/donplat.top-0001/fullchain.pem
+      - SSL_KEY_PATH=/etc/letsencrypt/live/donplat.top-0001/privkey.pem
+    restart: always
+    stop_grace_period: 1m
+    # Uncomment if using `ENABLE_FAIL2BAN=1`:
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
+
+
+#+end_export

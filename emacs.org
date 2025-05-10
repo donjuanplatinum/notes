@@ -23,6 +23,7 @@
   - [[#dired][Dired]]
     - [[#keyboard][keyboard]]
   - [[#imenu][imenu]]
+  - [[#proced][proced]]
 - [[#org-mode][org-mode]]
   - [[#基本][基本]]
   - [[#标记文本][标记文本]]
@@ -170,6 +171,8 @@ global-display-line-numbers-mode 'open 全局行号
 ** imenu
 | key   | mean     | command |
 | M-g i | 启动Imenu | imenu   |
+
+** proced
 * org-mode
 ** 基本
 | 折叠小节        | TAB       |                               |
