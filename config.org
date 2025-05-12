@@ -19,26 +19,36 @@ zone:
 :HEADER-ARGS: :tangle tangle/etc/nsd/zone/donjuan.lecturify.net.zone :mkdirp yes
 :END:
 #+begin_src conf
-$ORIGIN donjuan.lecturify.net.
-$TTL 86400
+  $ORIGIN donjuan.lecturify.net.
+  $TTL 86400
 
-@    IN	SOA	ns1.donjuan.lecturify.net.	admin.donjuan.lecturify.net.	(
-     6
-     604800
-     86400
-     2419200
-     86400	)
-www  3600	IN	CNAME	5t5316v124.goho.co.
-@    3600	IN	NS	ns1
-@    3600	IN	NS	ns2
-ns1  3600	IN	CNAME	5t5316v124.goho.co.
-nsd2 3600	IN	CNAME	5t5316v124.goho.co.
-@    3600	IN	MX 10	www
-matrix	3600	IN	CNAME	5t5316v124.goho.co.
-iked	3600	IN	A	38.87.162.107
-_acme-challenge	3600	IN	TXT	GfSc84PbKo47rfDbLw_vhfHrTfNuB2gxbgsA8owL31Y
-smtp	3600	IN	CNAME	www
-imap	3600	IN	CNAME	www
-pop3	3600	IN	CNAME	www
+  @    IN	SOA	ns1.donjuan.lecturify.net.	admin.donjuan.lecturify.net.	(
+       6
+       604800
+       86400
+       2419200
+       86400	)
+  www  3600	IN	CNAME	5t5316v124.goho.co.
+  @    3600	IN	NS	ns1
+       @    3600	IN	NS	ns2
+  ns1  3600	IN	CNAME	5t5316v124.goho.co.
+  nsd2 3600	IN	CNAME	5t5316v124.goho.co.
+  @    3600	IN	MX 10	www
+  matrix	3600	IN	CNAME	5t5316v124.goho.co.
+  iked	3600	IN	A	38.87.162.107
+  _acme-challenge	3600	IN	TXT	GfSc84PbKo47rfDbLw_vhfHrTfNuB2gxbgsA8owL31Y
+  smtp	3600	IN	CNAME	www
+  imap	3600	IN	CNAME	www
+  pop3	3600	IN	CNAME	www
 
+#+end_src
+** tmux
+*** .tmux.conf
+:PROPERTIES:
+:HEADER-ARGS: :tangle tangle/.tmux.conf :mkdirp yes
+:END:
+#+begin_src conf
+unbind C-b
+unbind M-C-b
+set -g prefix M-B
 #+end_src

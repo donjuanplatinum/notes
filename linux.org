@@ -122,6 +122,11 @@
   make INSTALL_MOD_STRIP=1 modules_install
   make install
 #+end_src
+
+生成initramfs
+#+begin_src shell
+  dracut --force --no-hostonly initramfs-6.12.27-barrensea.img 6.12.27-barrensea 
+#+end_src
 *** 查看系统调用的编号
 #+begin_src shell
   cd /usr/include/asm
