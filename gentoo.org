@@ -82,6 +82,7 @@
       - [[#rust][rust]]
       - [[#gcc][gcc]]
       - [[#libdrm][libdrm]]
+      - [[#obs-studio][obs-studio]]
     - [[#packageaccept_keywords][package.accept_keywords]]
       - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
 - [[#应该安装的包][应该安装的包]]
@@ -93,6 +94,7 @@
     - [[#required_use][REQUIRED_USE]]
   - [[#用户环境][用户环境]]
   - [[#skelebuild中文][skel.ebuild中文]]
+  - [[#编写dotnet项目的ebuild][编写dotnet项目的ebuild]]
 
 * 安装
 *** 1.挂载
@@ -1459,6 +1461,13 @@ sys-devel/gcc jit
   x11-libs/libdrm video_cards_radeon
 #+end_src
 
+**** obs-studio
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.use/obs-studio :mkdirp yes
+:END:
+#+begin_src shell
+  meida-video/obs-studio pipewire
+#+end_src
 *** package.accept_keywords
 **** gentoo-zh/xanmod-kernel
 :PROPERTIES:
@@ -1501,24 +1510,24 @@ sys-devel/gcc jit
 | REPLACING_VERSIONS  | 此软件包的所有版本(PVR)的空格分格列表                                                                                    |
 | REPLACED_BY_VERSION | 若此软件包作为安装的一部分被卸载 则返回软件版本(PVR)                                                                       |
 ** Ebuild定义变量
-| EAPI         | EAPI版本                                                          |
+| EAPI         | EAPI版本                                                         |
 | DESCRIPTION  | (必须)软件包的简短描述 <=80字                                        |
 | HOMEPAGE     | (必须)软件包主页 缺省值:https://wiki.gentoo.org/wiki/No_homepage    |
-| SRC_URI      | 软件包URI列表                                                      |
-| LICENSE      | 许可                                                              |
-| SLOT         | (必须)包的SLOT                                                     |
-| KEYWORDS     | 包的keywords                                                      |
+| SRC_URI      | 软件包URI列表                                                     |
+| LICENSE      | 许可                                                             |
+| SLOT         | (必须)包的SLOT                                                    |
+| KEYWORDS     | 包的keywords                                                     |
 | IUSE         | ebuild中所有USE(不包括arch)                                        |
-| REQUIRED_USE | 必须满足的USE                                                      |
+| REQUIRED_USE | 必须满足的USE                                                     |
 | PROPERTIES   | 空格分格的属性列表 支持条件语法 :interactive live test_network        |
 | RESTRICT     | 空格分格的要限制的portage功能列表 :fetch mirror strip test userpriv  |
-| DEPEND       | 构建依赖表                                                         |
+| DEPEND       | 构建依赖表                                                        |
 | BDEPEND      | (EAPI=7) CBUILD依赖表                                             |
 | RDEPEND      | 运行时依赖表                                                       |
 | PDEPEND      | 合并后要安装的包列表                                                |
 | S            | 临时的构建目录路径 由src_compile,src_install使用 默认:${WORKDIR}/${P} |
-| DOCS         | src_install默认安装的文档文件列表                                  |
-| HTML_DOCS    | einstalldocs要递归安装的文档列表                                           |
+| DOCS         | src_install默认安装的文档文件列表                                    |
+| HTML_DOCS    | einstalldocs要递归安装的文档列表                                    |
 
 
 
@@ -1741,3 +1750,17 @@ IUSE="gnome X"
 #}
 
 #+end_src
+** 编写dotnet项目的ebuild
+首先我们需要安装gdmt
+#+begin_src shell
+  sudo emerge -v dev-dotnet/gentoo-dotnet-maintainer-tools
+#+end_src
+然后我们安装dotnet-sdk
+#+begin_src shell
+  sudo emerge -v dev-dotnet/dotnet-sdk-bin
+#+end_src
+我们到项目的path 然后执行
+#+begin_src
+gdmt restore -e sdk版本
+#+end_src
+接下来可以获取NUGET

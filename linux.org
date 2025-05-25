@@ -1,5 +1,7 @@
 * Table                                                                 :TOC_8:
 - [[#linux][Linux]]
+  - [[#系統加密][系統加密]]
+    - [[#自动挂载][自动挂载]]
   - [[#loop设备][loop设备]]
   - [[#内核][内核]]
     - [[#编译内核][编译内核]]
@@ -14,6 +16,7 @@
     - [[#sysctl][sysctl]]
     - [[#out-of-memory-oom][Out Of Memory (OOM)]]
       - [[#修改oom分值][修改OOM分值]]
+    - [[#inotify][inotify]]
   - [[#日志][日志]]
     - [[#syslog-ng][syslog-ng]]
       - [[#日志级别][日志级别]]
@@ -72,6 +75,7 @@
     - [[#iostat][iostat]]
     - [[#top][top]]
     - [[#ps][ps]]
+    - [[#inotify-tool][inotify-tool]]
     - [[#smartmontools][smartmontools]]
   - [[#功能][功能]]
     - [[#btfs][BTFS]]
@@ -96,6 +100,43 @@
 
 * Linux
 
+** 系統加密
+
+格式化
+#+begin_src shell
+  cryptsetup luksFormat /dev/...
+#+end_src
+
+备份LUKS头文件(头文件损坏就彻底完了)
+#+begin_src shell
+  cryptsetup luksHeaderBackup /dev/.. --header-backup-file /path/luks-header.img
+#+end_src
+
+全盘加密(包括/boot) 必须使用luks1 因为2没完全支持
+#+begin_src shell
+  cryptsetup --type luks1 luksFormat /dev/..
+#+end_src
+
+打开加密
+#+begin_src shell
+  cryptsetup luksOpen /dev/.. mapper_name
+#+end_src
+*** 自动挂载
+首先开启dmcrypt server
+#+begin_src shell
+  rc-update add dmcrypt boot
+#+end_src
+
+编辑/etc/conf.d/dmcrypt
+#+begin_src shell
+  target=home
+  source=UUID="/dev/...的UUID"
+  key=/path/key.key
+#+end_src
+若没密码文件则会启动时输入
+
+配置fstab
+区别是在fstabUUID填写加密open后mapper映射的文件系统的UUID
 ** loop设备
 循环设备是一种块设备，它不将数据块映射到物理设备（如硬盘或光盘驱动器），而是映射到文件系统中常规文件的块或另一个文件
 块设备。例如，这对于为存储在文件中的文件系统映像提供块设备非常有用，这样就可以使用mount（8）命令安装它。你可以做
@@ -172,7 +213,7 @@ OOM Killer是 ~内核的一个进程~ 会根据一个复杂的算法去评估进
 分数储存在 [[*/proc/<pid>/oom_score][/proc/<pid>/oom_score]] 也可以使用 ~ps -eo pid,comm,oom --sort=-oom |head~ 来查看分数最高的进程
 
 **** 修改OOM分值
-
+*** TODO inotify
 ** 日志
 *** syslog-ng
 
@@ -794,7 +835,7 @@ strace的原理是[[https://github.com/torvalds/linux/blob/master/kernel/ptrace.
 *** TODO iostat
 *** TODO top
 *** TODO ps
-
+*** TODO inotify-tool
 *** smartmontools
 使用自我监控(Self-Monitoring)、分析(Analysis)和报告(Reporting)三种技术（缩写为S.M.A.R.T或SMART）来管理和监控存储硬件。
 ** 功能

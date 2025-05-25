@@ -12,6 +12,7 @@
     - [[#gstreamer][gstreamer]]
       - [[#plugins][plugins]]
         - [[#missing-decoder][missing decoder]]
+    - [[#obs-studio][obs-studio]]
   - [[#系统问题][系统问题]]
     - [[#kde][kde]]
       - [[#policykit-身份验证系统不可用-not-authorized-to-perform-operation][PolicyKit 身份验证系统不可用 Not authorized to perform operation]]
@@ -112,6 +113,10 @@ height=(int)1080,
 #+begin_src shell
   sudo emerge media-plugins/gst-plugins-libav
 #+end_src
+*** obs-studio
+在wayland下不显示屏幕
+
+解决方案: 重新编译obs 并加上pipewire use
 ** 系统问题
 *** kde
 **** PolicyKit 身份验证系统不可用 Not authorized to perform operation

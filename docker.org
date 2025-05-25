@@ -56,6 +56,8 @@
     - [[#cli][cli]]
   - [[#mail-server][mail-server]]
     - [[#compose-6][compose]]
+  - [[#v2raya][v2raya]]
+    - [[#cli-1][cli]]
 
 * Docker Cli
 ** 拉取所有tag
@@ -1113,3 +1115,9 @@ services:
 
 
 #+end_export
+
+** v2raya
+*** cli
+#+begin_src shell
+  podman run -itd   --name v2raya   --restart=always   --security-opt no-new-privileges   --cap-drop all   --network host   --memory=500M   --volume .:/etc/v2raya:z   docker.io/mzz2017/v2raya
+#+end_src
