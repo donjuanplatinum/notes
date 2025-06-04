@@ -94,7 +94,6 @@
     - [[#kde创建通知][kde创建通知]]
     - [[#检测进程是否运行][检测进程是否运行]]
     - [[#发出声音警报][发出声音警报]]
-    - [[#备份系统][备份系统]]
     - [[#電池管理][電池管理]]
     - [[#wifi设置][wifi设置]]
 
@@ -707,6 +706,10 @@ EFI系统分区可以在/boot或/boot/EFI中进行，但只使用/boot往往更�
 #+begin_src shell
   git log --reflog
 #+end_src
+查看更改文件的提交
+#+begin_src shell
+  git log [file]
+#+end_src
 *** lsof
 List Open File 获取被进程打开文件的信息
 
@@ -927,7 +930,7 @@ tldr
 #+begin_src shell
   play -n synth 1 sine 10000
 #+end_src
-*** 备份系统
+p*** 备份系统
 #+begin_src shell
   sudo tar -cjpvf gentoobackup.tar.gz  --exclude=/run --exclude=/mnt --exclude=/proc/ --exclude=/sys --exclude=/dev --exclude=/var/cache --exclude=/var/tmp --exclude=/tmp --exclude=/home --exclude=/root /
 

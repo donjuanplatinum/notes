@@ -116,7 +116,7 @@ height=(int)1080,
 *** obs-studio
 在wayland下不显示屏幕
 
-解决方案: 重新编译obs 并加上pipewire use
+解决方案: 重新编译obs 并加上pipewire use 并且plasma-workspace等加上screencast的USE
 ** 系统问题
 *** kde
 **** PolicyKit 身份验证系统不可用 Not authorized to perform operation

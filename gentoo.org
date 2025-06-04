@@ -83,6 +83,7 @@
       - [[#gcc][gcc]]
       - [[#libdrm][libdrm]]
       - [[#obs-studio][obs-studio]]
+      - [[#pipewire][pipewire]]
     - [[#packageaccept_keywords][package.accept_keywords]]
       - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
 - [[#应该安装的包][应该安装的包]]
@@ -548,9 +549,9 @@ https://wiki.gentoo.org/wiki/Handbook:X86/Working/Portage#Blocked_packages
   # This sets the language of build output to English.
   # Please keep this setting intact when reporting bugs.
   LC_MESSAGES=C.utf8
-  GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
-  #GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
-  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager sddm"
+  #GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
+  GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
+  USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager  pipewire  screencast plasma grub"
   VIDEO_CARDS="amdgpu radeonsi"
   MAKEOPTS="-j8"
 
@@ -1467,6 +1468,14 @@ sys-devel/gcc jit
 :END:
 #+begin_src shell
   meida-video/obs-studio pipewire
+#+end_src
+
+**** pipewire
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.use/pipewire :mkdirp yes
+:END:
+#+begin_src shell
+  media-video/pipewire gstreamer
 #+end_src
 *** package.accept_keywords
 **** gentoo-zh/xanmod-kernel
