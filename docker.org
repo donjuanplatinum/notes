@@ -1044,6 +1044,8 @@ services:
     restart: unless-stopped
 
 #+end_src
+data/id_ed25519.pub
+
 ** steamcmd
 #+begin_src shell
   docker run -it -v $PWD:/data steamcmd/steamcmd:latest +login anonymous +force_install_dir /data +app_update 740 +quit

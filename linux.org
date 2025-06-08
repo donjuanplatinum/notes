@@ -5,6 +5,8 @@
   - [[#loop设备][loop设备]]
   - [[#内核][内核]]
     - [[#编译内核][编译内核]]
+    - [[#syscall][SYSCALL]]
+      - [[#pselect][pselect]]
     - [[#查看系统调用的编号][查看系统调用的编号]]
     - [[#proc][/proc]]
       - [[#挂载][挂载]]
@@ -166,6 +168,19 @@
 生成initramfs
 #+begin_src shell
   dracut --force --no-hostonly initramfs-6.12.27-barrensea.img 6.12.27-barrensea 
+#+end_src
+*** SYSCALL
+**** pselect
+同时监控多个文件描述符 并在它们可读可写或发生异常时返回
+#+begin_src c
+  int pselect(
+      int nfds,                   // 最大文件描述符 +1
+      fd_set *readfds,            // 可读文件描述符集合
+      fd_set *writefds,           // 可写文件描述符集合
+      fd_set *exceptfds,          // 异常文件描述符集合
+      const struct timespec *timeout, // 超时时间（更精确，纳秒级）
+      const sigset_t *sigmask     // 信号屏蔽字（避免竞态条件）
+  );
 #+end_src
 *** 查看系统调用的编号
 #+begin_src shell
