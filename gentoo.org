@@ -84,6 +84,7 @@
       - [[#libdrm][libdrm]]
       - [[#obs-studio][obs-studio]]
       - [[#pipewire][pipewire]]
+      - [[#librime-lua][librime-lua]]
     - [[#packageaccept_keywords][package.accept_keywords]]
       - [[#gentoo-zhxanmod-kernel][gentoo-zh/xanmod-kernel]]
 - [[#应该安装的包][应该安装的包]]
@@ -1476,6 +1477,12 @@ sys-devel/gcc jit
 :END:
 #+begin_src shell
   media-video/pipewire gstreamer
+**** librime-lua
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/portage/package.use/librime-lua :mkdirp yes
+:END:
+#+begin_src shell
+  app-i18n/librime-lua lua_single_target_lua5-4
 #+end_src
 *** package.accept_keywords
 **** gentoo-zh/xanmod-kernel

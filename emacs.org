@@ -20,6 +20,7 @@
       - [[#筛选][筛选]]
       - [[#被标记的buffer][被标记的buffer]]
       - [[#用于标记][用于标记]]
+  - [[#desktop][desktop]]
   - [[#dired][Dired]]
     - [[#keyboard][keyboard]]
   - [[#imenu][imenu]]
@@ -151,6 +152,11 @@ global-display-line-numbers-mode 'open 全局行号
 | u   | 取消标记      |   |
 | * u | 标记所有未保存 |   |
 | * r | 标记所有只读      |   |
+
+** desktop
+保存当前使用状态
+| desktop-save   | 保存当前状态    |
+| desktop-revert | 回退到当前的状态 |
 ** Dired 
 *** keyboard
 | key   | mean             | command                  |
