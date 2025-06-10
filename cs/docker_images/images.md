@@ -715,7 +715,7 @@ dns txt记录认证
 
 ### 注意!
 
-在cloudflare下的ssl/tls ssl/tls加密设置为完全
+在cloudflare下的ssl/tls ssl/tls加密设置为完全 严格
 
 
 <a id="org9795cd1"></a>
