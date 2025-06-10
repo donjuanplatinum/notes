@@ -114,6 +114,6 @@ inotify是Linux核心子系统之一，做为文件系统的附加功能，它�
 
 
 #### Inotify系统调用
-[inotify_init][inotify_init]
-[inotify_add_watch][inotify_add_watch]
-[inotify_rm_watch][inotify_rm_watch]
+- [inotify_init][#inotify-init]
+- [inotify_add_watch][#inotify-add-watch]
+- [inotify_rm_watch][#inotify-rm-watch]
