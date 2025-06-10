@@ -5,9 +5,21 @@
 
 DonjuanPlatinum Notes documentation
 ===================================
+我是DonjuanPlatinum
+这是我的
+
+- `Github <https://github.com/donjuanplatinum>`_
+
+- `Mail <donjuan@donplat.top>`_
+
+我的爱好: emacs 钢琴 数学...
+
 
 .. toctree::
-   :caption: 计算机
-   cs/linux/index
+   :maxdepth: 1
+
+   cs/index
+
+
 
 	      
