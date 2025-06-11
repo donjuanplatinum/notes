@@ -2031,3 +2031,9 @@ USE关系
 
 接下来可以获取NUGET
 
+## 错误
+### ninja: error: manifest 'build.ninja' still dirty after 100 tries, perhaps system time is notset
+修改系统时间到未来
+```shell
+date -s "2094-06-11 15:30:00"
+```
