@@ -22,13 +22,38 @@ dracut --force --no-hostonly initramfs-6.12.27-barrensea.img 6.12.27-barrensea
 ### pselect6
 ### inotify_init
 `linux/fs/notify/inotify/inotify_user.c`
+初始化一个inotify实例 返回一个文件描述符 默认为阻塞模式
+
+系统调用注册
 ``` c
-SYSCALL_DEFINE0(inotify_init)
+	SYSCALL_DEFINE0(inotify_init)
+```
+
+
+使用
+```c
+	int fd = inotify_init();
+	if (fd == -1) {
+		perror("init inotify failed");
+		exit(EXIT_FAILURE);
+	}
 ```
 ### inotify_init1
 `linux/fs/notify/inotify/inotify_user.c`
+初始化一个inotify实例 返回一个文件描述符 按照flags参数设置模式
+
+系统调用注册
 ```c
-SYSCALL_DEFINE1(inotify_init1, int, flags)
+	SYSCALL_DEFINE1(inotify_init1, int, flags)
+```
+
+使用
+```c
+	int fd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+	if (fd == -1) {
+		perror("inotify_init1 failed");
+		exit(EXIT_FAILURE);
+}
 ```
 #### flags
 `linux/include/uapi/linux/inotify.h`
@@ -39,6 +64,7 @@ SYSCALL_DEFINE1(inotify_init1, int, flags)
 其中O_CLOEXEC与O_NONBLOCK为阻塞与非阻塞 定义于 `linux/include/uapi/asm-generic/fcntl.h`
 ### inotify_add_watch
 `linux/fs/notify/inotify/inotify_user.c`
+向inotify实例`fd`添加一个监控项 监视`pathname`对应文件目录事件 事件集由
 ```c
 SYSCALL_DEFINE3(inotify_add_watch, int, fd, const char __user *, pathname,
 		u32, mask)
@@ -115,5 +141,7 @@ inotify是Linux核心子系统之一，做为文件系统的附加功能，它�
 
 #### Inotify系统调用
 - [inotify_init][#inotify-init]
+
 - [inotify_add_watch][#inotify-add-watch]
+
 - [inotify_rm_watch][#inotify-rm-watch]

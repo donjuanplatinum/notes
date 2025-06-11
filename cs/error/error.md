@@ -193,3 +193,11 @@ bluetooth缺少pulseaudio支持 安装对应的包
 
     sudo pacman -S pulseaudio-bluetooth
 
+
+## 编译问题
+### ninjia
+#### ninja: error: manifest 'build.ninja' still dirty after 100 tries, perhaps system time is not set
+这是系统时间的问题 可以先将系统时间设置到未来 再使用ninjia编译
+```shell
+date -s "2077-06-11 15:30:00"
+```
