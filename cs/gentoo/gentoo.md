@@ -611,13 +611,13 @@ F4选择即可
     FFLAGS="${COMMON_FLAGS}"
     FEATURES="${FEATURES} binpkg-request-signature buildpkg"
     # NOTE: This stage was built with the bindist Use flag enabled
-    
+    ACCEPT_KEYWORDS="~amd64"
     # This sets the language of build output to English.
     # Please keep this setting intact when reporting bugs.
     LC_MESSAGES=C.utf8
     #GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
     GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
-    USE="-gnome wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager  pipewire  screencast plasma grub"
+    USE="-gnome screencast wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager  pipewire  screencast plasma grub"
     VIDEO_CARDS="amdgpu radeonsi"
     MAKEOPTS="-j8"
     

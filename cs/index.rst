@@ -8,4 +8,4 @@
    error/error
    game/game
    gentoo/index
-   
+   tools/index

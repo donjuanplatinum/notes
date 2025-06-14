@@ -4,5 +4,5 @@ Linux
 .. toctree::
 	      
    kernel
-   tools
+
    

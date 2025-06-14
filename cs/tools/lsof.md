@@ -1,12 +1,7 @@
-# Tools
-Linux下的工具
-
-## ssh
-
-## lsof
+# lsof
 List Open File 获取被进程打开文件的信息
 
-### Args
+## Args
 ```
   -a: 结果进行AND运算 而非OR
   +d 列出当前目录下(不包括子目录)
@@ -26,7 +21,7 @@ List Open File 获取被进程打开文件的信息
   -s 列出文件大小
   -r 间隔重复扫描
 ```
-### 文件描述符表
+## 文件描述符表
 ```
 （1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改
 （2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序
@@ -63,7 +58,7 @@ List Open File 获取被进程打开文件的信息
 （9）X：for an SCO OpenServer Xenix lock on the      entire file;
 （10）space：if there is no lock.
 ```
-### 文件类型表
+## 文件类型表
 ```
 （1）DIR：表示目录
 （2）CHR：表示字符类型
@@ -73,84 +68,16 @@ List Open File 获取被进程打开文件的信息
 （6）IPv4：网际协议 (IP) 套接字  
 ```
 
-## Strace
-Strace可以诊断 调试Linux用户空间
-检测进程与内核的交互 系统调用 信号 状态变更等
-
-### Args
-```
-| -c          | 统计                  |
-| -f          | 追踪fork子进程         |
-| -ff         | 将为每个子进程          |
-| -F          | 追踪vfork调用          |
-| -i          | 输出系统调用入口指针    |
-| -q          |                      |
-| -r          | 输出相对时间           |
-| -t -tt -ttt | 输出的每一行加入时间    |
-| -T          | 显示系统调用所需时间    |
-| -v          | 输出所有调用           |
-| -x          | 十六进制输出非标准字符串 |
-| -xx         | 十六禁止输出所有字符串   |
-| -e expr     | 指定表达式来控制如何追踪 |
-| -p pid      | 追踪指定的进程          |
-| -u user     | 以user身份执行         |
-```
-#### -e expr
-```
-| trace   | 指定追踪的系统调用     |
-| abbrev  | 输出系统调用的结果集合  |
-| verbose |                     |
-| raw     | 十六进制显示          |
-| signal  | 指定追踪的信号 默认all |
-```
-#### trace集合
-```
-| file    | 与文件相关的系统调用    |
-| process | 与进程相关的系统调用    |
-| network | 与网络相关的系统调用    |
-| signal  | 与信号相关的系统调用    |
-| ipc     | 与进程通讯相关的系统调用 |
-```
-### Examples
-不追踪sigio信号
+## 示例
+### 循环扫描ssh的链接
 ```shell
-  strace -e signal=!SIGIO
+	lsof -a -i -r -c ssh
 ```
-
-通用用法
-``` shell
-strace -o output -T -tt -e trace=file -p pid
-```
-## Shell
-### 每秒将占用最大的进程打印
+### 扫描指定端口
 ```shell
-for ((;;));do ps aux --sort=-%mem;sleep 1;done
+	sudo lsof -a -i :443
 ```
-
-
-### Linux桌面创建通知
+### qbittorrent打开了什么文件
+```shell
+	lsof -c qbittorrent
 ```
-notify-send "标题" "通知内容"
-```
-### 进程是否存在
-``` bash
-  while true ; do if ! ps  -p 10605; then notify-send 'ok';play -n synth 10 sine 1000;break ;fi ;sleep 5;done
-```
-### 发出声音警报
-``` shell
-play -n synth 1 sine 10000
-```
-
-### 系统备份
-``` shell
-  sudo tar -cjpvf gentoobackup.tar.gz  --exclude=/run --exclude=/mnt --exclude=/proc/ --exclude=/sys --exclude=/dev --exclude=/var/cache --exclude=/var/tmp --exclude=/tmp --exclude=/home --exclude=/root /
-```
-### 电池相关
-查看电池状态
-``` shell
-  upower -i $(upower -e)
-```
-### Wifi管理
-nmtui
-
-
