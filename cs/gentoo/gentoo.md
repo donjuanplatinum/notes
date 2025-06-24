@@ -617,7 +617,7 @@ F4选择即可
     LC_MESSAGES=C.utf8
     #GENTOO_MIRRORS="rsync://127.0.0.1/repo/gentoo/"
     GENTOO_MIRRORS="rsync://mirror.nju.edu.cn/gentoo/"
-    USE="-gnome screencast wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager  pipewire  screencast plasma grub"
+    USE="-gnome screencast wayland  qt5 kde dvd cdr acl alsa jack pulseaudio bluetooth wayland browser-integration discover networkmanager  pipewire  screencast plasma grub gstreamer "
     VIDEO_CARDS="amdgpu radeonsi"
     MAKEOPTS="-j8"
     
@@ -1501,7 +1501,7 @@ F4选择即可
 
 9.  obs-studio
 
-        meida-video/obs-studio pipewire
+        meida-video/obs-studio pipewire v4l
 
 10. pipewire
 
@@ -1511,6 +1511,7 @@ F4选择即可
 11. librime-lua
 
         app-i18n/librime-lua lua_single_target_lua5-4
+
 
 
 <a id="org36a3f34"></a>

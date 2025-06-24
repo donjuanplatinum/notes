@@ -12,7 +12,7 @@ DonjuanPlatinum Notes documentation
 
 - `Mail <donjuan@donplat.top>`_
 
-我的爱好: emacs 钢琴 数学...
+我的gpg指纹:1C9E EEE5 4C8E D5A8 3039  1C87 A9F6 8632 D259 40E6
 
 
 .. toctree::

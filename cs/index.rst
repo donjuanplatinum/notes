@@ -9,3 +9,5 @@
    game/game
    gentoo/index
    tools/index
+   algori/index
+   emacs/index
