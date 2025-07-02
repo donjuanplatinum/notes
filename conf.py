@@ -15,6 +15,7 @@ author = 'Donjuanplatinum'
 
 extensions = [
     'myst_parser', 
+    'sphinx.ext.mathjax',
 ]
 
 templates_path = ['_templates']
@@ -38,3 +39,9 @@ html_theme_options = {
 }
 
 source_suffix = ['.rst', '.md']
+myst_enable_extensions = [
+    "amsmath",    # 支持 \begin{equation} 等环境
+    "dollarmath", # 支持 $...$ 和 $$...$$
+]
+mathjax_path = "MathJax.js"
+
