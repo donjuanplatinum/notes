@@ -19,7 +19,7 @@ DonjuanPlatinum Notes documentation
    :maxdepth: 1
 
    cs/index
+   math/index
 
 
-
-	      
+	   
