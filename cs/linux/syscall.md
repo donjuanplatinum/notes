@@ -107,3 +107,36 @@
 		return 1;
 	}
 ```
+## mkdir
+`linux/fs/namei.c`
+创建目录 其中 pathname为目录路径 mode为权限模式
+
+系统调用原型
+```c
+#include <sys/stat.h>
+#include <sys/types.h>
+int mkdir (const char *pathname, mode_t mode);
+```
+
+返回值 `int` 成功0 失败-1 并设置errno
+
+用户头文件`sys/stat.h`
+示例
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+int main(){
+	const char *dir_path = "./new";
+	
+	mode_t mode = 0755;
+	if (mkdir(dir_path,mode) == 0 ) {
+	printf("创建成功\n");
+	} else {
+		perror("mkdir 失败");
+		return 1;
+	}
+	return 0;
+}
+```

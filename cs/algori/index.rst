@@ -3,7 +3,7 @@
 
 .. toctree::
 	      
-   encrypt
+   algs4
 
    
 

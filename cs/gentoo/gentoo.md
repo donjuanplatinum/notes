@@ -1044,6 +1044,8 @@ F4选择即可
 
 <a id="org5b82aff"></a>
 
+### /etc/portage/savedconfig
+#### x11-wm/dwm
 ## doc
 
 
@@ -1513,6 +1515,9 @@ F4选择即可
         app-i18n/librime-lua lua_single_target_lua5-4
 
 
+12. app-text/texlive-core
+
+		app-text/texlive-core cjk xetex
 
 <a id="org36a3f34"></a>
 

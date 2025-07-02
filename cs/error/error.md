@@ -141,6 +141,9 @@ GLFW Error: GLX: Failed to create context: GLXBadFBConfig
 
 <a id="orgc3ccf3c"></a>
 
+### glibc
+/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.14' not found"
+更新glibc
 ## 系统问题
 
 
@@ -201,3 +204,7 @@ bluetooth缺少pulseaudio支持 安装对应的包
 ```shell
 date -s "2077-06-11 15:30:00"
 ```
+### glibc
+
+#### *** stack smashing detected ***: terminated
+

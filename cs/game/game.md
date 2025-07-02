@@ -56,3 +56,8 @@ EAC可以通过Lutris的EAC或者在 `glibc` 的编译选项里打开hash-sysv-c
   -XX:SurvivorRatio=32
   -XX:+PerfDisableSharedMem
 ```
+
+Client
+```
+-XX:+UseG1GC -Xmx8G -Xms8G -Dsun.rmi.dgc.server.gcInterval=600000 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32
+```
