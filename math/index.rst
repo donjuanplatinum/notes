@@ -3,3 +3,4 @@
 
 .. toctree::
    analysis
+   number_theory

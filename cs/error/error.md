@@ -103,6 +103,9 @@ GLFW Error: GLX: Failed to create context: GLXBadFBConfig
 
 <a id="orgdcc6cb5"></a>
 
+### error: No module named 'imghdr'
+	
+	pip install standard-img
 ### wine
 
 
