@@ -76,3 +76,12 @@ Q
 - [inotify_add_watch][#inotify-add-watch]
 
 - [inotify_rm_watch][#inotify-rm-watch]
+## tmpfs
+基于内存的文件系统
+### /dev/shm
+默认为内存大小的一半 驻留在内存中 读写异常快
+
+修改大小
+```
+mount -o remount,size=32G tmpfs /dev/shm
+```

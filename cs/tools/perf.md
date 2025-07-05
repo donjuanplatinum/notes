@@ -5,6 +5,7 @@ tracepoints是散落在内核源码中的一些hook
 
 ## command
 perf的二级命令
+
  1  annotate  解析perf record生成的perf.data文件，显示被注释的代码。  
  2  archive  根据数据文件记录的build-id，将所有被采样到的elf文件打包。利  
      用此压缩包，可以再任何机器上分析数据文件中记录的采样数  
@@ -40,3 +41,26 @@ perf的二级命令
  21  top  类似于linux的top命令，对系统性能进行实时分析。  
  22  trace  关于syscall的工具。  
  23  probe  用于定义动态检查点。  
+
+## Examples
+* 全局性概况：
+
+ perf list查看当前系统支持的性能事件； perf bench对系统性能进行摸底； perf test对系统进行健全性测试； perf stat对全局性能进行统计；
+
+* 全局细节：
+
+ perf top可以实时查看当前系统进程函数占用率情况； perf probe可以自定义动态事件；
+
+* 特定功能分析：
+
+ perf kmem针对slab子系统性能分析； perf kvm针对kvm虚拟化分析； perf lock分析锁性能； perf mem分析内存slab性能； perf sched分析内
+ 核调度器性能； perf trace记录系统调用轨迹；
+
+* 最常用功能perf record，可以系统全局，也可以具体到某个进程，更甚具体到某一进程某一事件；可宏观，也可以很微观。
+
+ pref record记录信息到perf.data； perf report生成报告； perf diff对两个记录进行diff； perf evlist列出记录的性能事件； perf annotate显示
+ perf.data函数代码； perf archive将相关符号打包，方便在其它机器进行分析； perf script将perf.data输出可读性文本；
+
+* 可视化工具perf timechart
+
+ perf timechart record记录事件； perf timechart生成output.svg文档；
