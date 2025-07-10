@@ -11,3 +11,4 @@
    tools/index
    algori/index
    emacs/index
+   noun

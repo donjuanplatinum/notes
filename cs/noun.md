@@ -1,0 +1,34 @@
+# 专有名词
+
+## Linux内核
+
+### DSO
+Dynamic Shared Object 是 Linux/Unix 系统中动态链接库的实现形式
+
+### PMU
+Performance Monitoring Unit 性能监控单元
+
+以极低的开销收集处理器内部的详细性能数据
+
+### IPC
+Instructions Per Cycle 每周期指令数
+
+表示每个时钟周期内平均执行的指令数
+
+$$
+IPC = \frac{执行指令数(Instructions)}{消耗周期数(Cycles)}
+$$
+### IRQ
+Interrupt ReQuest 来自设备的中断请求
+
+IRQ编号是用来描述硬件中断源的内核标识符 通常它是一个到全局irq_desc数组的索引， 但是除了在linux/interrupt.h中实现的之外，其它细节是体系结构特征相关的。
+
+IRQ编号是对机器上可能的中断源的枚举
+### SMP
+Symmetric Multi-Processing 对称多处理
+
+操作系统支持多个处理器对称地共享系统资源且并行执行任务的技术
+### ACPI
+Advanced Configuration and Power Interface 高级配置与电源接口 
+
+管理计算机硬件的电源状态、配置、热管理、性能调节等

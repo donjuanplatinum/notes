@@ -11,23 +11,27 @@
 ### opengl
 
 
-<a id="org3f1ec1e"></a>
+#### GLFW Error: GLX: Failed to create context: GLXBadFBConfig
 
-#### 问题
-
-GLFW Error: GLX: Failed to create context: GLXBadFBConfig
-
+问题
+```
     Unable to load file texturedMesh.obj with ASSIMP
     GLFW Error: GLX: Failed to create context: GLXBadFBConfig
     Failed to create window
     Failed creating OpenGL window
+```
 
-
-<a id="org3d98409"></a>
-
-#### solution
-
+解决方案
+```
     MESA_GL_VERSION_OVERRIDE=4.5 然后再执行命令
+```
+
+#### RuntimeException: No OpenGL context found in the current thread.
+
+问题`RuntimeException: No OpenGL context found in the current thread.`
+
+解决方案
+
 
 
 <a id="orgc7e8ed6"></a>

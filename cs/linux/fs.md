@@ -21,6 +21,25 @@
 ```shell
 zcat /proc/config.gz
 ```
+### /proc/kcore
+`fs/proc/kcore.c`
+动态的内核文件 包含了系统中内核运行的所有数据
+### /proc/irq
+IRQ中断请求的详细信息
+
+- default_smp_affinity 指明了适用于所有非激活IRQ的默认亲和性掩码 一旦IRQ被 分配/激活，它的亲和位掩码将被设置为默认掩码。然后可以如上所述改变它。默认掩码是0xffffffff
+
+- IRQS(irq编号)
+	- smp_affinity 指定当前IRQ关联的CPU编号的掩码
+	- smp_affinity_list 指定当前IRQ关联的CPU编号的列表
+
+
+限制由CPU1来处理wifi 我的wifi的irq编号94
+```
+cd /proc/irq/94
+echo 1 > smp_affinity_list
+cat /proc/interrupts |grep -i 'CPU\|94:'
+```
 ## Inotify
 `linux/fs/notify/inotify`
 inotify是Linux核心子系统之一，做为文件系统的附加功能，它可监控文件系统并将异动通知应用程序。本系统的出现取代了旧有Linux核心里，拥有类似功能之dnotify模块。
