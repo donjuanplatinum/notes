@@ -132,3 +132,20 @@ perf stat -e cycles,instructions COMMAND
 perf record COMMAND
 perf annotate
 ```
+### 类似strace
+
+查看系统调用对应events
+```
+sudo perf list |grep -i syscalls
+```
+
+系统调用特殊events
+```
+raw_syscalls:sys_enter // 系统调用进入
+raw_syscalls:sys_exit // 系统调用退出
+vsyscall:emulate_vsyscall // vsyscall机制的仿真执行
+```
+追踪
+```
+
+```

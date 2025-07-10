@@ -140,3 +140,9 @@ int main(){
 	return 0;
 }
 ```
+# vsyscall
+Virtual Syscall 是Linux内核提供的快速系统调用机制 旨在减少用户态和内核态切换的开销 它最初用于优化某些频繁调用的系统调用（如 gettimeofday、time 等），通过映射一个只读内存页到用户空间，让用户程序直接读取数据，而无需进入内核
+
+# vDSO
+vsyscall的替代
+[vDSO](../noun.html#vDSO)

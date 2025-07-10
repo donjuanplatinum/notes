@@ -32,3 +32,13 @@ Symmetric Multi-Processing 对称多处理
 Advanced Configuration and Power Interface 高级配置与电源接口 
 
 管理计算机硬件的电源状态、配置、热管理、性能调节等
+### vDSO
+Virtual Dynamic Shared Object 虚拟动态共享对象
+
+Linux 内核提供的一种高效系统调用机制，用于优化某些频繁调用的系统调用 用于替代`vsyscall`
+ 
+将某些无副作用、只读、频繁调用的系统调用（如获取时间）直接映射到用户空间 
+
+- 无需进入内核
+- 零上下文切换
+
