@@ -42,3 +42,8 @@ Linux 内核提供的一种高效系统调用机制，用于优化某些频繁�
 - 无需进入内核
 - 零上下文切换
 
+## 硬件
+### SIMD
+Single Instruction Multiple Data 单指令多数据流技术
+
+SIMD (Single Instruction, Multiple Data) 是一种并行计算技术，它允许一条指令同时处理多个数据。

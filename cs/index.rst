@@ -12,3 +12,6 @@
    algori/index
    emacs/index
    noun
+   rust
+   cpp
+   nix

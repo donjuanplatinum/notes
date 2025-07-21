@@ -9,3 +9,4 @@
    shell
    misc
    perf
+   gdb

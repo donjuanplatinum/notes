@@ -4,6 +4,6 @@
 .. toctree::
 	      
    algs4
-
+   algori
    
 

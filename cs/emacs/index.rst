@@ -4,3 +4,4 @@ emacs
 .. toctree::
 
    eww
+   gdb
