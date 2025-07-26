@@ -47,3 +47,13 @@ Linux 内核提供的一种高效系统调用机制，用于优化某些频繁�
 Single Instruction Multiple Data 单指令多数据流技术
 
 SIMD (Single Instruction, Multiple Data) 是一种并行计算技术，它允许一条指令同时处理多个数据。
+## 说话术语
+### RTFM
+read the fucking manual
+
+通常用于回答基本问题，而这些问题的答案很容易在文档、用户指南、用户手册、手册页、在线帮助、网络论坛、软件文档或常见问题解答中找到。
+
+### LGTM
+Looks Good To Me
+
+表示review觉得可以

@@ -112,3 +112,96 @@ int main() {
   }
 }
 ```
+### 最大的行
+```c
+#include <stdio.h>
+#define IN 1
+#define OUT 0
+#define MAX 1000
+int _getline(char s[],int lim) {
+  int i = 0;
+  char c;
+  while (i < lim -1 &&(  c = getchar()) != EOF && c != '\n') {
+    s[i] = c;
+    ++i;
+  }
+  if (c == '\n') {
+    s[i] = c;
+    ++i;
+  }
+  s[i] = '\0';
+  return i;
+}
+void copy(char from[], char to[]) {
+  int i = 0;
+  while (from[i] != '\0') {
+    to[i] = from[i];
+    ++i;
+  }
+  to[i] = '\0';
+}
+int main() {
+  char c;
+  char string[MAX];
+  int len = 0;
+  int max_len = 0;
+  char max[MAX];
+  while ((len = _getline(string, MAX)) > 0) {
+    printf("%d",len);
+    if (len > max_len) {
+      copy(string, max);
+      max_len = len;
+      }
+  }
+  printf("%s",max);
+}
+
+```
+### 截断尾部空白
+```c
+void delete_tail_whitespace(char s[], int len) {
+  int index = len -1;
+  int add =0;
+  if (s[index] == '\n' && index == 0) {
+    s[index] = '\0';
+	return ;
+  }
+  if (s[index] != '\n') {
+    add = 0;
+  } else {add = 1;}
+  while (index > 0 && (s[index] == ' '|| s[index] == '\t' || s[index] == '\n')) {
+    s[index] = '\0';
+    --index;
+  }
+  if (add == 1) {
+    s[(++index)] = '\n';
+  }
+}
+```
+
+### 制表换空格
+```c
+int _getline_detab(char s[],int max){
+  char c;
+  int i = 0;
+  while (i < max - 1 && ((c = getchar()) != EOF) && c != '\n') {
+      if (c != '\t'){
+	s[i] = c;
+	++i;
+      } else {
+	int count = 8 - (i % 8);
+	while (count >0) {
+	  s[i] = ' ';
+	  ++i;
+	  --count;
+	}
+      }
+  }
+  if (c == '\n') {
+      s[i] = '\n';
+      ++i;
+    }
+  s[i] = '\0';
+  return i;
+}
+```
