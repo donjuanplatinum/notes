@@ -242,6 +242,9 @@ emerge fcitx fcitx-rime fcitx-configtools
 
 在输入法->添加输入法 添加中州韵
 ***** /etc/environment
+:PROPERTIES:
+:HEADER-ARGS: :tangle etc/environment :mkdirp yes
+:END:
 #+begin_src shell
   #
   # This file is parsed by pam_env module

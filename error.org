@@ -18,6 +18,8 @@
     - [[#gnome][gnome]]
       - [[#关于gnome下wayland的问题][关于Gnome下wayland的问题]]
         - [[#nvidia][nvidia]]
+    - [[#系统][系统]]
+      - [[#btd_service_connect-a2dp-sink-profile-connect-failed][btd_service_connect() a2dp-sink profile connect failed]]
 
 ** 环境问题
 *** opengl
@@ -122,3 +124,13 @@ height=(int)1080,
 #+begin_src shell
  __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia COMMAND
 #+end_src
+
+*** 系统
+
+**** btd_service_connect() a2dp-sink profile connect failed
+bluetooth缺少pulseaudio支持 安装对应的包
+#+begin_src shell
+  sudo pacman -S pulseaudio-bluetooth
+#+end_src
+
+
