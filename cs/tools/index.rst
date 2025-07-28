@@ -10,3 +10,4 @@
    misc
    perf
    gdb
+   cpupower
