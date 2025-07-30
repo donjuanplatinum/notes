@@ -42,6 +42,9 @@ Linux 内核提供的一种高效系统调用机制，用于优化某些频繁�
 - 无需进入内核
 - 零上下文切换
 
+## Linux
+### FUSE
+Filesystem in UserSpace 用户空间中的文件系统 为用户提供了一种无需特殊权限即可挂载文件系统的方法（Linux 中的挂载通常保留给具有管理权限的用户 ）。
 ## 硬件
 ### SIMD
 Single Instruction Multiple Data 单指令多数据流技术

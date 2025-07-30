@@ -344,9 +344,9 @@ F4选择即可
 
 ### 删除包
 
-    emerge --unmerge package
-    emerge --deselect package
-    emerge --depclean
+    emerge --unmerge/-C package # 危险 会直接删除此软件包且可能破坏系统
+    emerge --deselect package # 从@world中移除但不卸载
+    emerge --depclean/-c # 删除软件包与依赖
 
 
 <a id="org5645537"></a>
@@ -365,8 +365,8 @@ F4选择即可
     emerge --pretend package # 查看依赖
     emerge --fetchonly package # 仅下载源代码至/var/cache/distfiles
     emerge =package-version # 安装指定版本
-
-
+	emerge -1 # 不加入@world
+	emerge -v1nt @set  # 安装set集合的包并且不加入world
 <a id="org1ab55c6"></a>
 
 ### 系统更新
