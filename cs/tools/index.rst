@@ -11,3 +11,4 @@
    perf
    gdb
    cpupower
+   inotify-tools
