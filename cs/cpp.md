@@ -15,7 +15,7 @@ std::cin.tie(nullptr)
 ```
 
 注意
-## 程序
+## 程序(C)
 ### 单词计数
 ```c
 #include <stdio.h>
@@ -180,12 +180,13 @@ void delete_tail_whitespace(char s[], int len) {
 ```
 
 ### 制表换空格
+行处理
 ```c
 int _getline_detab(char s[],int max){
   char c;
   int i = 0;
   while (i < max - 1 && ((c = getchar()) != EOF) && c != '\n') {
-      if (c != '\t'){
+if (c != '\t'){
 	s[i] = c;
 	++i;
       } else {
@@ -203,5 +204,32 @@ int _getline_detab(char s[],int max){
     }
   s[i] = '\0';
   return i;
+}
+```
+逐字处理
+```c
+
+void detab(char s[]){
+  int c;
+  int count = 0; 
+  int pos = 0;
+  while ( (c = getchar()) != EOF){
+    if (c == '\t'){
+      pos %= 8;
+      count = 8 - pos;
+      while (count >0) {
+	putchar(' ');
+	--count;
+      }
+      pos =0;
+    } else  {
+      putchar(c);
+      ++pos;
+	  if (c == '\n') {
+		  pos = 0;
+	  }
+    }
+
+  }
 }
 ```

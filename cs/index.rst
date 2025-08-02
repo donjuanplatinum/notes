@@ -15,3 +15,4 @@
    rust
    cpp
    nix
+   regexp

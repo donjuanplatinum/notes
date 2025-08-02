@@ -12,3 +12,4 @@
    gdb
    cpupower
    inotify-tools
+   sed
