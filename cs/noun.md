@@ -50,6 +50,8 @@ Filesystem in UserSpace 用户空间中的文件系统 为用户提供了一种�
 Single Instruction Multiple Data 单指令多数据流技术
 
 SIMD (Single Instruction, Multiple Data) 是一种并行计算技术，它允许一条指令同时处理多个数据。
+### ASoC
+Advanced Linux Sound Architecture 高级Linux声音架构  Linux 系统中用于处理嵌入式设备音频功能的架构
 ## 说话术语
 ### RTFM
 read the fucking manual
@@ -60,3 +62,6 @@ read the fucking manual
 Looks Good To Me
 
 表示review觉得可以
+## coding
+### UB
+Undefined Behavoir 未定义行为

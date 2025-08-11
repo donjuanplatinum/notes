@@ -13,3 +13,4 @@
    cpupower
    inotify-tools
    sed
+   awk

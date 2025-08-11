@@ -16,3 +16,4 @@
    cpp
    nix
    regexp
+   logic

@@ -233,3 +233,47 @@ void detab(char s[]){
   }
 }
 ```
+### 空格换制表
+```c
+void entab(char s[]) {
+  int num_space = 0;
+  int num_tab = 0;
+  int pos = 0;
+  char c;
+  while ( (c = getchar()) != EOF) {
+    ++pos;
+    if (c == ' ') {
+      if ((pos % TABINC) != 0) {
+	++num_space;
+      } else {
+	num_space = 0;
+	++num_tab;
+      }
+    } else {
+      while (num_tab> 0) {
+	putchar('\t');
+	--num_tab;
+      }
+      if (c == '\t') {
+	num_space =0;
+      } else {
+	while (num_space >0) {
+	  putchar(' ');
+	  --num_space;
+	}
+      }
+      putchar(c);
+      if (c == '\n') {
+	pos = 0;
+      } else if (c == '\t') {
+	pos = pos + (TABINC - (pos - 1) % TABINC) - 1;
+      }
+    }
+  }
+  
+}
+```
+### 获得n低位全为1的屏蔽码
+```c
+~(~0 << n)
+```

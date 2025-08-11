@@ -204,6 +204,12 @@ bluetooth缺少pulseaudio支持 安装对应的包
     sudo pacman -S pulseaudio-bluetooth
 
 
+### podman
+#### Error: OCI runtime error: crun: sd-bus call: Process org.freedesktop.systemd1 exited with status 1: Input/output error
+解除DBUS_SESSION_BUS_ADDRESS环境变量
+```
+DBUS_SESSION_BUS_ADDRESS=
+```
 ## 编译问题
 ### ninjia
 #### ninja: error: manifest 'build.ninja' still dirty after 100 tries, perhaps system time is not set

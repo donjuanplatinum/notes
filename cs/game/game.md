@@ -61,3 +61,7 @@ Client
 ```
 -XX:+UseG1GC -Xmx8G -Xms8G -Dsun.rmi.dgc.server.gcInterval=600000 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32
 ```
+### cdda大灾变
+不知为何 gentoo的cdda会提示ncurses错误
+所以使用chroot一个archlinux环境游玩
+同时复制/usr/share/locales/zh_CN 到arch 里面有cdda的中文

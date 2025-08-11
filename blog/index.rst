@@ -4,4 +4,6 @@
 .. toctree::
    :maxdepth: 1
 
-   gz
+   life/index
+   android
+   

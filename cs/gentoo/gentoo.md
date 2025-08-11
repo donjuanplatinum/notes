@@ -347,6 +347,7 @@ F4选择即可
     emerge --unmerge/-C package # 危险 会直接删除此软件包且可能破坏系统
     emerge --deselect package # 从@world中移除但不卸载
     emerge --depclean/-c # 删除软件包与依赖
+	emerge -cvp --with-bdeps=y --deep # 深度清理
 
 
 <a id="org5645537"></a>
