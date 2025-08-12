@@ -40,6 +40,10 @@ cd /proc/irq/94
 echo 1 > smp_affinity_list
 cat /proc/interrupts |grep -i 'CPU\|94:'
 ```
+### /proc/cmdline
+当前内核的启动参数
+### /proc/mounts
+已挂载文件系统表
 ## Inotify
 `linux/fs/notify/inotify`
 inotify是Linux核心子系统之一，做为文件系统的附加功能，它可监控文件系统并将异动通知应用程序。本系统的出现取代了旧有Linux核心里，拥有类似功能之dnotify模块。

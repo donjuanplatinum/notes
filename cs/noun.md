@@ -43,6 +43,12 @@ Linux 内核提供的一种高效系统调用机制，用于优化某些频繁�
 - 零上下文切换
 
 ## Linux
+### KMS
+Kernel Mode Setting 内核级显示模式设置
+
+作用是可以在内核级别而不是最终用户级别切换显示分辨率和颜色深度。
+
+Linux 内核的 KMS 实现支持在 framebuffer 中使用原生分辨率和即时终端(tty)切换。KMS 使用了更新的技术(例如 DRI2)，可以减少失真、增强3D性能，甚至使用内核空间节能功能。
 ### FUSE
 Filesystem in UserSpace 用户空间中的文件系统 为用户提供了一种无需特殊权限即可挂载文件系统的方法（Linux 中的挂载通常保留给具有管理权限的用户 ）。
 ## 硬件
@@ -52,6 +58,10 @@ Single Instruction Multiple Data 单指令多数据流技术
 SIMD (Single Instruction, Multiple Data) 是一种并行计算技术，它允许一条指令同时处理多个数据。
 ### ASoC
 Advanced Linux Sound Architecture 高级Linux声音架构  Linux 系统中用于处理嵌入式设备音频功能的架构
+### DSDT
+Differentiated System Description Table  DSDT是ACPI规格的一部分 它提供了关于一个给定系统中受支持的电源事件的信息 通常 Linux遇到的问题是某些ACPI功能的缺失 比如风扇不转 盖子合上时屏幕不熄灭等等 这些问题可以归咎于DSDT是为Windows所定制的 安装后可以打补丁来修复这些问题
+
+基本上来说 一个DSDT表是运行在ACPI(电源管理)上的代码
 ## 说话术语
 ### RTFM
 read the fucking manual
