@@ -56,3 +56,24 @@ transparent告诉编译器MaybeUninit是包装器 它的内存布局与内部非
 相较于union,enum会多存储判别值
 
 union保证了0开销
+## 库
+### ribir
+一个gui库
+
+UI直接操作数据，数据的修改直接驱动UI的更新，不需要任何中间层和概念。
+
+#### widget
+在ribir中 widget是核心概念.对视图进行描述的基本单元,
+
+在形式上它可以是一个按钮，一个文本框，一个列表，一个对话框，甚至是整个应用界面.
+
+在代码上，它可以是一个函数，一个闭包或者一个数据对象
+
+widget被分为4类:
+- 函数 widget
+- Compose widget
+- Render widget
+- ComposeChild widget
+
+##### 函数wdget
+接收 `&BuildCtx` 作为参数 并返回Widget的函数或闭包

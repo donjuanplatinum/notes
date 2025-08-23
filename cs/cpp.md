@@ -15,6 +15,17 @@ std::cin.tie(nullptr)
 ```
 
 注意
+### 元素删除
+```cpp
+int k {0};
+for (int i {0};i < array.len;++i) { // i遍历数组
+	if (array[i] != target) { // 不是目标元素则递增k
+		array[k] = array[i]; // 将i补到k
+		k++; 
+	}
+	array.len = k; // 修改边界
+}
+```
 ## 程序(C)
 ### 单词计数
 ```c

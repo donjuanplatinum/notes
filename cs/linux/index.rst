@@ -7,3 +7,4 @@ Linux
    syscall
    fs
    inotify
+   selinux
