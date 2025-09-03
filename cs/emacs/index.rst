@@ -6,3 +6,5 @@ emacs
    eww
    gdb
    dired
+   wanderlust
+   elisp
