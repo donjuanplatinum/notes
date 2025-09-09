@@ -8,3 +8,5 @@ Linux
    fs
    inotify
    selinux
+   man
+

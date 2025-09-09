@@ -31,7 +31,7 @@ TODO: sed awk regexp
    cs/index
    math/index
    blog/index
-
+   todo/index
 	   
 
 Doc

@@ -13,20 +13,6 @@
 | 语法     | 形式 |
 |----------|------|
 | 声明参数 | &optional arg1     |
-## 注释
-### 特殊标记
-| 注释           | 作用     |
-|----------------|----------|
-| ;;;###autoload | 用于实现自动加载 类似于lazy_init 只在使用时加载 |
-
-## 原始函数
-函数定义与调用
-```emacs-lisp
-(defun add (a b)
-	(+ a b)
-)
-(add 5 3)
-```
 
 声明参数的特殊语法
 | 参数      | 行为                                                                     |
@@ -34,6 +20,15 @@
 | &optional | 代表此参数可选 可以传入或不传入(只能使用一次 且置于必选参数后,&rest之前) |
 | &rest     | 可变长度参数                                                             |
 | &key      | 在elisp不可用,但可用cl-defun等效                                         |
+
+
+## 注释
+### 特殊标记
+| 注释           | 作用     |
+|----------------|----------|
+| ;;;###autoload | 用于实现自动加载 类似于lazy_init 只在使用时加载 |
+
+## 原始函数
 这些函数就像rust的原始类型一般 基本由C语言实现 内置于emacs中
 ### integerp
 这是一个C语言的内置函数
@@ -61,7 +56,31 @@
 (downcase OBJ)
 ```
 ### buffer-substring
+返回start和end之间的字符串 
+```emacs-lisp
+(buffer-substring START END)
+```
+### looking-at
+如果光标后的字符与正则表达式 REGEXP 匹配 则返回 t.
+```emacs-lisp
+(looking-at REGEXP &optional INHIBIT-MODIFY)
+```
+经常与match-end match-beginning match-data连用
 
+### match-end
+返回上一次搜索所匹配文本的结束位置
+```emacs-lisp
+(match-end SUBEXP)
+```
+SUBEXP是正则表达式的子表达式的序号
+
+若SUBEXP=0 则返回整个正则表达式或整个字符串所匹配文本的结束位置
+### assoc
+查询关联列表
+```emacs-lisp
+(assoc KEY ALIST &optional TESTFN)
+```
+TESTFN是比较比较器 默认为equal
 ## 内置函数
 这些函数也基本由c语言实现 内置于emacs中
 ### interactive
@@ -79,6 +98,7 @@ interactive是内置函数 由c语言编写
 
 
 可用的代码字母有：
+```
 a -- 函数名：具有函数定义的符号。
 b -- 已存在缓冲区的名称。
 B -- 缓冲区名称，可能不存在。
@@ -110,11 +130,43 @@ x -- 读取但不求值的 Lisp 表达式。
 X -- 读取并求值的 Lisp 表达式。
 z -- 编码系统。
 Z -- 编码系统，如果没有前缀参数则为 nil。
+```
 
 此外，如果字符串以'*' 开头，则当缓冲区为只读时会发出错误信号。
+
 如果字符串以 '@' 开头，并且用于调用命令的键序列包含任何鼠标事件，则在运行命令之前会选中与这些事件中的第一个相关联的窗口。
+
 如果字符串以 '^' 开头且'shift-select-mode' 为非 nil，Emacs 会首先调用函数 'handle-shift-selection'。
+
 你可以同时使用 '@'、'' 和 '^'。它们会按照出现的顺序处理，在读取任何参数之前。
 
 如果存在 MODES，它应该是一个或多个此命令适用的模式名称（符号）。这样，'M-x TAB' 就能在当前缓冲区的模式与列表不匹配时，将此命令从补全候选列表中排除。
+
 基于此信息排除哪些命令由 'read-extended-command-predicate' 的值控制，详见其说明。
+
+## 数据结构
+### alist
+关联列表 存储键值对
+```emacs-lisp
+(setq alist '((name . "Alice") (age . 30) (city . "Beijing")))
+(assoc 'age alist)
+```
+## 常用
+### play-sound
+播放声音
+
+SOUND 是一种形式为 (sound KEYWORD VALUE...) 的列表。
+
+支持以下关键字：
+
+:file FILE - 从文件 FILE 中读取声音数据。如果 FILE 不是绝对文件名，则会在 data-directory（数据目录）中搜索该文件。
+
+:data DATA - 从字符串 DATA 中读取声音数据。
+
+注意：必须且只能指定 :file 或 :data 中的一项。
+
+:volume VOL - 将音量设置为 VOL。VOL 必须是 0..100 范围内的整数，或 0..1.0 范围内的浮点数。如果未指定，则不更改声音设备的音量设置。
+
+:device DEVICE - 在设备 DEVICE 上播放声音。如果未指定，则使用与系统相关的默认设备名称。
+
+注意：目前 Windows 系统不支持 :data 和 :device 关键字。

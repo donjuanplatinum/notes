@@ -3,7 +3,6 @@ emacs自带morse电码的操作函数 `unmorse-region` 和 `morse-region`
 
 其定义于`morse.el` `/usr/share/emacs/30.1/lisp/play/morse.el`
 
-
 ## morse.el
 在morse.el中 定义了morse-code的list
 ```emacs-lisp

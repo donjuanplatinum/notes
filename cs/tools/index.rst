@@ -14,3 +14,7 @@
    inotify-tools
    sed
    awk
+   pmap
+   top
+   ipcs
+   rfkill
