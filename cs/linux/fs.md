@@ -88,6 +88,16 @@ cat /proc/interrupts |grep -i 'CPU\|94:'
 | Locked          | 锁定内存: 被mlock等调用锁定                                                                            |
 ### /proc/mounts
 已挂载文件系统表
+## sysfs
+### /sys/devices/system/cpu/CPUID/cpufreq
+内核的cpu频率调节接口
+
+- scaling_cur_frequencies: 当前cpu频率
+- scaling_min_freq: 当前频率下限
+- scaling_max_freq: 上限
+- scaling_governor: 当前调节器
+- scaling_drvier: 当前驱动
+- scaling_available_governors: 可用调节器
 ## Inotify
 `linux/fs/notify/inotify`
 inotify是Linux核心子系统之一，做为文件系统的附加功能，它可监控文件系统并将异动通知应用程序。本系统的出现取代了旧有Linux核心里，拥有类似功能之dnotify模块。

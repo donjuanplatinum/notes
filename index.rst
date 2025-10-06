@@ -32,7 +32,7 @@ TODO: sed awk regexp
    math/index
    blog/index
    todo/index
-	   
+   latex
 
 Doc
 

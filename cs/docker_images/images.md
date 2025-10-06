@@ -929,6 +929,7 @@ dns txt记录认证
 
 docker-compose.yml
 
+```
       # Use postgres/example user/password credentials
     version: '3.9'
     
@@ -937,6 +938,9 @@ docker-compose.yml
       db:
         image: postgres
         restart: always
+		container_name: postgres
+		network:
+		 postgres:
         # set shared memory limit when using docker-compose
         shm_size: 128mb
         # or set shared memory limit when deploy via swarm stack
@@ -948,8 +952,12 @@ docker-compose.yml
         volumes:
             - ./data:/var/lib/postgresql/data
         environment:
+			POSTGRES_USER: user
             POSTGRES_PASSWORD: example
-
+	  networks:
+	    postgres:
+		 external: true
+```
 
 <a id="org3341520"></a>
 
@@ -1101,9 +1109,75 @@ data/id<sub>ed25519.pub</sub>
 <a id="orge08f54d"></a>
 
 ### compose
+```
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    # Provide the FQDN of your mail server here (Your DNS MX record should point to this value)
+    # hostname: mail.example.com
+    domainname: donplat.top
+      #    env_file: mailserver.env
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    ports:
+      - "25:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP (implicit TLS)
+      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "993:993"  # IMAP4 (implicit TLS)
+    volumes:
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-state/:/var/mail-state/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/letsencrypt/:/etc/letsencrypt
+    environment:
+      - SSL_TYPE=manual
+      - SSL_CERT_PATH=/etc/letsencrypt/live/donplat.top-0001/fullchain.pem
+      - SSL_KEY_PATH=/etc/letsencrypt/live/donplat.top-0001/privkey.pem
+    restart: always
+    stop_grace_period: 1m
+    # Uncomment if using `ENABLE_FAIL2BAN=1`:
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
+
+```
 
 
-<a id="org9d3733d"></a>
+添加用户
+```
+setup email add donjuan@donplat.top password
+```
+
+配置dkim
+```
+setup config dkim
+```
+
+生成于`/tmp/docker-mailserver/opendkim/`
+
+设置dns记录
+type: TXT 
+name: mail._domainkey
+data: 文件内容()
+```
+mail._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+"p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqQMMqhb1S52Rg7VFS3EC6JQIMxNDdiBmOKZvY5fiVtD3Z+yd9ZV+V8e4IARVoMXWcJWSR6xkloitzfrRtJRwOYvmrcgugOalkmM0V4Gy/2aXeamuiBuUc4esDQEI3egmtAsHcVY1XCoYfs+9VqoHEq3vdr3UQ8zP/l+FP5UfcaJFCK/ZllqcO2P1GjIDVSHLdPpRHbMP/tU1a9mNZ"
+"5QMZBJ/JuJK/s+2bp8gpxKn8rh1akSQjlynlV9NI+7J3CC7CUf3bGvoXIrb37C/lpJehS39KNtcGdaRufKauSfqx/7SxA0zyZC+r13f7ASbMaQFzm+/RRusTqozY/p/MsWx8QIDAQAB"
+) ; # 生成的文件
+
+data区域的内容: v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqQMMqhb1S52Rg7VFS3EC6JQIMxNDdiBmOKZvY5fiVtD3Z+yd9ZV+V8e4IARVoMXWcJWSR6xkloitzfrRtJRwOYvmrcgugOalkmM0V4Gy/2aXeamuiBuUc4esDQEI3egmtAsHcVY1XCoYfs+9VqoHEq3vdr3UQ8zP/l+FP5UfcaJFCK/ZllqcO2P1GjIDVSHLdPpRHbMP/tU1a9mNZ5QMZBJ/JuJK/s+2bp8gpxKn8rh1akSQjlynlV9NI+7J3CC7CUf3bGvoXIrb37C/lpJehS39KNtcGdaRufKauSfqx/7SxA0zyZC+r13f7ASbMaQFzm+/RRusTqozY/p/MsWx8QIDAQAB
+
+```
+
+用户配置文件`docker-data/dms/config/postfix-accounts.cf`
 
 ## v2raya
 
@@ -1115,3 +1189,774 @@ data/id<sub>ed25519.pub</sub>
     podman run -itd   --name v2raya   --restart=always   --security-opt no-new-privileges   --cap-drop all   --network host   --memory=500M   --volume .:/etc/v2raya:z   docker.io/mzz2017/v2raya
 
 
+## Jitsi
+开源的会议
+
+### .env
+```
+# shellcheck disable=SC2034
+
+################################################################################
+################################################################################
+# Welcome to the Jitsi Meet Docker setup!
+#
+# This sample .env file contains some basic options to get you started.
+# The full options reference can be found here:
+# https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-docker
+################################################################################
+################################################################################
+
+
+#
+# Basic configuration options
+#
+
+# Directory where all configuration will be stored
+CONFIG=~/.jitsi-meet-cfg
+
+# Exposed HTTP port (will redirect to HTTPS port)
+HTTP_PORT=8000
+
+# Exposed HTTPS port
+HTTPS_PORT=8443
+
+# System time zone
+TZ=UTC
+
+# Public URL for the web service (required)
+# Keep in mind that if you use a non-standard HTTPS port, it has to appear in the public URL
+#PUBLIC_URL=https://meet.example.com:${HTTPS_PORT}
+
+# Media IP addresses to advertise by the JVB
+# This setting deprecates DOCKER_HOST_ADDRESS, and supports a comma separated list of IPs
+# See the "Running behind NAT or on a LAN environment" section in the Handbook:
+# https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-docker#running-behind-nat-or-on-a-lan-environment
+#JVB_ADVERTISE_IPS=192.168.1.1,1.2.3.4
+
+#
+# Memory limits for Java components
+#
+
+#JICOFO_MAX_MEMORY=3072m
+#VIDEOBRIDGE_MAX_MEMORY=3072m
+
+#
+# JaaS Components (beta)
+# https://jaas.8x8.vc
+#
+
+# Enable JaaS Components (hosted Jigasi)
+# NOTE: if Let's Encrypt is enabled a JaaS account will be automatically created, using the provided email in LETSENCRYPT_EMAIL
+#ENABLE_JAAS_COMPONENTS=0
+
+#
+# Let's Encrypt configuration
+#
+
+# Enable Let's Encrypt certificate generation
+#ENABLE_LETSENCRYPT=1
+
+# Domain for which to generate the certificate
+#LETSENCRYPT_DOMAIN=meet.example.com
+
+# E-Mail for receiving important account notifications (mandatory)
+#LETSENCRYPT_EMAIL=alice@atlanta.net
+
+# Use the staging server (for avoiding rate limits while testing)
+#LETSENCRYPT_USE_STAGING=1
+
+# Set ACME server. Default is zerossl, you can peek one at https://github.com/acmesh-official/acme.sh/wiki/Server
+#LETSENCRYPT_ACME_SERVER="letsencrypt"
+
+#
+# Etherpad integration (for document sharing)
+#
+
+# Set the etherpad-lite URL in the docker local network (uncomment to enable)
+#ETHERPAD_URL_BASE=http://etherpad.meet.jitsi:9001
+
+# Set etherpad-lite public URL, including /p/ pad path fragment (uncomment to enable)
+#ETHERPAD_PUBLIC_URL=https://etherpad.my.domain/p/
+
+
+#
+# Whiteboard integration
+#
+
+# Set the excalidraw-backend URL in the docker local network (uncomment to enable)
+#WHITEBOARD_COLLAB_SERVER_URL_BASE=http://whiteboard.meet.jitsi
+
+# Set the excalidraw-backend public URL (uncomment to enable)
+#WHITEBOARD_COLLAB_SERVER_PUBLIC_URL=https://whiteboard.meet.my.domain
+
+
+#
+# Basic Jigasi configuration options (needed for SIP gateway support)
+#
+
+# SIP URI for incoming / outgoing calls
+#JIGASI_SIP_URI=test@sip2sip.info
+
+# Password for the specified SIP account as a clear text
+#JIGASI_SIP_PASSWORD=passw0rd
+
+# SIP server (use the SIP account domain if in doubt)
+#JIGASI_SIP_SERVER=sip2sip.info
+
+# SIP server port
+#JIGASI_SIP_PORT=5060
+
+# SIP server transport
+#JIGASI_SIP_TRANSPORT=UDP
+
+
+#
+# Authentication configuration (see handbook for details)
+#
+
+# Enable authentication (will ask for login and password to join the meeting)
+#ENABLE_AUTH=1
+
+# Enable guest access (if authentication is enabled, this allows for users to be held in lobby until registered user lets them in)
+#ENABLE_GUESTS=1
+
+# Select authentication type: internal, jwt, ldap or matrix
+#AUTH_TYPE=internal
+
+# JWT authentication
+#
+
+# Application identifier
+#JWT_APP_ID=my_jitsi_app_id
+
+# Application secret known only to your token generator
+#JWT_APP_SECRET=my_jitsi_app_secret
+
+# (Optional) Set asap_accepted_issuers as a comma separated list
+#JWT_ACCEPTED_ISSUERS=my_web_client,my_app_client
+
+# (Optional) Set asap_accepted_audiences as a comma separated list
+#JWT_ACCEPTED_AUDIENCES=my_server1,my_server2
+
+# LDAP authentication (for more information see the Cyrus SASL saslauthd.conf man page)
+#
+
+# LDAP url for connection
+#LDAP_URL=ldaps://ldap.domain.com/
+
+# LDAP base DN. Can be empty
+#LDAP_BASE=DC=example,DC=domain,DC=com
+
+# LDAP user DN. Do not specify this parameter for the anonymous bind
+#LDAP_BINDDN=CN=binduser,OU=users,DC=example,DC=domain,DC=com
+
+# LDAP user password. Do not specify this parameter for the anonymous bind
+#LDAP_BINDPW=LdapUserPassw0rd
+
+# LDAP filter. Tokens example:
+# %1-9 - if the input key is user@mail.domain.com, then %1 is com, %2 is domain and %3 is mail
+# %s - %s is replaced by the complete service string
+# %r - %r is replaced by the complete realm string
+#LDAP_FILTER=(sAMAccountName=%u)
+
+# LDAP authentication method
+#LDAP_AUTH_METHOD=bind
+
+# LDAP version
+#LDAP_VERSION=3
+
+# LDAP TLS using
+#LDAP_USE_TLS=1
+
+# List of SSL/TLS ciphers to allow
+#LDAP_TLS_CIPHERS=SECURE256:SECURE128:!AES-128-CBC:!ARCFOUR-128:!CAMELLIA-128-CBC:!3DES-CBC:!CAMELLIA-128-CBC
+
+# Require and verify server certificate
+#LDAP_TLS_CHECK_PEER=1
+
+# Path to CA cert file. Used when server certificate verify is enabled
+#LDAP_TLS_CACERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
+# Path to CA certs directory. Used when server certificate verify is enabled
+#LDAP_TLS_CACERT_DIR=/etc/ssl/certs
+
+# Wether to use starttls, implies LDAPv3 and requires ldap:// instead of ldaps://
+# LDAP_START_TLS=1
+
+
+#
+# Security
+#
+# Set these to strong passwords to avoid intruders from impersonating a service account
+# The service(s) won't start unless these are specified
+# Running ./gen-passwords.sh will update .env with strong passwords
+# You may skip the Jigasi and Jibri passwords if you are not using those
+# DO NOT reuse passwords
+#
+
+# XMPP password for Jicofo client connections
+JICOFO_AUTH_PASSWORD=
+
+# XMPP password for JVB client connections
+JVB_AUTH_PASSWORD=
+
+# XMPP password for Jigasi MUC client connections
+JIGASI_XMPP_PASSWORD=
+
+# XMPP password for Jigasi transcriber client connections
+JIGASI_TRANSCRIBER_PASSWORD=
+
+# XMPP recorder password for Jibri client connections
+JIBRI_RECORDER_PASSWORD=
+
+# XMPP password for Jibri client connections
+JIBRI_XMPP_PASSWORD=
+
+#
+# Docker Compose options
+#
+
+# Container restart policy
+#RESTART_POLICY=unless-stopped
+
+# Jitsi image version (useful for local development)
+#JITSI_IMAGE_VERSION=latest
+```
+```
+mkdir -p ~/.jitsi-meet-cfg/{web,transcripts,prosody/config,prosody/prosody-plugins-custom,jicofo,jvb,jigasi,jibri}
+mkdir "~/.jitsi-meet-cfg/$_"
+```
+
+### compose
+```
+services:
+    # Frontend
+    web:
+        image: jitsi/web:${JITSI_IMAGE_VERSION:-unstable}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        ports:
+            - '${HTTP_PORT}:80'
+            - '${HTTPS_PORT}:443'
+        volumes:
+            - ${CONFIG}/web:/config:Z
+            - ${CONFIG}/web/crontabs:/var/spool/cron/crontabs:Z
+            - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
+            - ${CONFIG}/web/load-test:/usr/share/jitsi-meet/load-test:Z
+        labels:
+            service: "jitsi-web"
+        environment:
+            - AMPLITUDE_ID
+            - ANALYTICS_SCRIPT_URLS
+            - ANALYTICS_WHITELISTED_EVENTS
+            - AUDIO_QUALITY_OPUS_BITRATE
+            - AUTO_CAPTION_ON_RECORD
+            - BRANDING_DATA_URL
+            - BWE_ESTIMATOR_ENGINE
+            - BOSH_RELATIVE
+            - CHROME_EXTENSION_BANNER_JSON
+            - CODEC_ORDER_JVB
+            - CODEC_ORDER_JVB_MOBILE
+            - CODEC_ORDER_P2P
+            - CODEC_ORDER_P2P_MOBILE
+            - COLIBRI_WEBSOCKET_PORT
+            - COLIBRI_WEBSOCKET_JVB_LOOKUP_NAME
+            - COLIBRI_WEBSOCKET_REGEX
+            - CONFCODE_URL
+            - CORS_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN
+            - DEFAULT_LANGUAGE
+            - DEPLOYMENTINFO_ENVIRONMENT
+            - DEPLOYMENTINFO_ENVIRONMENT_TYPE
+            - DEPLOYMENTINFO_REGION
+            - DEPLOYMENTINFO_SHARD
+            - DESKTOP_SHARING_FRAMERATE_AUTO
+            - DESKTOP_SHARING_FRAMERATE_MIN
+            - DESKTOP_SHARING_FRAMERATE_MAX
+            - DIALIN_NUMBERS_URL
+            - DIALOUT_AUTH_URL
+            - DIALOUT_CODES_URL
+            - DISABLE_AUDIO_LEVELS
+            - DISABLE_COLIBRI_WEBSOCKET_JVB_LOOKUP
+            - DISABLE_DEEP_LINKING
+            - DISABLE_GRANT_MODERATOR
+            - DISABLE_HTTPS
+            - DISABLE_KICKOUT
+            - DISABLE_LOCAL_RECORDING
+            - DISABLE_POLLS
+            - DISABLE_PRIVATE_CHAT
+            - DISABLE_PROFILE
+            - DISABLE_REACTIONS
+            - DISABLE_REMOTE_VIDEO_MENU
+            - DISABLE_START_FOR_ALL
+            - DROPBOX_APPKEY
+            - DROPBOX_REDIRECT_URI
+            - DYNAMIC_BRANDING_URL
+            - ENABLE_ADAPTIVE_MODE
+            - ENABLE_AUDIO_PROCESSING
+            - ENABLE_AUTOMATIC_GAIN_CONTROL
+            - ENABLE_AUTH
+            - ENABLE_AUTH_DOMAIN
+            - ENABLE_BREAKOUT_ROOMS
+            - ENABLE_CALENDAR
+            - ENABLE_COLIBRI_WEBSOCKET
+            - ENABLE_COLIBRI_WEBSOCKET_UNSAFE_REGEX
+            - ENABLE_E2EPING
+            - ENABLE_FILE_RECORDING_SHARING
+            - ENABLE_GUESTS
+            - ENABLE_HSTS
+            - ENABLE_HTTP_REDIRECT
+            - ENABLE_IPV6
+            - ENABLE_LETSENCRYPT
+            - ENABLE_NO_AUDIO_DETECTION
+            - ENABLE_NOISY_MIC_DETECTION
+            - ENABLE_OCTO
+            - ENABLE_OPUS_RED
+            - ENABLE_PREJOIN_PAGE
+            - ENABLE_P2P
+            - ENABLE_WELCOME_PAGE
+            - ENABLE_CLOSE_PAGE
+            - ENABLE_LIVESTREAMING
+            - ENABLE_LIVESTREAMING_DATA_PRIVACY_LINK
+            - ENABLE_LIVESTREAMING_HELP_LINK
+            - ENABLE_LIVESTREAMING_TERMS_LINK
+            - ENABLE_LIVESTREAMING_VALIDATOR_REGEXP_STRING
+            - ENABLE_LOAD_TEST_CLIENT
+            - ENABLE_LOCAL_RECORDING_NOTIFY_ALL_PARTICIPANT
+            - ENABLE_LOCAL_RECORDING_SELF_START
+            - ENABLE_RECORDING
+            - ENABLE_REMB
+            - ENABLE_REQUIRE_DISPLAY_NAME
+            - ENABLE_SERVICE_RECORDING
+            - ENABLE_SIMULCAST
+            - ENABLE_STATS_ID
+            - ENABLE_STEREO
+            - ENABLE_SUBDOMAINS
+            - ENABLE_TALK_WHILE_MUTED
+            - ENABLE_TCC
+            - ENABLE_TRANSCRIPTIONS
+            - ENABLE_VLA
+            - ENABLE_XMPP_WEBSOCKET
+            - ENABLE_JAAS_COMPONENTS
+            - ETHERPAD_PUBLIC_URL
+            - ETHERPAD_URL_BASE
+            - E2EPING_NUM_REQUESTS
+            - E2EPING_MAX_CONFERENCE_SIZE
+            - E2EPING_MAX_MESSAGE_PER_SECOND
+            - GOOGLE_ANALYTICS_ID
+            - GOOGLE_API_APP_CLIENT_ID
+            - HIDE_PREMEETING_BUTTONS
+            - HIDE_PREJOIN_DISPLAY_NAME
+            - HIDE_PREJOIN_EXTRA_BUTTONS
+            - INVITE_SERVICE_URL
+            - JVB_PREFER_SCTP
+            - LETSENCRYPT_DOMAIN
+            - LETSENCRYPT_EMAIL
+            - LETSENCRYPT_USE_STAGING
+            - LETSENCRYPT_ACME_SERVER
+            - MATOMO_ENDPOINT
+            - MATOMO_SITE_ID
+            - MICROSOFT_API_APP_CLIENT_ID
+            - NGINX_KEEPALIVE_TIMEOUT
+            - NGINX_RESOLVER
+            - NGINX_WORKER_PROCESSES
+            - NGINX_WORKER_CONNECTIONS
+            - PEOPLE_SEARCH_URL
+            - PREFERRED_LANGUAGE
+            - PUBLIC_URL
+            - P2P_PREFERRED_CODEC
+            - P2P_STUN_SERVERS
+            - RESOLUTION
+            - RESOLUTION_MIN
+            - RESOLUTION_WIDTH
+            - RESOLUTION_WIDTH_MIN
+            - START_AUDIO_MUTED
+            - START_AUDIO_ONLY
+            - START_SILENT
+            - START_WITH_AUDIO_MUTED
+            - START_VIDEO_MUTED
+            - START_WITH_VIDEO_MUTED
+            - TOKEN_AUTH_URL
+            - TOOLBAR_BUTTONS
+            - TRANSLATION_LANGUAGES
+            - TRANSLATION_LANGUAGES_HEAD
+            - TZ
+            - USE_APP_LANGUAGE
+            - VIDEOQUALITY_BITRATE_H264_LOW
+            - VIDEOQUALITY_BITRATE_H264_STANDARD
+            - VIDEOQUALITY_BITRATE_H264_HIGH
+            - VIDEOQUALITY_BITRATE_H264_FULL
+            - VIDEOQUALITY_BITRATE_H264_ULTRA
+            - VIDEOQUALITY_BITRATE_H264_SS_HIGH
+            - VIDEOQUALITY_BITRATE_VP8_LOW
+            - VIDEOQUALITY_BITRATE_VP8_STANDARD
+            - VIDEOQUALITY_BITRATE_VP8_HIGH
+            - VIDEOQUALITY_BITRATE_VP8_FULL
+            - VIDEOQUALITY_BITRATE_VP8_ULTRA
+            - VIDEOQUALITY_BITRATE_VP8_SS_HIGH
+            - VIDEOQUALITY_BITRATE_VP9_LOW
+            - VIDEOQUALITY_BITRATE_VP9_STANDARD
+            - VIDEOQUALITY_BITRATE_VP9_HIGH
+            - VIDEOQUALITY_BITRATE_VP9_FULL
+            - VIDEOQUALITY_BITRATE_VP9_ULTRA
+            - VIDEOQUALITY_BITRATE_VP9_SS_HIGH
+            - VIDEOQUALITY_BITRATE_AV1_LOW
+            - VIDEOQUALITY_BITRATE_AV1_STANDARD
+            - VIDEOQUALITY_BITRATE_AV1_HIGH
+            - VIDEOQUALITY_BITRATE_AV1_FULL
+            - VIDEOQUALITY_BITRATE_AV1_ULTRA
+            - VIDEOQUALITY_BITRATE_AV1_SS_HIGH
+            - VIDEOQUALITY_PREFERRED_CODEC
+            - XMPP_AUTH_DOMAIN
+            - XMPP_BOSH_URL_BASE
+            - XMPP_DOMAIN
+            - XMPP_GUEST_DOMAIN
+            - XMPP_MUC_DOMAIN
+            - XMPP_HIDDEN_DOMAIN
+            - XMPP_PORT
+            - XMPP_RECORDER_DOMAIN
+            - WHITEBOARD_COLLAB_SERVER_PUBLIC_URL
+            - WHITEBOARD_COLLAB_SERVER_URL_BASE
+        networks:
+            meet.jitsi:
+        depends_on:
+            - jvb
+
+    # XMPP server
+    prosody:
+        image: jitsi/prosody:${JITSI_IMAGE_VERSION:-unstable}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        expose:
+            - '${XMPP_PORT:-5222}'
+            - '${PROSODY_S2S_PORT:-5269}'
+            - '5347'
+            - '${PROSODY_HTTP_PORT:-5280}'
+        labels:
+            service: "jitsi-prosody"
+        volumes:
+            - ${CONFIG}/prosody/config:/config:Z
+            - ${CONFIG}/prosody/prosody-plugins-custom:/prosody-plugins-custom:Z
+        environment:
+            - AUTH_TYPE
+            - DISABLE_POLLS
+            - ENABLE_AUTH
+            - ENABLE_AV_MODERATION
+            - ENABLE_BREAKOUT_ROOMS
+            - ENABLE_END_CONFERENCE
+            - ENABLE_GUESTS
+            - ENABLE_IPV6
+            - ENABLE_LOBBY
+            - ENABLE_RECORDING
+            - ENABLE_S2S
+            - ENABLE_TRANSCRIPTIONS
+            - ENABLE_VISITORS
+            - ENABLE_XMPP_WEBSOCKET
+            - ENABLE_JAAS_COMPONENTS
+            - GC_TYPE
+            - GC_INC_TH
+            - GC_INC_SPEED
+            - GC_INC_STEP_SIZE
+            - GC_GEN_MIN_TH
+            - GC_GEN_MAX_TH
+            - GLOBAL_CONFIG
+            - GLOBAL_MODULES
+            - JIBRI_RECORDER_USER
+            - JIBRI_RECORDER_PASSWORD
+            - JIBRI_SIP_BREWERY_MUC
+            - JIBRI_XMPP_USER
+            - JIBRI_XMPP_PASSWORD
+            - JICOFO_AUTH_PASSWORD
+            - JICOFO_COMPONENT_SECRET
+            - JIGASI_TRANSCRIBER_PASSWORD
+            - JIGASI_TRANSCRIBER_USER
+            - JIGASI_XMPP_USER
+            - JIGASI_XMPP_PASSWORD
+            - JVB_AUTH_USER
+            - JVB_AUTH_PASSWORD
+            - JWT_APP_ID
+            - JWT_APP_SECRET
+            - JWT_ACCEPTED_ISSUERS
+            - JWT_ACCEPTED_AUDIENCES
+            - JWT_ASAP_KEYSERVER
+            - JWT_ALLOW_EMPTY
+            - JWT_AUTH_TYPE
+            - JWT_ENABLE_DOMAIN_VERIFICATION
+            - JWT_SIGN_TYPE
+            - JWT_TOKEN_AUTH_MODULE
+            - MATRIX_UVS_URL
+            - MATRIX_UVS_ISSUER
+            - MATRIX_UVS_AUTH_TOKEN
+            - MATRIX_UVS_SYNC_POWER_LEVELS
+            - MATRIX_LOBBY_BYPASS
+            - LOG_LEVEL
+            - LDAP_AUTH_METHOD
+            - LDAP_BASE
+            - LDAP_BINDDN
+            - LDAP_BINDPW
+            - LDAP_FILTER
+            - LDAP_VERSION
+            - LDAP_TLS_CIPHERS
+            - LDAP_TLS_CHECK_PEER
+            - LDAP_TLS_CACERT_FILE
+            - LDAP_TLS_CACERT_DIR
+            - LDAP_START_TLS
+            - LDAP_URL
+            - LDAP_USE_TLS
+            - MAX_PARTICIPANTS
+            - PROSODY_ADMINS
+            - PROSODY_AUTH_TYPE
+            - PROSODY_C2S_LIMIT
+            - PROSODY_C2S_REQUIRE_ENCRYPTION
+            - PROSODY_RESERVATION_ENABLED
+            - PROSODY_RESERVATION_REST_BASE_URL
+            - PROSODY_DISABLE_C2S_LIMIT
+            - PROSODY_DISABLE_S2S_LIMIT
+            - PROSODY_ENABLE_FILTER_MESSAGES
+            - PROSODY_ENABLE_RATE_LIMITS
+            - PROSODY_ENABLE_RECORDING_METADATA
+            - PROSODY_ENABLE_STANZA_COUNTS
+            - PROSODY_ENABLE_S2S
+            - PROSODY_ENABLE_METRICS
+            - PROSODY_GUEST_AUTH_TYPE
+            - PROSODY_HTTP_PORT
+            - PROSODY_LOG_CONFIG
+            - PROSODY_METRICS_ALLOWED_CIDR
+            - PROSODY_MODE
+            - PROSODY_RATE_LIMIT_LOGIN_RATE
+            - PROSODY_RATE_LIMIT_SESSION_RATE
+            - PROSODY_RATE_LIMIT_TIMEOUT
+            - PROSODY_RATE_LIMIT_ALLOW_RANGES
+            - PROSODY_RATE_LIMIT_CACHE_SIZE
+            - PROSODY_S2S_LIMIT
+            - PROSODY_S2S_PORT
+            - PROSODY_TRUSTED_PROXIES
+            - PROSODY_VISITOR_INDEX
+            - PROSODY_VISITORS_MUC_PREFIX
+            - PROSODY_VISITORS_S2S_VHOSTS
+            - PUBLIC_URL
+            - STUN_HOST
+            - STUN_PORT
+            - TURN_CREDENTIALS
+            - TURN_USERNAME
+            - TURN_PASSWORD
+            - TURN_HOST
+            - TURNS_HOST
+            - TURN_PORT
+            - TURNS_PORT
+            - TURN_TRANSPORT
+            - TURN_TTL
+            - TZ
+            - VISITORS_MAX_VISITORS_PER_NODE
+            - VISITORS_XMPP_DOMAIN
+            - VISITORS_XMPP_SERVER
+            - VISITORS_XMPP_PORT
+            - XMPP_BREAKOUT_MUC_MODULES
+            - XMPP_CONFIGURATION
+            - XMPP_DOMAIN
+            - XMPP_AUTH_DOMAIN
+            - XMPP_GUEST_DOMAIN
+            - XMPP_MUC_DOMAIN
+            - XMPP_INTERNAL_MUC_DOMAIN
+            - XMPP_LOBBY_MUC_MODULES
+            - XMPP_MODULES
+            - XMPP_MUC_MODULES
+            - XMPP_MUC_CONFIGURATION
+            - XMPP_INTERNAL_MUC_MODULES
+            - XMPP_HIDDEN_DOMAIN
+            - XMPP_PORT
+            - XMPP_RECORDER_DOMAIN
+            - XMPP_SERVER_S2S_PORT
+            - XMPP_SPEAKERSTATS_MODULES
+        networks:
+            meet.jitsi:
+                aliases:
+                    - ${XMPP_SERVER:-xmpp.meet.jitsi}
+
+    # Focus component
+    jicofo:
+        image: jitsi/jicofo:${JITSI_IMAGE_VERSION:-unstable}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        ports:
+            - '127.0.0.1:${JICOFO_REST_PORT:-8888}:8888'
+        volumes:
+            - ${CONFIG}/jicofo:/config:Z
+        labels:
+            service: "jitsi-jicofo"
+        environment:
+            - AUTH_TYPE
+            - BRIDGE_AVG_PARTICIPANT_STRESS
+            - BRIDGE_STRESS_THRESHOLD
+            - ENABLE_AUTH
+            - ENABLE_AUTO_OWNER
+            - ENABLE_MODERATOR_CHECKS
+            - ENABLE_CODEC_VP8
+            - ENABLE_CODEC_VP9
+            - ENABLE_CODEC_AV1
+            - ENABLE_CODEC_H264
+            - ENABLE_CODEC_OPUS_RED
+            - ENABLE_JVB_XMPP_SERVER
+            - ENABLE_OCTO
+            - ENABLE_OCTO_SCTP
+            - ENABLE_RECORDING
+            - ENABLE_SCTP
+            - ENABLE_SHARED_DOCUMENT_RANDOM_NAME
+            - ENABLE_TRANSCRIPTIONS
+            - ENABLE_VISITORS
+            - ENABLE_AUTO_LOGIN
+            - JICOFO_AUTH_LIFETIME
+            - JICOFO_AUTH_PASSWORD
+            - JICOFO_AUTH_TYPE
+            - JICOFO_BRIDGE_REGION_GROUPS
+            - JICOFO_ENABLE_AUTH
+            - JICOFO_ENABLE_BRIDGE_HEALTH_CHECKS
+            - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT
+            - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT
+            - JICOFO_CONF_SOURCE_SIGNALING_DELAYS
+            - JICOFO_CONF_MAX_AUDIO_SENDERS
+            - JICOFO_CONF_MAX_VIDEO_SENDERS
+            - JICOFO_CONF_STRIP_SIMULCAST
+            - JICOFO_CONF_SSRC_REWRITING
+            - JICOFO_ENABLE_HEALTH_CHECKS
+            - JICOFO_ENABLE_ICE_FAILURE_DETECTION
+            - JICOFO_ENABLE_LOAD_REDISTRIBUTION
+            - JICOFO_ENABLE_REST
+            - JICOFO_HEALTH_CHECKS_USE_PRESENCE
+            - JICOFO_ICE_FAILURE_INTERVAL
+            - JICOFO_ICE_FAILURE_MIN_ENDPOINTS
+            - JICOFO_ICE_FAILURE_THRESHOLD
+            - JICOFO_MAX_MEMORY
+            - JICOFO_MULTI_STREAM_BACKWARD_COMPAT
+            - JICOFO_OCTO_REGION
+            - JICOFO_RESTART_REQUEST_MAX
+            - JICOFO_RESTART_REQUEST_INTERVAL
+            - JICOFO_TRUSTED_DOMAINS
+            - JIBRI_BREWERY_MUC
+            - JIBRI_REQUEST_RETRIES
+            - JIBRI_PENDING_TIMEOUT
+            - JIGASI_BREWERY_MUC
+            - JIGASI_SIP_URI
+            - JIGASI_TRUSTED_DOMAINS
+            - JVB_BREWERY_MUC
+            - JVB_XMPP_AUTH_DOMAIN
+            - JVB_XMPP_INTERNAL_MUC_DOMAIN
+            - JVB_XMPP_PORT
+            - JVB_XMPP_SERVER
+            - MAX_BRIDGE_PARTICIPANTS
+            - OCTO_BRIDGE_SELECTION_STRATEGY
+            - PROSODY_VISITORS_MUC_PREFIX
+            - SENTRY_DSN="${JICOFO_SENTRY_DSN:-0}"
+            - SENTRY_ENVIRONMENT
+            - SENTRY_RELEASE
+            - TZ
+            - VISITORS_MAX_PARTICIPANTS
+            - VISITORS_MAX_VISITORS_PER_NODE
+            - VISITORS_XMPP_AUTH_DOMAIN
+            - VISITORS_XMPP_SERVER
+            - VISITORS_XMPP_DOMAIN
+            - XMPP_DOMAIN
+            - XMPP_AUTH_DOMAIN
+            - XMPP_INTERNAL_MUC_DOMAIN
+            - XMPP_MUC_DOMAIN
+            - XMPP_HIDDEN_DOMAIN
+            - XMPP_SERVER
+            - XMPP_PORT
+            - XMPP_RECORDER_DOMAIN
+            - MAX_SSRCS_PER_USER
+            - MAX_SSRC_GROUPS_PER_USER
+        depends_on:
+            - prosody
+        networks:
+            meet.jitsi:
+
+    # Video bridge
+    jvb:
+        image: jitsi/jvb:${JITSI_IMAGE_VERSION:-unstable}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        ports:
+            - '${JVB_PORT:-10000}:${JVB_PORT:-10000}/udp'
+            - '127.0.0.1:${JVB_COLIBRI_PORT:-8080}:8080'
+        volumes:
+            - ${CONFIG}/jvb:/config:Z
+        labels:
+            service: "jitsi-jvb"
+        environment:
+            - AUTOSCALER_SIDECAR_KEY_FILE
+            - AUTOSCALER_SIDECAR_KEY_ID
+            - AUTOSCALER_SIDECAR_GROUP_NAME
+            - AUTOSCALER_SIDECAR_HOST_ID
+            - AUTOSCALER_SIDECAR_INSTANCE_ID
+            - AUTOSCALER_SIDECAR_PORT
+            - AUTOSCALER_SIDECAR_REGION
+            - AUTOSCALER_SIDECAR_SHUTDOWN_POLLING_INTERVAL
+            - AUTOSCALER_SIDECAR_STATS_POLLING_INTERVAL
+            - DISABLE_AWS_HARVESTER
+            - DOCKER_HOST_ADDRESS
+            - ENABLE_COLIBRI_WEBSOCKET
+            - ENABLE_JVB_XMPP_SERVER
+            - ENABLE_OCTO
+            - ENABLE_SCTP
+            - JVB_ADVERTISE_IPS
+            - JVB_ADVERTISE_PRIVATE_CANDIDATES
+            - JVB_AUTH_USER
+            - JVB_AUTH_PASSWORD
+            - JVB_BREWERY_MUC
+            - JVB_CC_TRUST_BWE
+            - JVB_DISABLE_STUN
+            - JVB_DISABLE_XMPP
+            - JVB_INSTANCE_ID
+            - JVB_PORT
+            - JVB_MUC_NICKNAME
+            - JVB_STUN_SERVERS
+            - JVB_LOG_FILE
+            - JVB_OCTO_BIND_ADDRESS
+            - JVB_OCTO_REGION
+            - JVB_OCTO_RELAY_ID
+            - JVB_REQUIRE_VALID_ADDRESS
+            - JVB_USE_USRSCTP
+            - JVB_WS_DOMAIN
+            - JVB_WS_SERVER_ID
+            - JVB_WS_TLS
+            - JVB_XMPP_AUTH_DOMAIN
+            - JVB_XMPP_INTERNAL_MUC_DOMAIN
+            - JVB_XMPP_PORT
+            - JVB_XMPP_SERVER
+            - PUBLIC_URL
+            - SENTRY_DSN="${JVB_SENTRY_DSN:-0}"
+            - SENTRY_ENVIRONMENT
+            - SENTRY_RELEASE
+            - COLIBRI_REST_ENABLED
+            - SHUTDOWN_REST_ENABLED
+            - TZ
+            - VIDEOBRIDGE_MAX_MEMORY
+            - XMPP_AUTH_DOMAIN
+            - XMPP_INTERNAL_MUC_DOMAIN
+            - XMPP_SERVER
+            - XMPP_PORT
+        depends_on:
+            - prosody
+        networks:
+            meet.jitsi:
+
+# Custom network so all services can communicate using a FQDN
+networks:
+    meet.jitsi:
+```
+## nginx
+### compose
+```
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    network_mode: host
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+	  - /etc/letsencrypt:/etc/letsencrypt
+    restart: always
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+```

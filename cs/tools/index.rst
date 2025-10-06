@@ -18,3 +18,5 @@
    top
    ipcs
    rfkill
+   qemu
+   openssl

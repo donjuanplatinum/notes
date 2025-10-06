@@ -4,3 +4,4 @@
 .. toctree::
    analysis
    number_theory
+   common

@@ -17,3 +17,6 @@
    nix
    regexp
    logic
+   service
+   rfc
+   ml

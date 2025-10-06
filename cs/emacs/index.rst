@@ -8,3 +8,6 @@ emacs
    dired
    wanderlust
    elisp
+   eaf
+
+   
