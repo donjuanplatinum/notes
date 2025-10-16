@@ -12,7 +12,7 @@
    algori/index
    emacs/index
    noun
-   rust
+   rust/index
    cpp
    nix
    regexp
