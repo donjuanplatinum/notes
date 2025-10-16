@@ -99,3 +99,16 @@ pub struct Conv2d {
 
 #### AdamW
 
+### linear
+构建全连接层
+```rust
+pub fn linear(
+    in_dim: usize,
+    out_dim: usize,
+    vb: VarBuilder<'_>,
+) -> Result<Linear>
+```
+
+- in_dim: 输入维度(向量的维度)
+- out_dim: 输出维度
+- vb: VarBuilder
