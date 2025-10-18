@@ -21,3 +21,4 @@ $$
 - $\theta$ -> \theta
 - $\eta$ -> \eta
 - $\partial$ -> \partial
+- $\lambda$ -> \lambda

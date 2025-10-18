@@ -4,7 +4,8 @@ Huggingface研发的Rust的LLM框架
 ## candle-nn
 candle的神经网络
 
-### struct
+### var_map
+VarMap是保存命名变量的存储库。
 #### VarMap
 VarMap保存了模型的参数.
 
@@ -19,6 +20,8 @@ VarMap结构体可以以 safetensors 格式序列化。
 - `load<P: AsRef<Path>>(&mut self,path:P)-> Result<()>`: 以Safetensors文件加载一些值 并修改现有变量 当前不在映射中的变量的值不会被保留。
 - `set_one<K: AsRef<str>, V: AsRef<Tensor>>(&mut self,name: K,value: V) -> Result<()>`: 设置变量的值
 - `set<I: Iterator<Item = (K,V)>,K: AsRef<str>,V: AsRef<Tensor>>(&mut self,iter: I)-> Result<()`: 设置一些变量
+### var_builder
+VarBuilder用于从模型中检索变量
 #### VarBuilder
 VarBuilder 是个工厂对象，用来帮你创建网络层的参数。
 
@@ -29,6 +32,8 @@ VarBuilder 是个工厂对象，用来帮你创建网络层的参数。
 - `zeros`: 初始化VarBuilder为任何张量为0
 - `get<S: Into<Shape>>(&self,s:S,name: &str)-> Result<Tensor>`: 检索当前路径上与给定名称关联的张量
 - `push_prefix<S: ToString>(&self,s: S)`: 生成一个新的VarBuilder 在原始参数路径前加入s. 类似cd
+### activation
+激活函数
 ### conv
 卷积层
 #### conv2d
@@ -97,9 +102,9 @@ pub struct Conv2d {
 ### optim
 优化器
 
-#### AdamW
 
 ### linear
+#### linear
 构建全连接层
 ```rust
 pub fn linear(
@@ -112,3 +117,18 @@ pub fn linear(
 - in_dim: 输入维度(向量的维度)
 - out_dim: 输出维度
 - vb: VarBuilder
+#### Linear
+全连接层 对输入数据应用线性变换
+
+```
+use candle_core::{Tensor,Device::Cpu};
+use candle_nn::{Linear,Module};
+
+let w = Tensor::new([[1f32,2.], [3.,4.],[5.,6.]], &Cpu)?;
+let layer = Linear::new(w,None);
+let xs = Tensor::new(&[[10f32,100.]],&Cpu)?;
+let ys = layer.forward(&xs)?;
+```
+
+### loss
+损失函数

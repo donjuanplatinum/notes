@@ -1,6 +1,8 @@
 # 安卓虚拟机
 使用qemu和blissos
 
+
+使用GL
 ```bash
 #!/bin/bash
 qemu-system-x86_64 \
@@ -17,6 +19,28 @@ qemu-system-x86_64 \
 -device virtio-vga-gl -display sdl,gl=on \
 -audiodev pa,id=snd0 -device AC97,audiodev=snd0 \
 -net nic,model=virtio-net-pci -net user,hostfwd=tcp::4444-:5555
+```
+不使用GL
+```bash
+#!/bin/bash
+qemu-system-x86_64 \
+-enable-kvm \
+-M q35 \
+-m 10240 -smp 8 -cpu host \
+-bios /usr/share/edk2/OvmfX64/OVMF_CODE.fd \
+-drive file=/media/vdisk/android/android.qcow2,if=virtio \
+-drive file=/media/vdisk/android/Bliss-v16.9.7-x86_64-OFFICIAL-gapps-20241011.iso,media=cdrom \
+-boot order=cd \
+-usb \
+-device virtio-tablet \
+-device virtio-keyboard \
+-device qemu-xhci,id=xhci \
+-machine vmport=off \
+-device virtio-vga \
+-display sdl \
+-audiodev pa,id=snd0 -device AC97,audiodev=snd0 \
+-net nic,model=virtio-net-pci -net user,hostfwd=tcp::4444-:5555
+
 ```
 
 访问qcow2
