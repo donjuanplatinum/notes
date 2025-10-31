@@ -79,6 +79,12 @@ $$
 // 以0.0为均值 0.02为标准差 创建input_dim行 hidden_dim列矩阵
 let tensor = Tensor::randn(0.0,0.02,(input_dim,hidden_dim))?;
 ```
+### 哈达玛乘积
+对于两个具有相同维度的矩阵,它们的哈达玛乘积为逐元素相乘
+
+$$
+(A \circ B)_{ij} = A_{ij}  B_{ij}
+$$
 ## 卷积
 上卷积在深度学习中 可理解为特征提取
 
@@ -700,3 +706,40 @@ impl Rnn{
 长短期记忆网络
 
 ![LSTM](../../resource/lstm.png) 
+
+lstm是RNN的一种变体与改进 解决了梯度爆炸的问题 以及RNN短期记忆有限的问题
+
+lstm的核心设计是引入了`门控机制` 一共有三个门
+
+
+### 门
+- 输入门(i_t): 决定当前输入$x_t$多少信息写入cell状态$C_t$
+- 遗忘门(f_t): 决定之前cell状态$C_{t-1}$多少保留
+- 输出门(o_t): 决定最终隐藏状态$h_t$从cell状态中输出多少信息
+- 候选状态($\tilde{C}_t$): 当前输入生成的候选cell状态
+
+sigmoid函数的值域在(0,1) tanh的值域在(-1,1)
+
+所以sigmoid函数可以控制信息流出的比例 tanh可控制信息的流出的方向
+
+
+$$
+i_t = sigmoid(W_ix x_t + W_ih h_{t-1} + b_i)
+f_t = sigmoid(W_fx x_t + W_fh h_{t-1} + b_f)
+o_t = sigmoid(W_ox x_t + W_oh h_{t-1} + b_o)
+\tilde{C}_t = tanh(W_c x_t + U_c h_{t-1} + b_c)
+$$
+
+### 记忆状态
+本期记忆状态$C_t$由上期记忆状态$C_{t-1}$与遗忘门过滤后的结果相乘 再加上本期新增的部分决定
+
+$$
+C_{t} = f(t) \circ C_{t-1} + i_t \circ \tilde{C}_t
+$$
+
+### 隐藏状态
+隐藏状态=输出门与本期记忆状态的tanh结果相乘
+
+$$
+h_t = o_t \circ tanh(C_t)
+$$
