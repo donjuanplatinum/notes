@@ -30,6 +30,31 @@ let tensor = tensor.flatten_from(1)?; // to shape(3,4)
 let c = a.reshape((2, (), 1))?;
 assert_eq!(c.shape().dims(), &[2, 3, 1]);
 ```
+- `randn<S: Into<Shape>,T: FloatDType>(mean: T,std:T,s: S,device: &Device) -> Result<Self>`: 按照指定的形状s 均值mean 标准差std创建张量
+- `stack<A: AsRef<Tensor>, D: Dim>(args: &[A], dim: D) -> Result<Self>`: 把一组形状相同的张量沿着一个维度拼接 
+
+t1 = [[1,2],[3,4]];
+
+t2 = [[5,6],[7,8]];
+
+t3 = [[9,10],[11,12]];
+
+他们的形状为[2,2]
+
+则按照0维拼起来为
+```rust
+let y = Tensor::stack(&[t1,t2,t3],0)?;
+```
+
+结果为
+```
+y.shape = [3,2,2];
+y = [[[1,2],[3,4]],
+	[[5,6],[7,8]],
+	[[9,10],[11,12]],
+]
+```
+
 ### shape
 #### D
 维度

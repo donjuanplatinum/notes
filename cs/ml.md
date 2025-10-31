@@ -73,6 +73,12 @@ stride[0] = b * c * d
 $$
 A_{mxn} x B_{nxp} = C_{mxp}
 $$
+### 正态分布
+在初始化时 经常使用正态分布 因为正态分布`更自然而稳定 多数聚集在0附近 少量较大值`
+```rust
+// 以0.0为均值 0.02为标准差 创建input_dim行 hidden_dim列矩阵
+let tensor = Tensor::randn(0.0,0.02,(input_dim,hidden_dim))?;
+```
 ## 卷积
 上卷积在深度学习中 可理解为特征提取
 
@@ -142,7 +148,7 @@ $output = x W ^ T + b$
 其中x为图片展平后的向量 W为权重矩阵shape[out_size,in_size] b为偏置向量shape[out_size]
 
 
-我们知道 输入的向量是一个1xin_size形状的矩阵
+我们知道 输入的向量是一个1 * in_size形状的矩阵
 
 根据矩阵的乘法 我们有
 
@@ -385,6 +391,34 @@ $$
 log_softmax(z_{i}) = z_{i} - log(\sum_{j=1}^{n} e ^{z_{j}})
 $$
 
+## 激活函数
+### ReLU
+
+$$
+f(x) = max(0,x)
+$$
+
+常用于CNN
+
+优点
+- 计算简单 收敛块
+- 避免梯度消失 对正数 导数恒为1
+- 稀疏激活 很多神经元输出0 有正则化效果
+
+### tanh
+
+$$
+tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}
+$$
+
+常用于RNN
+
+输出范围(-1,1)
+
+优点
+- 平滑连续
+- 输出有符号 可表示正向记忆 负向记忆
+
 ## CNN
 卷积神经网络
 
@@ -550,14 +584,28 @@ for epoch in 0..epochs{
 RNN 的关键特性是其能够保持隐状态（hidden state），使得网络能够记住先前时间步的信息，这对于处理序列数据至关重要。
 
 ```
-输入x1张量(shape[size]) --------->  h1 ------------> y1 ------------------->  h2------------> y2 ......------> yn
-     计算隐藏状态h1      计算输出y1      x1与h1作为第二次的输入        计算输出y2
-		                              计算隐藏状态
+输入x1张量(shape[1,in_size]) 计算隐藏状态--------->  h1(shape[1,hidden_dim])  计算全连接层------------> y1(shape[out_dim]) ------------------->  h2------------> y2 ......------> yn
+		                                             
 ```
 
-其中 输入x的形状为shape([size])  $w_x$的形状为shape([hidden_size,input_size]) $$
+
+
+$w_x$的形状为shape([hidden_size,input_size]) 
 
 注意 RNN的所有时间步的W,b是相同的
+### 超参数
+- hiddem_dim: 隐藏层维度越大 记忆越大 但运算速度更慢 更容易过拟合
+- output_dim: 模型最终的输出大小 例如词汇表大小 情感分类 
+### 输入张量
+其中 输入x的形状为shape([seq_len,batch_size,input_dim])  
+
+seq_len为序列长度 即RNN的时间步 循环的次数
+
+batch_size为批大小
+
+input_dim为每个时间步输入向量的维度
+
+形象的比喻是 每句话seq_len个词 每个词input_dim维 每次输入batch句话
 ### 工作机制
 1. 接收当前输入$x_t$和前一时刻的隐藏状态$h_{t-1}$
 2. 计算新的隐藏状态
@@ -574,10 +622,11 @@ RNN 的关键特性是其能够保持隐状态（hidden state），使得网络�
 ### 隐藏状态
 这是RNN能记住前面序列信息 和 理解上下文的关键
 
-隐藏状态为$h_{t}$
+隐藏状态为$h_{t}$ 隐藏层的维度为`hidden_dim` 隐藏层维度是决定模型性能的重要参数
+
 
 $$
-h_{t} = f(W_{x} x_{t} + W_{h} h_{t-1} + b)
+h_{t} = f( x_{t} W_{x} +  h_{t-1} W_{h} + b)
 $$
 
 其中
@@ -600,17 +649,54 @@ $y_t = g(W_{hy} h_t + c)$
 而$W_y$和c就是反向传播更新的参数
 
 
+### vocab
+vocab是模型的输入的字符的集合 也就是tokenizer.json里的词
+
 ### 实现
 ```rust
-pub struct Rnn {
-    /// 输入层权重
-	w_i: Tensor,
-	/// 隐藏层权重
-	w_h: Tensor,
-	/// 偏置
-	b: Tensor,
-	/// 当前隐藏层状态
-	hidden: Tensor,
+struct Rnn{
+	/// 隐藏状态权重矩阵
+	w_xh: Tensor, // shape(in_dim,hidden_dim)
+	/// 输入权重矩阵
+	w_hh: Tensor, // shape(hidden_dim,hidden_dim)
+	/// 隐藏状态偏置
+	b_h: Tensor, // shape(hidden_dim)
+	/// 全连接层权重矩阵
+	w_hy: Tensor, // shape(hidden_dim,out_dim)
+	/// 全连接层偏置
+	b_y: Tensor, // shape(out_dim)
 }
-
+pub struct RnnConfig {
+    /// 输入向量维度
+    pub in_dim: usize,
+    /// 隐藏状态维度(越大模型记忆越大但容易过拟合)
+    pub hidden_dim: usize,
+    /// 输出维度
+    pub out_dim: usize,
+    pub seq_len: usize,
+}
 ```
+
+```rust
+impl Rnn{
+	pub fn new(vb: &VarBuilder,imput_dim: usize,hidden_dim:usize,output_dim: usize) -> Result<Self>{
+	let device = Device::Cpu;
+	
+	let w_xh = vb.get((config.in_dim, config.hidden_dim), "w_xh")?;
+	let w_hh = vb.get((config.hidden_dim, config.hidden_dim), "w_hh")?;
+	let b_h  = vb.get(config.hidden_dim, "b_h")?;
+	let w_hy = vb.get((config.hidden_dim, config.out_dim), "w_hy")?;
+	let b_y  = vb.get(config.out_dim, "b_y")?;
+	Ok(Self{
+	    w_xh,w_hh,b_h,w_hy,b_y
+	})
+	}
+		
+}
+```
+	
+
+## LSTM
+长短期记忆网络
+
+![LSTM](../../resource/lstm.png) 
