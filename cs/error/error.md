@@ -30,8 +30,13 @@
 
 问题`RuntimeException: No OpenGL context found in the current thread.`
 
-解决方案
+xrandr这是x的基础组件
 
+解决方案 安装xrandr
+
+```
+sudo emerge xrandr
+```
 
 
 <a id="orgc7e8ed6"></a>

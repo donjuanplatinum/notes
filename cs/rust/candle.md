@@ -1,6 +1,50 @@
 # Candle
 Huggingface研发的Rust的LLM框架
 
+## candle-core
+保存了张量的类型和基本操作
+### Tensor
+张量
+
+方法:
+- `max_pool2d<T: ToUsize2>(&self,sz: T)-> Result<Self>`: 将4维的张量`shape(batch_size,channels,high,weigth)`最大池化 池化核的尺寸为`sz` 默认没有填充 步长默认为sz
+- `flatten_all(&self) -> Result<Tensor>`: 将整个张量展平为一维
+```rust
+[[0,1],[2,3],[4,5]] -> [0,1,2,3,4,5]
+(3,2) -> (6)
+```
+- `flatten_from<D: Dim>(&self,start_dim:D) -> Result<Tensor>`: 从start_dim维度开始展平到最后一个维度 [start_dim,last_dim]
+```rust
+// CNN全连接层的输入
+let tensor = Tensor::new(&[[[0f32,1.], [2.,3.]], [[4.,5.], [6.,7.]], [[8.,9.], [10.,11.]]], &Device::Cpu)?; //shape(3,2,2)
+let tensor = tensor.flatten_from(1)?; // to shape(3,4)
+```
+- `flatten_to<D: Dim>(&self,end_dim: D) -> Result<Tensor>`: 从0维度展平到end_dim维度 [0,end_dim]
+- `flatten<D1:Dim,D2: Dim>(&self,start_dim: D1,end_dim:D2)-> Result<Tensor>`: 从start_dim展平到end_dim [start_dim,end_dim]
+- `dim<D: Dim>(&self,dim:D)-> Result<usize>`: 返回指定维度的大小
+- `narrow<D: Dim>(&self,dim:D,start:usize,len:usize) -> Result<Self>`: 从原始张量中取出(不复制 高性能)一部分子张量 沿维度dim 从索引start开始 提取长度为len的子张量
+- `argmax<D: Dim>(&self, dim: D) -> Result<Self>`: 沿着D维度返回最大值
+- `shape(&self) -> &Shape`: 返回张量形状
+- `reshape<S: ShapeWithOneHole>(&self, s: S) -> Result<Tensor>`: 按照s元组指定的形状将张量变形 ()表示自动推断
+``` rust
+let c = a.reshape((2, (), 1))?;
+assert_eq!(c.shape().dims(), &[2, 3, 1]);
+```
+### shape
+#### D
+维度
+```rust
+pub enum D {
+    Minus1,
+    Minus2,
+    Minus(usize),
+}
+```
+
+其中: 
+- Minus1: 最后一维
+- Minus2: 倒数第二维
+- Minus(usize): 第usize维
 ## candle-nn
 candle的神经网络
 
@@ -100,9 +144,26 @@ pub struct Conv2d {
 - `new(weight: Tensor,bias: Option<Tensor>,config: Conv2dConfig)-> Self`: 构建函数
 - `forward(&self,x: &Tensor)-> Result<Tensor>`: 经过这一层
 ### optim
-优化器
+优化器 用于计算梯度并更新模型参数
+#### AdamW
+adamW优化器
+##### new_lr
+AdamW构建器
+```rust
+new_lr(vars: Vec<Var>,
+learning_rate: f64) -> Result<Self>
+```
 
+其中：
+- vars: 在训练过程中更新的模型参数
+- learning: 学习率
 
+##### backward_step
+反向传播并更新参数
+```rust
+backward_step(&mut self, loss:
+&Tensor) -> Result<()>
+```
 ### linear
 #### linear
 构建全连接层
@@ -132,3 +193,45 @@ let ys = layer.forward(&xs)?;
 
 ### loss
 损失函数
+#### nll
+负对数似然损失
+```rust
+nll(inp: &Tensor, target: &Tensor) -> Result<Tensor>
+```
+
+其中:
+- inp是预测的结果
+- target是真实的标签的张量
+#### cross_entropy
+交叉熵损失
+```rust
+cross_entropy(inp: &Tensor, target: &Tensor) -> Result<Tensor>
+```
+- inp是预测的结果
+- target是真实的标签的张量
+
+### ops
+张量操作
+#### log_softmax
+对输入张量的维度生成对数概率
+```rust
+log_softmax<D: Dim>(xs: &Tensor, d: D) -> Result<Tensor>
+```
+
+其中:
+- d: 作用的维度 一般是最后一个维度D::Minus1
+
+
+例如对全连接层的输出转换为概率
+```rust
+let output = linear.forward(&tensor)?;
+let result = log_softmax(&output,candle_core::D::Minus1)?;
+```
+#### softmax
+对输入张量的维度生成概率
+```rust
+softmax<D: Dim>(xs: &Tensor, dim: D) -> Result<Tensor>
+```
+
+其中:
+- d: 作用的维度 一般是最后一个维度D::Minus1

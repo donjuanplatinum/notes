@@ -1,4 +1,11 @@
 # Elisp
+## Lisp语法
+### 函数
+```lisp
+(defun square (x)
+	(* x x)
+)
+```
 ## 语法
 这里会列举出elisp的语法和形式
 ### 注释
@@ -170,3 +177,19 @@ SOUND 是一种形式为 (sound KEYWORD VALUE...) 的列表。
 :device DEVICE - 在设备 DEVICE 上播放声音。如果未指定，则使用与系统相关的默认设备名称。
 
 注意：目前 Windows 系统不支持 :data 和 :device 关键字。
+## 示例
+计算 $1! + 2! + .. + n!$
+
+这里使用类似霍纳规则的算法
+
+$$
+a_0 + a_0 * a_1 + a_0 * a_1 * a_2 = a_0(1 + a_1(1+ a_2))
+$$
+
+所以使用递归解决
+```elisp
+(defun f (x y)
+  (if (= x y)
+      y
+    (* x (+ 1 (f (+ x 1) y)))))
+```

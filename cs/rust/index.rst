@@ -4,3 +4,4 @@ Rust
 .. toctree::
    
    candle
+   clap

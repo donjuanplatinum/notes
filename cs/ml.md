@@ -67,6 +67,12 @@ stride[0] = b * c * d
 ```
 
 所以假设我需要访问元素(n,c,h,w) -> `offset = n * 1 + c * d + h * (c * d) + w * (b * c * d)`
+### 矩阵乘积形状判断
+当且仅当前一个矩阵的列数n等于后一个矩阵的行数m时 两个矩阵的乘积为m*p矩阵
+
+$$
+A_{mxn} x B_{nxp} = C_{mxp}
+$$
 ## 卷积
 上卷积在深度学习中 可理解为特征提取
 
@@ -117,69 +123,91 @@ $$
 然后滑完后得到的新的矩阵就是池化结果
 
 我们不难的发现 一个m*n 矩阵 与 a * b的池化核池化 得到一个 (((m - a) / a)的向下取整+1) * (((n - b ) / b)的向下取整 + 1)
+
+池化的公式
+
+$$
+输出矩阵的高 = \frac{原矩阵的高 + 2 * 填充 - 池化核的高}{步长} + 1
+$$
 ## 全连接层
 神经网络的分类器
 
+全连接层输出对分类的`预测分数logits`
+
+logits的张量为: `shape(batch_size,n)`
+
+
 $output = x W ^ T + b$
 
-其中x为图片展平后的向量 W为权重矩阵 b为偏置向量
+其中x为图片展平后的向量 W为权重矩阵shape[out_size,in_size] b为偏置向量shape[out_size]
+
+
+我们知道 输入的向量是一个1xin_size形状的矩阵
+
+根据矩阵的乘法 我们有
+
+$$
+x_{1xn} W_{nxb} = out_{1xb}
+$$
+
+
+全连接层的输入张量是二维的`shape(batch_size,n)`
+
 
 在初始时 W和b是随机的(形状不随机) 而在模型训练过程中通过反向传播等进行更新
 
+
+
+
 `所以模型训练的过程之一可以说就是在更新和确定全连接层参数`
+
 
 在Mnist CNN中 使用了两个全连接层
 
+
 第一层linear(in_dim,out_dim): in_dim为池化后的张量shape(num,dim)中的dim out_dim为第一次粗分类
 
+
+
 而第二层linear(out_dim,out_dim2): 把第一层的分类结果分类为最后的out_dim2
-## 损失
-## CNN
-卷积神经网络
+## 损失函数
+### nll
+负对数似然损失
 
-卷积神经网络在`训练`时 通过对输入的图片进行特征提取(卷积)->对提取结果抓重点(池化)->重复一次->把张量展平->全连接层(分类)->分成0-10十类
+它希望模型给正确类别分配的概率越高越好，错的越低越好。
 
-mnist数据集的卷积网络
-
-
-## 前向传播
-
-```
-输入层 (1×28×28 灰度图)
-↓
-conv1: Conv2d(1, 32, kernel=3)
-↓
-池化层 (2×2)
-↓
-conv2: Conv2d(32, 64, kernel=3)
-↓
-池化层 (2×2)
-↓
-Flatten 展平
-↓
-全连接层 (Linear)
-↓
-输出层 (10 类)
-```
-
-## 损失计算
-在前向传播中计算预测结果与真实标签之间的差异或误差
-
-在分类任务中 主要使用交叉熵 而在回归中 主要使用均方误差损失
-
-#### 交叉熵函数
+真实标签是索引y
 
 $$
-L = - \sum_{i} y_{i} \cdot log(p_{i})
+NLLLose(p,y) = - log(p_{y})
 $$
 
-其中
-- $y_{i}$ 是真实标签 若真实类别是i 则 $y_i = 1$  其他类别为0
-- $p_i$ 是模型预测的类别i的概率
+即取出真实类别对应的预测概率$p_{y}$
 
-损失值越小，表示模型的预测越接近真实标签。交叉熵损失计算的是预测概率分布与真实标签分布之间的"距离"。这个值越小，模型越好。
+与交叉熵损失的联系
 
-#### 均方差损失
+$$
+CrossEntropyLoss(z,y) = NLLLoss(log_softmax(z),y)
+$$
+
+### cross_entropy
+交叉熵 用于 分类任务 的常用损失函数
+
+它衡量的是 真实标签与 预测概率分布 之间的差异 差异越小 模型性能越好
+
+如果模型正确预测了类别，损失会小（概率接近 1，log(1) = 0）。
+
+如果模型错误预测了类别，损失会大（概率接近 0，log(0) 会趋近负无穷）
+
+假设我们有一个n分类问题 给定一个真实标签的分布p和概率函数(一般是softmax)输出的概率分布q 满足:
+
+$$
+H(p,q) = - \sum_{i=1}^{n} p_{i} log{q_{i}}
+$$
+
+- $p_{i}$是真实标签的概率分布 通常是一个one-hot向量(即除了真实的标签的数组下标为1 其他为0)
+- $q_{i}$是模型预测的概率分布 通常是通过softmax得到的概率分布
+### 均方差损失
 
 $$
 L = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y_i})^2
@@ -205,10 +233,11 @@ $$
 - $\frac{\partial L}{\partial \theta}$是损失函数关于参数的梯度
 
 
-#### 随机梯度下降
+### 随机梯度下降
 在每一次更新中随机抽取样本来梯度下降 可节省内存
 ## 学习率
-学习率控制着模型在训练过程中每次参数更新的步长大小 即在使用梯度下降（或其变种）更新神经网络参数时 调整的幅度
+学习率控制着模型在训练过程中每次参数更新的步长大小 即在使用梯度下降（或其变种）更新神经网络参数时 调整的幅度 所以学习率极大影响着梯度下降核反向传播的过程
+
 
 ## 反向传播
 在拿到前向传播得到的损失函数后 通过损失函数对神经网络的卷积层或全连接层的参数求偏导 一层层的使用链式法则偏导过去 
@@ -322,3 +351,266 @@ data augmentation
 Adam的改进版 加入正则化
 
 目前非常推荐在 Transformer 和 CNN 中使用。
+## 概率
+将输入转换为概率分布
+
+需要使用概率函数进行输出
+### softmax
+常见用于多分类问题的最后一层 将模型输出的logits转换为概率分布
+
+常与softmax_crossentropy搭配
+特点:
+- 使得每个元素表示`对应类别的概率` 且总和为1
+- 所有输出压缩到[0,1]
+
+给定一个张良 $z = [ z_{1}, z_{2}, ..., z_{n}]$ 则soft将$z_{i}$会转换为类别概率$p_{i}$
+
+$$
+p_{i} = \frac{e^{z_{i}}}{\sum_{j=1}^{n} e^{z_{j}}}
+$$
+
+### log_softmax
+log_softmax是softmax函数的对数版本 通常用于分类任务的最后一层输出
+
+常与负对数似然损失(NLLLoss)配合 将分类的logits转换为对数概率
+
+log_softmax输出的对数概率小于等于0
+$$
+log_softmax(z_{i}) = log(\frac{e^{z_{i}}}{\sum_{j=1}^{n} e^{z_{j}}})
+$$
+
+化简为
+
+$$
+log_softmax(z_{i}) = z_{i} - log(\sum_{j=1}^{n} e ^{z_{j}})
+$$
+
+## CNN
+卷积神经网络
+
+自动提取数据的空间特征 用于分类 检测分割等任务
+
+```
+输入图像------->张量(shape[batch_size,channels,high,weight]) ------> 卷积层 ----> 激活函数---->池化
+
+----->经过多个这样的卷积+激活+池化----->展平为二维张量(shape[batch_size,channels*high*weight])----->全连接层------>激活------->经过多个全连接层+激活----->最后一个全连接层
+
+
+------>转换为概率输出
+```
+### MNIST实现
+
+CNN定义
+```rust
+pub struct MnistCnn{
+    conv1:  Conv2d, // 卷积层1
+    conv2:  Conv2d, // 卷积层2
+    fc1: Linear, // 全连接层1
+    fc2: Linear, // 全连接层2
+}
+```
+
+构造函数
+```rust
+pub fn new(vb: VarBuilder) -> Result<Self>{
+	// 加入padding填充以防止边缘特征无法提取
+	let convdefault = Conv2dConfig{
+	    padding: 1,
+	    ..Default::default()
+	}; 
+	// 第一层输入为(channels:1,out_channels:32,kernel_size:3)
+	let conv1 = conv2d(1,32,3,convdefault,vb.pp("c1"))?;
+	// 第二层输入为(channels:32,out_channels:64,kernel_size:3)
+	let conv2 = conv2d(32,64,3,convdefault,vb.pp("c2"))?;
+	// 第二个卷积层的输出经过展平后输入到全连接层 被输出为128个分类
+	let fc1 = linear(64*7*7,128,vb.pp("fc1"))?;
+	// 将第一个全连接层输出的128个分类输出成最后10个分类
+	let fc2 = linear(128,10,vb.pp("fc2"))?;
+	Ok(Self{
+	    conv1,
+	    conv2,
+	    fc1,
+	    fc2,
+	})
+    }
+```
+
+forward过程
+```rust
+    fn forward(&self, xs: &Tensor) -> candle_core::Result<Tensor> {
+		// batch_size为输入张量的第一个维度的大小 shape(batch_size,channels,h,w)
+        let batch_size = xs.dim(0)?; 
+		// 因为数据集的张量是(batch_size,n) 所以要变形张量
+        let xs = xs.reshape((batch_size, 1, 28, 28))?;
+        Ok(xs
+		// 第一个卷积层
+            .apply(&self.conv1)?
+			// 激活
+            .relu()?
+			// 最大池化
+            .max_pool2d(2)?
+			// 第二个卷积层
+            .apply(&self.conv2)?
+			// 激活
+            .relu()?
+			// 最大池化
+            .max_pool2d(2)?
+			// 从第二个维度展平到最后一个维度
+            .flatten_from(1)?
+			// 第一个全连接层
+            .apply(&self.fc1)?
+			// 激活
+            .relu()?
+			// 第二个全连接层
+            .apply(&self.fc2)?)
+    }
+```
+
+训练
+```rust
+	// 构造参数集合Varmap和VarBuilder 后续反向传播时会更新这里的参数
+    let vm = VarMap::new(); 
+    let vb = VarBuilder::from_varmap(&vm,DType::F32,&Device::Cpu); 
+	
+	
+	// 给模型输入参数
+	let model = MnistCnn::new(vb.clone())?;
+	
+	// 反向传播用的优化器
+	let mut optim = AdamW::new_lr(vm.all_vars(),learning_rate)?;
+	
+	// 数据集导入
+	let datasets = vision::mnist::load()?;
+	
+	// 数据集图片张量变形为(batch_size,channels,h,w)
+	let (train_images,test_images) = (datasets.train_images.reshape((60000,1,28,28))?,
+	
+	// 转换U8为F32
+	let train_images = train_images.to_dtype(DType::F32)?;
+    let test_images = test_images.to_dtype(DType::F32)?;
+	
+	// 标签转换为I64
+	let train_labels = datasets.train_labels.to_dtype(DType::I64)?;
+	let test_labels = datasets.test_labels.to_dtype(DType::I64)?;
+	
+	// 训练集的图片数量
+	let train_image_nums = train_images.dim(0)?;
+	
+	// 批次数 = 图片数量 / 一批的图片数量
+	let batches_num = train_image_size / batch_size;
+	
+	// 构造一个存放索引的向量
+	let mut batch_indices = (0..batches_num).collect::<Vec<usize>>();
+
+// 训练epochs轮
+for epoch in 0..epochs{
+	// 损失总和
+	let mut sum_loss = 0f32;
+	// 打乱索引的顺序 防止模型学习顺序(刷题化)
+	batch_indices.shuffle(&mut thread_rng());
+	// 一个batch_size为一组开始训练
+	for batch_index in batch_indices.iter() {
+		// 沿着train_images的第0维的batch_index * batch_size取出大小为batch_size的子张量
+		// 第0维是图片维度 所以相当于从图片里面取出了batch_size张
+	    let train_images = train_images.narrow(0,batch_index * batch_size,batch_size)?;
+	    let train_labels = train_labels.narrow(0,batch_index*batch_size,batch_size)?;
+		
+		// 正向传播得到logtis分数
+	    let logits = model.forward(&train_images).expect("训练集forward失败");
+	    // 从正向传播的结果和实际的labels中计算损失函数
+	    let loss = loss::cross_entropy(&logits,&train_labels)?;
+		
+		// 利用损失函数反向传播更新参数
+	    optim.backward_step(&loss)?;
+		// 累加损失
+	    sum_loss += loss.to_scalar::<f32>()?;
+	    
+	}
+	// 平均损失
+	let average_loss = sum_loss / batches_num as f32;
+	// 从测试集正向传播
+	let test_logits = model.forward(&test_images)?;
+	// 预测结果 并将概率最大的视为结果 
+	let pred = test_logits.argmax(D::Minus1)?.to_dtype(DType::I64)?;
+	
+	// 将正向传播的结果与实际的结果比较 获得正确的预测的数量
+	let sum_ok = pred.eq(&test_labels)?.to_dtype(DType::F32)?.sum_all()?.to_scalar::<f32>()?;
+	// 准确率 = 正确预测的数量 / 总数量
+	let test_acc = sum_ok as f32  / test_labels.dims1()? as f32;
+	println!("{epoch:4} train loss {:8.5} test acc: {:5.2}%",average_loss,100. * test_acc);
+
+	vm.save(format!("./model.safetensors-{}",epoch))?;
+    }
+```
+## RNN
+循环神经网络
+
+处理序列数据，能够捕捉时间序列或有序数据的动态信息，能够处理序列数据，如文本、时间序列或音频
+
+RNN 的关键特性是其能够保持隐状态（hidden state），使得网络能够记住先前时间步的信息，这对于处理序列数据至关重要。
+
+```
+输入x1张量(shape[size]) --------->  h1 ------------> y1 ------------------->  h2------------> y2 ......------> yn
+     计算隐藏状态h1      计算输出y1      x1与h1作为第二次的输入        计算输出y2
+		                              计算隐藏状态
+```
+
+其中 输入x的形状为shape([size])  $w_x$的形状为shape([hidden_size,input_size]) $$
+
+注意 RNN的所有时间步的W,b是相同的
+### 工作机制
+1. 接收当前输入$x_t$和前一时刻的隐藏状态$h_{t-1}$
+2. 计算新的隐藏状态
+3. 产生输出
+
+### 与传统的FNN
+在传统的神经网络中 是不会管上下文的,比如苹果和苹果公司的苹果. 在全连接层输出后苹果的label是公司还是水果
+
+完全取决于训练集谁的label多 所以一个词有多个含义在传统的NN中无法辨别.
+
+而在RNN中 RNN会记住前面序列的信息 可达到上下文信息理解的效果
+
+
+### 隐藏状态
+这是RNN能记住前面序列信息 和 理解上下文的关键
+
+隐藏状态为$h_{t}$
+
+$$
+h_{t} = f(W_{x} x_{t} + W_{h} h_{t-1} + b)
+$$
+
+其中
+- $x_t$: 当前输入
+- $h_{t-1}$: 上一次的隐藏状态
+- $f$: 激活函数
+- $W_x$: 输入权重矩阵 处理输入$x_t$
+- $W_h$: 隐藏状态权重矩阵 处理前一个隐藏状态$h_{t-1}$
+- $b$: 偏置
+
+而$W_x W_h b$就是反向传播更新的参数
+
+
+
+### 输出
+$y_t = g(W_{hy} h_t + c)$
+
+其中g为激活函数
+
+而$W_y$和c就是反向传播更新的参数
+
+
+### 实现
+```rust
+pub struct Rnn {
+    /// 输入层权重
+	w_i: Tensor,
+	/// 隐藏层权重
+	w_h: Tensor,
+	/// 偏置
+	b: Tensor,
+	/// 当前隐藏层状态
+	hidden: Tensor,
+}
+
+```

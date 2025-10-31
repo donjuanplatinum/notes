@@ -1960,3 +1960,4 @@ services:
       timeout: 5s
       retries: 3
 ```
+## stable-diffusion-webui
