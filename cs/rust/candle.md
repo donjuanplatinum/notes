@@ -206,7 +206,7 @@ pub fn linear(
 #### Linear
 全连接层 对输入数据应用线性变换
 
-```
+```rust
 use candle_core::{Tensor,Device::Cpu};
 use candle_nn::{Linear,Module};
 
@@ -260,3 +260,80 @@ softmax<D: Dim>(xs: &Tensor, dim: D) -> Result<Tensor>
 
 其中:
 - d: 作用的维度 一般是最后一个维度D::Minus1
+### rnn
+循环神经网络
+#### LSTM
+长短期记忆模型
+```rust
+pub struct LSTM {
+	// 应用于输入的四个偏重 w_ix w_fx w_cx w_ox
+    w_ih: Tensor, 
+	// 应用于隐藏状态的四个偏重 w_ih w_fh w_ch w_oh
+    w_hh: Tensor,
+	// 应用于输入的四个偏置
+    b_ih: Option<Tensor>,
+	// 应用于隐藏状态的四个偏置
+    b_hh: Option<Tensor>,
+	// 隐藏层维度 是超参数
+    hidden_dim: usize,
+    config: LSTMConfig,
+    device: Device,
+    dtype: DType,
+}
+```
+
+#### LSTMConfig
+lstm的配置
+```rust
+pub struct LSTMConfig {
+	/// 各种偏重 偏置的初始化方式
+    pub w_ih_init: Init,
+    pub w_hh_init: Init,
+    pub b_ih_init: Option<Init>,
+    pub b_hh_init: Option<Init>,
+	
+	/// 当前lstm层索引层号(多层lstm用)
+    pub layer_idx: usize,
+	/// lstm方向 前或后 用于双向lstm
+    pub direction: Direction,
+}
+```
+#### lstm
+LSTM构建函数
+```rust
+pub fn lstm(
+    in_dim: usize, 
+    hidden_dim: usize,
+    config: LSTMConfig,
+    vb: VarBuilder<'_>,
+) -> Result<LSTM>
+```
+其中:
+- in_dim: 输入维度
+- hidden_dim: 隐藏状态维度
+### init
+初始化方法
+#### Init
+初始化方法的enum 用于初始化一开始的偏重 偏置
+```rust
+pub enum Init {
+	/// 常量
+    Const(f64),
+	/// 正态分布
+    Randn {
+        mean: f64,
+        stdev: f64,
+    },
+	/// 均匀分布
+    Uniform {
+        lo: f64,
+        up: f64,
+    },
+	/// kaiming初始化
+    Kaiming {
+        dist: NormalOrUniform,
+        fan: FanInOut,
+        non_linearity: NonLinearity,
+    },
+}
+```

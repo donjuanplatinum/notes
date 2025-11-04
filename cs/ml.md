@@ -1,4 +1,20 @@
 # ML
+## 神经网络
+神经网络的本质是
+
+`神经网络是一个通过优化学习参数，以逼近（或拟合）任意复杂函数的通用非线性映射器`
+
+可以把神经网络看作一种把输入空间映射到输出空间的几何变换。
+
+每一层线性变换 + 非线性激活，使数据在高维空间中逐渐变得“线性可分”。
+
+- 线性层负责旋转 拉伸 平移
+- 激活函数负责弯曲空间 使模型表达非线性边界
+
+**那为什么不用其他数学方法逼近?**
+数学里面有那么多逼近函数的方式: Taylor展开 Lagrange插值 傅立叶....
+
+其他数学方法的泛化能力都非常的弱 比如逼近sinx. 拉格朗日插值就会在边界震荡 而神经网络可很好的泛化
 ## Tensor
 张量
 
@@ -85,6 +101,10 @@ let tensor = Tensor::randn(0.0,0.02,(input_dim,hidden_dim))?;
 $$
 (A \circ B)_{ij} = A_{ij}  B_{ij}
 $$
+### 点积
+点积反应的意义是: 张量x在y方向上的投影再与y的乘积, 能够反应两个张量的`相似度`
+
+*点积越小 相似度越小*
 ## 卷积
 上卷积在深度学习中 可理解为特征提取
 
@@ -252,6 +272,7 @@ $$
 
 
 ## 反向传播
+深度学习的可行性建立在 *每个参数的输出对损失的可导性*
 在拿到前向传播得到的损失函数后 通过损失函数对神经网络的卷积层或全连接层的参数求偏导 一层层的使用链式法则偏导过去 
 
 然后根据学习率 来更新参数的值
@@ -425,6 +446,56 @@ $$
 - 平滑连续
 - 输出有符号 可表示正向记忆 负向记忆
 
+### sigmoid
+
+$$
+\sigma(x) = \frac{1}{1+e^{-x}}
+$$
+
+s形曲线 输入大时饱和于1 小于0时饱和于0 常用于门控LSTM
+### softplus
+
+## tokenizer
+实际上就是一个KV表 但是加入了一些适用于自然语言处理的映射算法
+
+将原始的文本切成一系列token 再把每个token映射为ID
+```
+输入句子: "I love you"
+↓ token
+分词: ["I", "love", "you"]
+↓ token_id
+映射ID: [101, 2347, 872]
+
+```
+
+但是tokenizer实际上会加入更多的操作 比如unicode规范 填充一些特殊的tokenizer自己的标记字符等
+
+而Tokenizer也是`需要训练`的 因为分词方法需要找到最优的
+token表 通常用BPE或Unigram分词
+
+在deepseekV3中 一个token的向量为7168维
+
+- BPE 从语料中统计最常见的字符组合 并不断合并
+- WordPiece 用似然估计挑选最优子词集合
+- Unigram/SentencePiece 用概率模型选出最优子词表
+
+## embedding
+将tokenizer得到的token_id转换为一维张量(向量)
+
+假设有几个token"apple" "banana" "redpen"
+
+而向量的方向为(颜色,种类)
+
+则
+- apple = (红,水果) 
+- banana = (黄,水果)
+- redpen = (红,文具)
+
+则apple - 水果 + 文具 $\approx$ 红笔
+
+再比如相似的词之间的向量内积要小以表示相似
+
+通常embedding是需要训练的 放在模型的一层中 通过反向传播更新
 ## CNN
 卷积神经网络
 
@@ -658,6 +729,14 @@ $y_t = g(W_{hy} h_t + c)$
 ### vocab
 vocab是模型的输入的字符的集合 也就是tokenizer.json里的词
 
+### 反向传播
+在CNN中 验证集比对的是预测结果是不是正确的
+
+比如 这张图片是猫 而模型预测的是狗 那么模型损失函数会去根据此计算
+
+而在RNN中 不可能去用验证集比对句子是否完全一样 这几乎是不可能的
+
+所以在RNN中 验证集是去比对下一个字的概率分布
 ### 实现
 ```rust
 struct Rnn{
@@ -702,6 +781,7 @@ impl Rnn{
 ```
 	
 
+
 ## LSTM
 长短期记忆网络
 
@@ -725,10 +805,22 @@ sigmoid函数的值域在(0,1) tanh的值域在(-1,1)
 
 $$
 i_t = sigmoid(W_ix x_t + W_ih h_{t-1} + b_i)
-f_t = sigmoid(W_fx x_t + W_fh h_{t-1} + b_f)
-o_t = sigmoid(W_ox x_t + W_oh h_{t-1} + b_o)
-\tilde{C}_t = tanh(W_c x_t + U_c h_{t-1} + b_c)
 $$
+$$
+f_t = sigmoid(W_fx x_t + W_fh h_{t-1} + b_f)
+$$
+
+$$
+o_t = sigmoid(W_ox x_t + W_oh h_{t-1} + b_o)
+$$
+
+$$
+\tilde{C}_t = tanh(W_cx x_t + W_ch h_{t-1} + b_c)
+$$
+
+`注意 在实际实现中 w_ix w_fx w_ox w_cx都放在w_ih张量里 shape[4*hidden_dim,input_dim] w_hx等也同理在w_hh张量 偏置也是`
+
+`而在合并起来后 其实就回到了RNN的公式 四个权重 四个偏置都合并`
 
 ### 记忆状态
 本期记忆状态$C_t$由上期记忆状态$C_{t-1}$与遗忘门过滤后的结果哈达玛相乘 再加上本期新增的部分决定
@@ -744,3 +836,67 @@ $$
 h_t = o_t \circ tanh(C_t)
 $$
 
+
+
+## 注意力机制
+Attention is All Your Need!
+
+在早期的 RNN、LSTM 中，每个输入词对输出的影响是平均的。
+
+但人类阅读时并不会平均看待所有词。 所以我们希望模型在处理某个词时， 能自动“聚焦”于输入中最相关的部分。 这就是注意力
+
+### 缩放点积注意力
+$$
+Attention(Q,K,V) = softmax(\frac{Q K^T}{\sqrt(d_k)}) V
+$$
+
+![qkv](../../resource/qkv.png)
+在上面的公式中
+- Q(shape[n,$d_k$])代表查询向量: 我要查找的信息
+- K(shape[n,$d_k$]) V(shape[n,$d_k$])就是键值对的KV的意思
+- $d_k$是键向量维度
+
+假设输入为x(shape[1,m]) 则
+
+Q(shape[1])
+
+$$
+x \cdot W_Q = Q
+
+x \cdot W_K = K
+
+x \cdot W_V = V
+$$
+
+$W_Q W_K W_V$是可训练的参数矩阵
+
+Q和$K^T$点积 得到了相似度(点积反应相似度),相似度除以$\sqrt(d_k)$ 为了防止方差过大
+
+上一步得到的结果与V点积 计算`加权求和`
+### 多头注意力机制
+多头注意力机制是在这个过程的基础上 将原来的$W_Q W_K W_V$分给很多个注意力头 以让模型学习更多方面的信息 最后拼接起来
+
+![multiattn](../../resource/multiattn.png)
+
+$$
+MultiHead(Q,K,V) = Concat(head_1,head_2,..,head_h)W^O
+$$
+
+其中
+
+$$
+head_i = Attention(Q W^{Q}_i,KW^k_i,VW^V_i)
+$$
+#### 问题
+- 无法捕捉多种关系 因为QKV的权重矩阵只有一组
+- 表达能力有限
+## Transformers
+这是由谷歌提出的框架 也是目前应用最广泛的框架
+
+![transformers](../../resource/transformers.png) 
+
+### 流程
+输入在经过`嵌入`(embedding)后 成为了向量. 然后通过编码(encoding)后 进入多头注意力运算
+
+## Todo
+- BPE,Unigram

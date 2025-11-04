@@ -18,9 +18,27 @@ $$
 - 尖帽: $\hat{a}$ -> \hat{a}
 - 波浪帽: $\tilde{C}_t$ -> \tilde{C}_t
 - 哈达玛乘积: $\circ$ -> \circ
+- 约等于: $\approx$ -> \approx
+- 等价无穷小 $\sim$ -> \sim
+- 矩阵:
+
+$\begin{bmatrix}
+x_1 & x_2 & x_3 \\
+y_1 & y_2 & y_3
+\end{bmatrxi}
+$
+
+```
+\begin{bmatrix}
+x_1 & x_2 & x_3 \\
+y_1 & y_2 & y_3
+\end{bmatrxi}
+```
 
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
 - $\partial$ -> \partial
 - $\lambda$ -> \lambda
+- $\sigma$ -> \sigma
+
