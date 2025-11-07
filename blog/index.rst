@@ -8,4 +8,5 @@
    android
    unpack
    wxd
+   codegeex
    

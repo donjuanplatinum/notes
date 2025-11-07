@@ -32,7 +32,7 @@ assert_eq!(c.shape().dims(), &[2, 3, 1]);
 ```
 - `randn<S: Into<Shape>,T: FloatDType>(mean: T,std:T,s: S,device: &Device) -> Result<Self>`: 按照指定的形状s 均值mean 标准差std创建张量
 - `stack<A: AsRef<Tensor>, D: Dim>(args: &[A], dim: D) -> Result<Self>`: 把一组形状相同的张量沿着一个维度拼接 
-
+- `chunk<D: Dim>(&self,chunks:usize,dim: D)-> Result<Vec<Self>>`: 把张量沿着dim维度切分成chunks个 但可能小于chunks个
 t1 = [[1,2],[3,4]];
 
 t2 = [[5,6],[7,8]];

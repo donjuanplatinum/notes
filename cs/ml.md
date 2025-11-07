@@ -143,6 +143,7 @@ $$
 `所以模型训练的过程之一可以说就是在更新和确定卷积核`
 
 不同卷积核可提取出不同的特征: 如类似Laplace的卷积核用二阶导近似算子检测灰度突变位置  而类似Guass的卷积核抑制噪声，高频信息被压制。
+
 ## 池化
 池化是对卷积后结果的一次"抓重点"
 
@@ -496,6 +497,32 @@ token表 通常用BPE或Unigram分词
 再比如相似的词之间的向量内积要小以表示相似
 
 通常embedding是需要训练的 放在模型的一层中 通过反向传播更新
+### RoPE
+Rotary Embedding 旋转嵌入
+
+是一种特殊的位置编码方法 相较于传统的sin/cos更能优雅的将位置信息融合进注意力的QK
+
+原始的PE是把位置编码直接`加法`加入到embedding中
+
+这样会使之变为`绝对位置` 不能直接知道token间的相对距离 以及序列更长时 泛化能力变差
+
+RoPE是使用`旋转`来在向量空间表达位置信息
+
+传统的注意力: $score_ij = q^T_i k_j$
+
+RoPE的注意力: $score_ij = (R_{\theta(i)} q_i)^T (R_{\theta(j) k_j})$
+
+其中$R_{\theta(p)}$是旋转矩阵 对每个位置p进行不同的角度旋转
+
+- 每个位置p有不同的相位
+- 两个token的相对位置i-j会反应在旋转角度差$\theta(i-j)$
+- 注意力得分自然包含了相对位置信息
+#### 原理
+假设embedding维度为d 我们把两个维度当成一个二维平面$(q_2k,q_{2k+1})$
+
+其中旋转角度: $\theta_p = p / 10000^{2k/d}$
+
+
 ## CNN
 卷积神经网络
 
@@ -785,7 +812,7 @@ impl Rnn{
 ## LSTM
 长短期记忆网络
 
-![LSTM](../../resource/lstm.png) 
+![LSTM](../resource/lstm.png) 
 
 lstm是RNN的一种变体与改进 解决了梯度爆炸的问题 以及RNN短期记忆有限的问题
 
@@ -850,7 +877,7 @@ $$
 Attention(Q,K,V) = softmax(\frac{Q K^T}{\sqrt(d_k)}) V
 $$
 
-![qkv](../../resource/qkv.png)
+![qkv](../resource/qkv.png)
 在上面的公式中
 - Q(shape[n,$d_k$])代表查询向量: 我要查找的信息
 - K(shape[n,$d_k$]) V(shape[n,$d_k$])就是键值对的KV的意思
@@ -873,10 +900,13 @@ $W_Q W_K W_V$是可训练的参数矩阵
 Q和$K^T$点积 得到了相似度(点积反应相似度),相似度除以$\sqrt(d_k)$ 为了防止方差过大
 
 上一步得到的结果与V点积 计算`加权求和`
+#### 问题
+- 无法捕捉多种关系 因为QKV的权重矩阵只有一组
+- 表达能力有限
 ### 多头注意力机制
-多头注意力机制是在这个过程的基础上 将原来的$W_Q W_K W_V$分给很多个注意力头 以让模型学习更多方面的信息 最后拼接起来
+多头注意力机制是在这个过程的基础上 将原来的$W_Q W_K W_V$分给很多个注意力头 以让模型学习更多方面的信息 最后拼接(按列)起来
 
-![multiattn](../../resource/multiattn.png)
+![multiattn](../resource/multiattn.png)
 
 $$
 MultiHead(Q,K,V) = Concat(head_1,head_2,..,head_h)W^O
@@ -887,16 +917,79 @@ $$
 $$
 head_i = Attention(Q W^{Q}_i,KW^k_i,VW^V_i)
 $$
-#### 问题
-- 无法捕捉多种关系 因为QKV的权重矩阵只有一组
-- 表达能力有限
+### 多查询注意力机制
+多头注意力机制的简化版
+
+相当于多头注意力机制但是每个头的KV不是独立的 只有Q是独立的
+## 残差连接
+当网络很深时 梯度在反向传播容易消失或爆炸
+
+残差连接就是在网络层之间增加一个跳跃连接（skip connection），让网络学习残差而不是完整映射
+
+假设我们希望学习
+
+$$
+y=H(x)
+$$
+
+如果学习$H(x)$很难 可改为学习残差$F(x) = H(x) -x$
+
+
+## 归一化
+归一化就是把数据 调整到统一的尺度或范围，让不同特征或者数据之间更可比、更稳定。
+- 消除量纲差异 降低数值差异对计算的影响
+
+神经网络训练时，如果输入或者隐藏状态的数值范围差异太大，会出现几个问题: 梯度消失/爆炸 训练收敛慢 内部协变量偏移
+
+归一化可以缓解这些问题，让网络训练更稳定、更快收敛。
+
+### BatchNorm
+对同一特征在一个batch内计算均值和标准差然后归一化
+### LayerNorm
+对单个样本的所有特征维度计算均值和标准差然后归一化
+### InstanceNorm
+对单个样本的每个通道进行归一化
+### GroupNorm
+把通道分成G组 每组内计算均值和方差然后归一化 是BatchNorm和InstanceNorm的折中方案
+### RMSNorm
+LayerNorm的变体 不同于 LayerNorm： RMSNorm 不减去均值（no centering），只做标准差/幅值归一化
+
+
 ## Transformers
 这是由谷歌提出的框架 也是目前应用最广泛的框架
 
-![transformers](../../resource/transformers.png) 
+![transformers](../resource/transformers.png) 
 
-### 流程
-输入在经过`嵌入`(embedding)后 成为了向量. 然后通过编码(encoding)后 进入多头注意力运算
+其中:
+- Input Embedding: 词嵌入为向量
+- Postitional Encoding: 位置编码
+### 位置编码
+在Transofrmer中 是不依赖序列顺序的 所以需要使用位置编码
 
+transformer采用sin-cos编码
+
+$$
+PE_(pos,2i) = sin(\frac{pos}{10000^{2i/d_model}})
+
+PE_(pos,2i+1) = cos(\frac{pos}{10000^{2i/d_model}})
+$$
+
+其中:
+- pos: token在序列的位置
+- i: embedding的维度索引
+- d_model: embedding的维度大小
+
+意义: 不同位置的编码之间有平滑的相位差 模型可以通过线性组合推断相对位置
+## kv_cache
+在注意力模型推理的过程中 假设有n个输入 那么每生成一个token 需要重新计算前面所有的K V然后计算$Q K^T$ 这显然是浪费的
+
+KV_Cache会保存前面每个token的KV以避免重复计算
+
+```
+step1: 计算 k0,v0 [k0][v0]
+step2: 计算 k1,v1 [k0,k1][v0,v1]
+..
+```
 ## Todo
 - BPE,Unigram
+- kformer
