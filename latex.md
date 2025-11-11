@@ -40,14 +40,14 @@ y_1 & y_2 & y_3
 
 $$
 \begin{cases}
-h_{t+1} = A h_t + B x_t \
+h_{t+1} = A h_t + B x_t \\
 y_t = C h_t + D x_t
 \end{cases}
 $$
 
 ```latex
 \begin{cases}
-h_{t+1} = A h_t + B x_t \
+h_{t+1} = A h_t + B x_t \\
 y_t = C h_t + D x_t
 \end{cases}
 ```
