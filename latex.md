@@ -22,23 +22,42 @@ $$
 - 等价无穷小 $\sim$ -> \sim
 - 矩阵:
 
-$\begin{bmatrix}
-x_1 & x_2 & x_3 \\
-y_1 & y_2 & y_3
-\end{bmatrxi}
-$
-
-```
+$$
 \begin{bmatrix}
 x_1 & x_2 & x_3 \\
 y_1 & y_2 & y_3
-\end{bmatrxi}
+\end{bmatrix}
+$$
+
+```latex
+\begin{bmatrix}
+x_1 & x_2 & x_3 \\
+y_1 & y_2 & y_3
+\end{bmatrix}
 ```
 
+- 括号: 
+
+$$
+\begin{cases}
+h_{t+1} = A h_t + B x_t \
+y_t = C h_t + D x_t
+\end{cases}
+$$
+
+```latex
+\begin{cases}
+h_{t+1} = A h_t + B x_t \
+y_t = C h_t + D x_t
+\end{cases}
+```
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
 - $\partial$ -> \partial
 - $\lambda$ -> \lambda
 - $\sigma$ -> \sigma
-
+- $\Delta$ -> \Delta
+- $\pi$ -> \pi
+- $\psi$ -> \psi
+- $\phi$ -> \phi

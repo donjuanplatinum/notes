@@ -33,6 +33,7 @@ TODO: sed awk regexp
    blog/index
    todo/index
    latex
+   principle
 
 Doc
 
