@@ -3,3 +3,4 @@
 
 .. toctree::
    her
+   common
