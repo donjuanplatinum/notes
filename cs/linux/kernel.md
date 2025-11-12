@@ -1,5 +1,20 @@
 # Linux内核
 
+## 内核结构
+![Linux Kernel Model](../../resource/LKM.svg)
+
+在这个架构图中 Linux被拆解为5个部分: 用户接口(human interfaces) 系统(system) 进程管理(processing) 内存管理(memnory) 存储管理(storage) 网络管理(networking)
+
+而这五个部分又被分为7个层级: 
+- 用户空间接口(userspace interfaces)[这里面包含了系统调用和系统文件] 
+- 虚拟(virtual)[主要表示内核中的逻辑抽象] 
+- 桥接(briges)[连接转换不同的抽象层次] 
+- 逻辑层(logical)
+- 设备管理层(device control)
+- 硬件接口(hardware interfaces)
+- 设备层(electronics)
+### human interfaces
+
 ## 编译内核
 
 ### 编译内核与模块

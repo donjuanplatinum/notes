@@ -9,4 +9,4 @@
    unpack
    wxd
    codegeex
-   
+   how_to_use_ai

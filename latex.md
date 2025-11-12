@@ -51,6 +51,7 @@ h_{t+1} = A h_t + B x_t \\
 y_t = C h_t + D x_t
 \end{cases}
 ```
+- 累乘: $\prod_{k=1}^{n} k$ ->\prod_{k=1}^{n} k
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta

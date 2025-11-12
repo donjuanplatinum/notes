@@ -20,3 +20,4 @@
    rfkill
    qemu
    openssl
+   ffmpeg
