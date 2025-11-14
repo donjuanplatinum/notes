@@ -1,6 +1,7 @@
 # Python基础
-有Rust基础的快速了解python
+有Rust基础的快速上手python
 
+因为是快速上手 所以各种优化,细节都不会提及
 ## 与Rust的一些区别
 - Python在`显式`上是没有类型标注的 也不用打分号
 
@@ -31,3 +32,64 @@ tuple = ('abcd',123,True)
 
 ### Set
 集合
+
+其实就是Rust的HashSet 是一个哈希表 但是仍然可以放不同类型的元素
+
+```python
+a = {'a','b',1,True}
+```
+
+### Dict
+字典
+
+经典的KV表 就是Rust的HashMap 但是仍然可以存放不同类型的元素
+
+```python
+dict = {'name': 1, 'yes': False}
+```
+## 基本语法
+### if_else
+```python
+	if a > b:
+		func1()
+	elif a< b:
+		func2()
+	else:
+		func3()
+```
+
+### match_case
+```python
+match subject:
+	case pattern_1:
+		func1()
+	case pattern_2:
+		func2()
+	case _:
+		func3()
+```
+
+### while
+
+```python
+while a>b:
+	func()
+```
+
+### for
+这里python的for也是和rust一样对迭代器使用
+```python
+for i in Iterator:
+	func()
+	
+```
+
+#### range
+类似rust的 `for i in 0..5`的语法
+
+同样是前闭后开
+
+```python
+for i in range(0,5)
+```
+
