@@ -65,4 +65,4 @@ y_t = C h_t + D x_t
 - $\psi$ -> \psi
 - $\phi$ -> \phi
 - $\mu$ -> \mu
-
+- $\rho$ -> \rho
