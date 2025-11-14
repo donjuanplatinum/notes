@@ -1315,3 +1315,11 @@ plt.title("Bayesian Optimization Convergence")
 plt.show()
 
 ```
+## vit
+Vision Transformer
+
+在图像任务上使用Transformer模型
+
+把图像切成 patch，当成 token 输入 Transformer，完全抛弃了 CNN 卷积结构，最终在大规模数据上超过传统 CNN（如 ResNet）。
+
+![VIT](../resource/vit.png)
