@@ -112,9 +112,16 @@ sudo emerge xrandr
 
 <a id="orgdcc6cb5"></a>
 
-### error: No module named 'imghdr'
+#### error: No module named 'imghdr'
 	
 	pip install standard-img
+#### UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+这是因为matplotlib没有找到绘画框架
+
+```
+pip install pyqt5 -i https://mirrors.ustc.edu.cn/pypi/web/simple
+```
 ### wine
 
 

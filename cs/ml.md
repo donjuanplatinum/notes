@@ -1216,3 +1216,102 @@ $$
 即左边是解码器的上采样 右边是编码器的提取的特征 为什么可以合并成图?
 
 这个在模型的训练中 卷积核会去学习如何融合它们俩 所以最后会融合起来
+## 贝叶斯优化
+贝叶斯优化是一种在黑盒函数(几乎没有这个函数任何信息)中找到全局最优值的方法
+
+作用的函数的特点:
+- 没有解析式 没有导数信息 不知道是否连续... 几乎只知道输入对应的输出
+
+我们需要的效果:
+- 仅考虑最大(小)值 
+- 尽可能少的次数
+
+贝叶斯优化很适合这种任务
+
+### 步骤
+贝叶斯优化需要经过两个步骤
+
+1. 使用贝叶斯统计模型建模目标函数
+2. 使用采集函数(UCB)寻找下一个采集点
+
+### 建模目标函数
+使用高斯过程回归来建模目标函数
+
+在贝叶斯优化中 我们会假设我们的观测点符合高斯分布 这个过程叫先验假设
+
+$$
+f(x) ~ N(\mu_0 (x),\sum_0 (x_,x))
+$$
+
+其中
+
+$$
+\mu_0(x) = [\mu_0(x1),\cdots,\mu_0(x_k)] \\
+\sum_0(x,x) = [\sum_0(x_1,x_1),\cdots,\sum_0(x_1,x_k);\cdots;\sum_0(x_k,x_1),\cdots,\sum_0(x_k,x_k)]
+$$
+
+其中 均值函数$\mu_0$ 我们一般会选择如下形式 而且一般设为0
+
+$$
+\mu_0(x) = \mu + \sum_{i=1}^{p} \beta_i \psi_i (x)
+$$
+
+而方差函数我们一般使用高斯核
+
+$$
+\sum_0(x,x') = k(x,x') = e^({- \frac{{||x-x'||}^2}{2l^2}})
+$$
+
+其中
+- x,x':两个输入点
+- l: 长度尺度超参数 控制函数的平滑程度
+
+高斯核表示 两个点越接近 相似度越高（核值越接近 1）,两个点越远 核值越接近 0
+
+一个点的影响在空间中呈高斯扩散，离得越近影响越大。
+
+```python
+from skopt import gp_minimize
+from skopt.space import Real
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ---------- 定义黑盒函数 ----------
+def branin(xy):
+    x, y = xy
+    a = 1.0
+    b = 5.1/(4*np.pi**2)
+    c = 5/np.pi
+    r = 6
+    s = 10
+    t = 1/(8*np.pi)
+
+    return (y - b*x**2 + c*x - r)**2 + s*(1 - t)*np.cos(x) + s
+
+# ---------- 搜索空间 ----------
+space  = [
+    Real(-5, 10, name="x"),
+    Real(0, 15, name="y")
+]
+
+# ---------- 贝叶斯优化 ----------
+result = gp_minimize(
+    func=branin,
+    dimensions=space,
+    n_calls=50,          # 优化迭代次数
+    n_initial_points=5,  # 初始随机点
+    noise=0.0,           
+    random_state=42
+)
+
+print("最优参数:", result.x)
+print("最优函数值:", result.fun)
+
+
+plt.plot(result.func_vals)
+plt.xlabel("Iteration")
+plt.ylabel("Function value")
+plt.title("Bayesian Optimization Convergence")
+plt.show()
+
+```

@@ -45,6 +45,7 @@ y_t = C h_t + D x_t
 \end{cases}
 $$
 
+
 ```latex
 \begin{cases}
 h_{t+1} = A h_t + B x_t \\
@@ -52,6 +53,7 @@ y_t = C h_t + D x_t
 \end{cases}
 ```
 - 累乘: $\prod_{k=1}^{n} k$ ->\prod_{k=1}^{n} k
+- 省略号: $\cdots$ -> \cdots
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
@@ -62,3 +64,5 @@ y_t = C h_t + D x_t
 - $\pi$ -> \pi
 - $\psi$ -> \psi
 - $\phi$ -> \phi
+- $\mu$ -> \mu
+
