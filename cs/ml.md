@@ -1315,6 +1315,7 @@ plt.title("Bayesian Optimization Convergence")
 plt.show()
 
 ```
+### 使用
 ## vit
 Vision Transformer
 
@@ -1322,4 +1323,75 @@ Vision Transformer
 
 把图像切成 patch，当成 token 输入 Transformer，完全抛弃了 CNN 卷积结构，最终在大规模数据上超过传统 CNN（如 ResNet）。
 
-![VIT](../resource/vit.png)
+![VIT](../resource/vit.gif)
+
+### 架构
+```
+输入分割 ->线性投影-> 位置编码-> 
+```
+
+- 输入分割: 一般裁剪为16*16 这是有实验作为支撑的经验数据
+- 线性投影: 补丁转化为向量 将每个patch的张量展平为shape(1,n)的向量
+
+会有一个`可学习`的线性投影层(全连接层) 将这个向量映射到固定的维度D上 这个D就是transformer的hidden_size 它被称为`patch_embedding`
+
+然后会在`patch_embedding`后的向量的前缀加一个`可学习`的CLS token
+
+cls token的作用是`分类标记` 作为全局表示符号 收集整个图像的信息
+
+所有的输入 token（在 ViT 中即每个 patch）会经过一系列的自注意力层（Self-Attention），而 [CLS] token 通过这个过程积累了所有 patch 信息的“摘要”或“总结”。
+
+*为什么它有全局信息?*
+
+在 transformer模型中 一个token会对一个batch_size所有的token计算注意力分数 所以cls token有对其他token的注意力分数
+
+- 位置编码: 告诉模型 每个补丁的原始空间位置. 
+
+我们来回顾一下 很多机器学习架构都需要对图形的空间信息做特殊处理
+
+比如在U-Net中 会把保存有空间信息的下采样的张量通过跳跃连接拼接到上采样的张量
+
+那么在VIT中:
+1. 创建`可学习`的位置编码矩阵 `shape(D,n+1)` +1是cls token
+2. 将这个矩阵加到patch_embedding的矩阵上
+- 送入transformer
+- 根据任务决定输出
+1. 图像分类任务: 将cls token的输出连接一个全连接层然后和CNN一样得到概率分布
+2. 图像分割任务: 上采样 然后通过像素级分级
+
+### 使用
+```
+pip install vit-pytorch
+```
+
+```python
+import torch
+from vit_pytorch import ViT
+
+v = ViT(
+    image_size = 256,
+    patch_size = 32,
+    num_classes = 1000,
+    dim = 1024,
+    depth = 6,
+    heads = 16,
+    mlp_dim = 2048,
+    dropout = 0.1,
+    emb_dropout = 0.1
+)
+
+img = torch.randn(1, 3, 256, 256)
+
+preds = v(img) # (1, 1000)
+```
+
+其中
+- image_size: 图像尺寸
+- patch_size: 补丁大小(必须能被image_size)整除
+- num_classes: 分类数量
+- dim: 隐藏层维度
+- depth: transformer的数量
+- heads: 多头注意力的头数
+- mlp_dim: 前馈层的维度
+- channels: 和cnn一样
+- dropout: [0,1]

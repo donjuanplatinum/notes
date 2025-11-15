@@ -21,3 +21,5 @@
    rfc
    ml
    python/index
+   pypi
+   
