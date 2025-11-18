@@ -5,3 +5,6 @@ Rust
    
    candle
    clap
+   std
+   criterion
+   asm

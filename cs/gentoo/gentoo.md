@@ -205,7 +205,7 @@
             GTK_IM_MODULE="fcitx"
             XMODIFIERS="@im=fcitx"
         
-            emerge fcitx fcitx-libpinyin fcitx-qt5 kcm-fcitx libpinyin
+	emerge fcitx fcitx-libpinyin fcitx-qt5 kcm-fcitx libpinyin
 
 22. 服务启动
 

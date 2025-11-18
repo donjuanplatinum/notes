@@ -87,7 +87,7 @@ stride[0] = b * c * d
 当且仅当前一个矩阵的列数n等于后一个矩阵的行数m时 两个矩阵的乘积为m*p矩阵
 
 $$
-A_{mxn} x B_{nxp} = C_{mxp}
+A_{mxn}  B_{nxp} = C_{mxp}
 $$
 ### 正态分布
 在初始化时 经常使用正态分布 因为正态分布`更自然而稳定 多数聚集在0附近 少量较大值`
@@ -1171,6 +1171,27 @@ $$
 $$
 h_t = \sum_{k=1}^{t} (\prod_{j=k+1}^{t} A_j)B_k x_k
 $$
+### 使用
+```
+pip install mamba-ssm
+```
+
+```python
+import torch
+from mamba_ssm import Mamba
+
+batch, length, dim = 2, 64, 16
+x = torch.randn(batch, length, dim).to("cuda")
+model = Mamba(
+    # This module uses roughly 3 * expand * d_model^2 parameters
+    d_model=dim, # Model dimension d_model
+    d_state=16,  # SSM state expansion factor
+    d_conv=4,    # Local convolution width
+    expand=2,    # Block expansion factor
+).to("cuda")
+y = model(x)
+assert y.shape == x.shape
+```
 ## Unet
 U-Net 是 1995 年提出的医学图像分割经典网络 是`图像分割`领域的标准架构
 
@@ -1327,7 +1348,7 @@ Vision Transformer
 
 ### 架构
 ```
-输入分割 ->线性投影-> 位置编码-> 
+输入分割 ->线性投影-> 位置编码-> 训练->分类/分割
 ```
 
 - 输入分割: 一般裁剪为16*16 这是有实验作为支撑的经验数据
@@ -1395,3 +1416,47 @@ preds = v(img) # (1, 1000)
 - mlp_dim: 前馈层的维度
 - channels: 和cnn一样
 - dropout: [0,1]
+
+
+## GNN
+图神经网络
+
+这里的图就是传统算法结构中的图 故不多讲述
+
+我们知道: 在欧式空间中 以往的神经网络可以很好的训练. 但是在面对非欧空间时 就不太行了 所以我们使用GNN
+
+那么我们如何解决 让图抽象为可以训练的结构
+
+GNN的核心就是 图矩阵(邻接矩阵)的表示 和 层与层的消息传递
+
+### GNN处理的任务
+- 节点分类: 给定节点 预测类型
+- 链路预测: 预测两个节点是否有连接
+- 社区检测: 确定具有紧密连接关系的节点
+- 网络相似度: 衡量两个网络或子网络之间的相似性
+
+### GCN
+图卷积神经网络
+
+
+#### 使用
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch_geometric.datasets import Planetoid
+from torch_geometric.nn import GCNConv
+
+class GCN(nn.Module):
+    def __init__(self, in_channels, hidden_channels, out_channels):
+        super().__init__()
+        self.conv1 = GCNConv(in_channels, hidden_channels)
+        self.conv2 = GCNConv(hidden_channels, out_channels)
+
+    def forward(self, x, edge_index):
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, edge_index)
+        return x
+```
