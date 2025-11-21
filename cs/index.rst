@@ -23,5 +23,5 @@
    python/index
    pypi
    asm
-   dbg
+   dbg/index
    
