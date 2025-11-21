@@ -6,3 +6,6 @@ Python
    torch
    matplotlib
    python
+   numpy
+   pandas
+   

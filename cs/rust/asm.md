@@ -21,10 +21,20 @@ cargo asm crate::Type::method --rust
 
 
 *尽量使用#[inline(never)] 否则一些函数会被编译器内联而使rust-asm看不到汇编*
-### criterion
+
 ## 良好的优化习惯
 ### 尽量使用开区间Range
+`前闭后开是计算机领域最好的表示法`
+
+![为什么编号应该从零开始？](https://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD831.html)
+
+![rust闭区间不会被llvm优化](https://users.rust-lang.org/t/why-does-iterator-fold-sometimes-optimize-to-a-closed-form-formula-but-a-plain-for-loop-doesnt/136331/3)
+
 Rust编译器会对开区间`Range`有优化 这是由于C语言不流行闭区间`RangeInclusive`
+
+出现这种情况的原因是，包含范围需要进行特殊检查，以处理类似这样的情况1..=i32::MAX，这种情况无法用排除范围来表示。
+
+使用for循环时，Rust 会反复.next()调用迭代器。每次调用时，它都必须检查当前迭代是否是上一次迭代的特殊情况。而使用.fold()`for` 循环.for_each()，迭代器可以遍历所有迭代1..n，然后单独执行n最后一次迭代，这更容易被 LLVM 优化。
 
 #### 代码与汇编
 这里贴出一个前n项和的代码
