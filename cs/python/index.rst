@@ -8,4 +8,5 @@ Python
    python
    numpy
    pandas
-   
+   scipy
+   sklearn

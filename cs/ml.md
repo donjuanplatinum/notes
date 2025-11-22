@@ -1241,6 +1241,7 @@ $$
 贝叶斯优化是一种在黑盒函数(几乎没有这个函数任何信息)中找到全局最优值的方法
 
 作用的函数的特点:
+
 - 没有解析式 没有导数信息 不知道是否连续... 几乎只知道输入对应的输出
 
 我们需要的效果:
@@ -1249,94 +1250,280 @@ $$
 
 贝叶斯优化很适合这种任务
 
-### 步骤
-贝叶斯优化需要经过两个步骤
+贝叶斯优化在一个迭代循环中运行 每一步都围绕着平衡两个目标: **开发** 和 **探索**
 
-1. 使用贝叶斯统计模型建模目标函数
-2. 使用采集函数(UCB)寻找下一个采集点
+### 核心组件
+贝叶斯优化的两个核心组件: 代理模型 和 采集函数
 
-### 建模目标函数
-使用高斯过程回归来建模目标函数
+#### 代理模型
+代理模型是 使用历史的观测数据来拟合f(x)的曲线的模型
+ 
+通常使用高斯过程GP
+	
+##### 高斯过程
+GP是一种强大的 非参数化的回归方法.
 
-在贝叶斯优化中 我们会假设我们的观测点符合高斯分布 这个过程叫先验假设
-
-$$
-f(x) ~ N(\mu_0 (x),\sum_0 (x_,x))
-$$
-
-其中
+GP会假设f(x)服从多维高斯分布
 
 $$
-\mu_0(x) = [\mu_0(x1),\cdots,\mu_0(x_k)] \\
-\sum_0(x,x) = [\sum_0(x_1,x_1),\cdots,\sum_0(x_1,x_k);\cdots;\sum_0(x_k,x_1),\cdots,\sum_0(x_k,x_k)]
+f(x_1),f(x_2),...,f(x_n) ~ N(\mu,K)
 $$
-
-其中 均值函数$\mu_0$ 我们一般会选择如下形式 而且一般设为0
-
-$$
-\mu_0(x) = \mu + \sum_{i=1}^{p} \beta_i \psi_i (x)
-$$
-
-而方差函数我们一般使用高斯核
-
-$$
-\sum_0(x,x') = k(x,x') = e^({- \frac{{||x-x'||}^2}{2l^2}})
-$$
-
-其中
-- x,x':两个输入点
-- l: 长度尺度超参数 控制函数的平滑程度
-
-高斯核表示 两个点越接近 相似度越高（核值越接近 1）,两个点越远 核值越接近 0
-
-一个点的影响在空间中呈高斯扩散，离得越近影响越大。
 
 ```python
-from skopt import gp_minimize
-from skopt.space import Real
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import Matern, ConstantKernel as C
 
-# ---------- 定义黑盒函数 ----------
-def branin(xy):
-    x, y = xy
-    a = 1.0
-    b = 5.1/(4*np.pi**2)
-    c = 5/np.pi
-    r = 6
-    s = 10
-    t = 1/(8*np.pi)
+# 训练点 在贝叶斯优化中由采集函数传给GPR
+X_train = np.array([[1], [3], [5], [6], [7.5]])
+y_train = np.sin(X_train).ravel()
 
-    return (y - b*x**2 + c*x - r)**2 + s*(1 - t)*np.cos(x) + s
+# 核函数 在贝叶斯优化中 我们经常使用Matern
+kernel = Matern()
 
-# ---------- 搜索空间 ----------
-space  = [
-    Real(-5, 10, name="x"),
-    Real(0, 15, name="y")
-]
+# 使用GPR高斯过程回归
+gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=1e-6, normalize_y=True)
 
-# ---------- 贝叶斯优化 ----------
-result = gp_minimize(
-    func=branin,
-    dimensions=space,
-    n_calls=50,          # 优化迭代次数
-    n_initial_points=5,  # 初始随机点
-    noise=0.0,           
-    random_state=42
-)
+# 拟合训练数据
+gp.fit(X_train, y_train)
 
-print("最优参数:", result.x)
-print("最优函数值:", result.fun)
+# 生成预测点
+X_test = np.linspace(0, 10, 200).reshape(-1, 1)
+y_pred, sigma = gp.predict(X_test, return_std=True)  # 返回均值和标准差
 
 
-plt.plot(result.func_vals)
-plt.xlabel("Iteration")
-plt.ylabel("Function value")
-plt.title("Bayesian Optimization Convergence")
+plt.figure(figsize=(10,5))
+
+plt.plot(X_test, y_pred, 'b-', label='GP Mean')
+
+plt.plot(X_test, np.sin(x_test), label='sinx')
+# 不确定性带（±1 std）
+plt.fill_between(X_test.ravel(),
+                 y_pred - sigma,
+                 y_pred + sigma,
+                 alpha=0.2, color='blue', label='GP ±1 std')
+# 训练点
+plt.scatter(X_train, y_train, c='r', marker='o', s=50, label='Training Data')
+plt.title("Gaussian Process Regression")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+###### 核函数
+核函数是高斯过程**最重要**的组件 它决定了对目标函数形状的**先验假设**
+
+在实际运用中 核函数的参数是训练调优的 通过LML最大化边界似然来完成
+
+常用的核函数
+
+- RBF: 高斯核 也叫平方指数核
+
+假设目标函数无限平滑 当你确信你的目标函数**非常光滑** 没有高频噪声或剧烈突变 可以用
+- Matern: **最常用**的 RBF的泛化形式 通过`nu`参数控制平滑度
+
+  - nu = 0.5 非常粗糙
+  - nu = 1.5 一次可导
+  - nu = 2.5 二次可导 是BO的默认首选
+  - nu = $\infty$ 收敛于RBF
+- RQ: 有理二次核 多个不同length_scale的RBF核的无穷和
+
+允许函数在不同的尺度上发生变化 比 RBF 更灵活 能够同时容纳大尺度的波动和小尺度的细节
+
+当你不确定函数的波动频率是否一致时 可以使用
+- ESS: 周期核
+
+为周期性规律设计的 适用于时间序列数据 季节性数据 或者类似正弦波的物理现象
+- WhiteKernel: 白噪核
+
+通常加在其他核上
+#### 采集函数
+采集函数接收代理模型提供的**预测均值**和**预测方差** 去计算在整个搜索空间中 哪个点的潜在价值最高 同时要平衡**开发**与**探索**的权重
+
+常用的采集函数:
+
+- EI: 期望提升
+
+计算通过在x处采样 能够比当前已知的最佳值提升的期望量
+
+$$
+EI(x) = \begin{cases}
+(\mu(x) - \mu_(best) - \xi)\Phi(Z) + \sigma(x)\phi(Z), \sigma(x) > 0 \\
+0, \sigma(x) = 0
+\end{cases}
+$$
+
+其中
+
+$$
+Z = \frac{\mu(x) - \mu_{best} - \xi}{\sigma(x)}
+$$
+
+Z反应了获得改进的概率
+
+$\mu(x)$: 高斯过程模型在x的预测值
+
+$\sigma(x)$: 高斯过程在x的不确定性
+
+$\mu_{best}$: 当前最优值
+
+$\xi$: 平衡系数 平衡探索与开发 $\xi$ 越大 越倾向于探索
+
+$\Phi(Z)$: f(x)能超过当前最优值的概率 若Z很大 则$\Phi(Z)$ 接近1
+
+$\phi(Z)$: f(x)超过当前最优值提升的幅度
+
+- UCB: 上置信界
+
+简单的将预测均值$\mu$ 加上不确定性$\sigma$的缩放版本 
+
+$$
+UCB(x) = \mu(x) + \beta \cdot \sigma(x)
+$$
+
+其中
+
+$\mu(x)$ 是高斯过程得出的预测均值
+
+$\sigma(x)$ 是高斯过程得出的不确定性
+
+$\beta$ 是权重 平衡开发与探索
+
+乐观主义的策略: 我们永远选择最乐观的点去采样
+
+$\mu$告诉我们函数值可能的值 而$\beta \cdot \sigma(x)$告诉我们若运气好 函数能到的边界
+
+##### LML
+优化高斯过程核的参数的过程其实和反向传播是类似的 计算LML的梯度然后优化器更新
+
+边际似然 在高斯过程中 我们假设观测到的数据y服从一个多维高斯分布 LML 就是这个多维高斯分布的概率密度函数的对数
+
+LML的公式可以分解为三个部分
+$$
+\log p(\mathbf{y} \mid X, \theta) = \underbrace{-\frac{1}{2} \mathbf{y}^T (\mathbf{K} + \sigma_n^2 \mathbf{I})^{-1} \mathbf{y}}_{\text{I. 数据拟合优度 (Data Fit)}} \underbrace{- \frac{1}{2} \log |\mathbf{K} + \sigma_n^2 \mathbf{I}|}_{\text{II. 模型复杂度惩罚 (Complexity Penalty)}} \underbrace{- \frac{N}{2} \log(2\pi)}_{\text{III. 常数项}}
+$$
+
+- 数据拟合优度: 衡量模型预测值与实际观测值的匹配程度
+- 模型复杂度: 防止过拟合
+- 常数项: 标准化用 不影响优化过程
+
+LML的优化过程就是使用优化器来找到一组$\theta$ 使上述LML的值最大 
+
+这是通过在每次的高斯过程的循环中更新的
+
+
+### 示例
+这里的黑盒函数是
+
+$$
+f(x) = sin(5x) \cdot (1 - tanh(x^2))
+$$
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import Matern
+from scipy.stats import norm
+
+def target_function(x):
+    return np.sin(5 * x) * (1 - np.tanh(x ** 2))
+
+def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
+	# 由高斯过程回归得到预测均值和预测标准差
+    mu, sigma = gpr.predict(X, return_std=True)
+    mu = mu.ravel()
+    sigma = sigma.ravel()
+    
+    mu_sample = gpr.predict(X_sample)
+    mu_sample_opt = np.max(mu_sample)
+
+    with np.errstate(divide='warn'):
+        imp = mu - mu_sample_opt - xi
+        Z = imp / sigma
+        ei = imp * norm.cdf(Z) + sigma * norm.pdf(Z)
+        ei[sigma == 0.0] = 0.0
+    return ei
+
+
+# 搜索空间
+X_bound = np.linspace(0, 2, 200).reshape(-1, 1)
+y_true = target_function(X_bound)
+
+# 初始观测点
+X_train = np.array([[0.1], [0.5]])
+y_train = target_function(X_train)
+
+# 定义内核和模型
+kernel = Matern()
+gpr = GaussianProcessRegressor(kernel=kernel, alpha=1e-6, n_restarts_optimizer=10)
+
+# 设置迭代次数
+n_iterations = 3
+
+
+fig, axes = plt.subplots(n_iterations, 2, figsize=(12, 4 * n_iterations), sharex=True)
+plt.subplots_adjust(hspace=0.3)
+
+
+for i in range(n_iterations):
+    
+    # GPR拟合
+    gpr.fit(X_train, y_train)
+    
+    # 由GPR得到均值核方差
+    mu, std = gpr.predict(X_bound, return_std=True)
+    mu = mu.ravel()
+    std = std.ravel()
+    
+    # 计算采集函数EI的值
+    ei = expected_improvement(X_bound, X_train, y_train, gpr)
+    
+    # 把EI给的下一个点加入到GPR的探测点中
+    next_x_idx = np.argmax(ei)
+    next_x = X_bound[next_x_idx]
+    next_y_val = target_function(next_x) 
+    
+    
+    ax_model = axes[i, 0] 
+    ax_acq = axes[i, 1]      
+    ax_model.plot(X_bound, y_true, 'k--', alpha=0.5, label='Ground Truth')
+    ax_model.plot(X_bound, mu, 'b-', label='GP Mean')
+    ax_model.fill_between(X_bound.ravel(), mu - 1.96 * std, mu + 1.96 * std, 
+                          alpha=0.2, color='blue', label='95% Confidence')
+    
+    ax_model.scatter(X_train, y_train, c='black', s=40, zorder=10, label='Existing Data')
+    
+    ax_model.axvline(x=next_x, color='red', linestyle='--', alpha=0.6)
+    ax_model.scatter(next_x, mu[next_x_idx], c='red', s=100, marker='*', zorder=15, label='Next Candidate')
+    
+    ax_model.set_title(f"Iteration {i+1}: Surrogate Model", fontsize=12, fontweight='bold')
+    ax_model.set_ylabel("Output $f(x)$")
+    if i == 0: ax_model.legend(loc='upper left', fontsize=8)
+
+    
+    ax_acq.plot(X_bound, ei, 'g-', label='Expected Improvement')
+    ax_acq.fill_between(X_bound.ravel(), 0, ei, color='green', alpha=0.3)
+    
+    ax_acq.axvline(x=next_x, color='red', linestyle='--', alpha=0.6)
+    
+    ax_acq.set_title(f"Iteration {i+1}: Acquisition Function (EI)", fontsize=12)
+    ax_acq.set_ylabel("Utility")
+    
+    
+    X_train = np.vstack((X_train, next_x))
+    y_train = np.vstack((y_train, next_y_val))
+
+
+axes[-1, 0].set_xlabel("Input $x$")
+axes[-1, 1].set_xlabel("Input $x$")
+
+plt.tight_layout()
 plt.show()
 
 ```
-### 使用
 ## vit
 Vision Transformer
 
@@ -1460,3 +1647,13 @@ class GCN(nn.Module):
         x = self.conv2(x, edge_index)
         return x
 ```
+## PCGrad
+投影解决梯度冲突
+
+在实际情况中 经常遇到两个任务的梯度方向冲突(内积<0) 则我们需要将一个梯度在另一个梯度的正交子空间投影
+
+
+## k-近邻
+## 决策树
+## 支持向量机
+

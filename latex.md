@@ -66,3 +66,5 @@ y_t = C h_t + D x_t
 - $\phi$ -> \phi
 - $\mu$ -> \mu
 - $\rho$ -> \rho
+- $\infty$ -> \infty
+- $\xi$ -> \xi
