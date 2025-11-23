@@ -10,3 +10,4 @@ Python
    pandas
    scipy
    sklearn
+   manim
