@@ -54,6 +54,9 @@ y_t = C h_t + D x_t
 ```
 - 累乘: $\prod_{k=1}^{n} k$ ->\prod_{k=1}^{n} k
 - 省略号: $\cdots$ -> \cdots
+- 内积: $\langle x, y \rangle$ -> $\langle x, y \rangle$
+- 范数: $\|x\|$ -> \|x\|
+- 积分: $\int$ -> \int
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta

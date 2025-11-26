@@ -9,5 +9,5 @@ emacs
    wanderlust
    elisp
    eaf
-
+   gptel
    
