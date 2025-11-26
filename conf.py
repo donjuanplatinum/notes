@@ -35,7 +35,8 @@ html_logo = "resource/profile.png"
 html_favicon = "resource/profile.png"
 
 html_theme_options = {
-    'navigation_depth': 400,  # 默认是4
+    "collapse_navigation": False,
+    "navigation_depth": 400,
 }
 
 source_suffix = ['.rst', '.md']
