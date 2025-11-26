@@ -43,6 +43,7 @@ source_suffix = ['.rst', '.md']
 myst_enable_extensions = [
     "amsmath",    # 支持 \begin{equation} 等环境
     "dollarmath", # 支持 $...$ 和 $$...$$
+    "sphinx_copybutton",
 ]
 mathjax_path = "MathJax.js"
 
