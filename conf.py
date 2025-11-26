@@ -16,6 +16,8 @@ author = 'Donjuanplatinum'
 extensions = [
     'myst_parser', 
     'sphinx.ext.mathjax',
+    'sphinx_copybutton',
+    'sphinxcontrib.images',
 ]
 
 templates_path = ['_templates']
@@ -43,8 +45,6 @@ source_suffix = ['.rst', '.md']
 myst_enable_extensions = [
     "amsmath",    # 支持 \begin{equation} 等环境
     "dollarmath", # 支持 $...$ 和 $$...$$
-    "sphinx_copybutton",
-    "sphinxcontrib_images",
 ]
 mathjax_path = "MathJax.js"
 
