@@ -11,3 +11,4 @@ Python
    scipy
    sklearn
    manim
+   torch_adapt

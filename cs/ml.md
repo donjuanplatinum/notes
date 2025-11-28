@@ -286,6 +286,15 @@ $$
 
 在这种情况下，损失函数度量的是预测值与真实值之间的差异，模型的目标是最小化这个损失。
 
+### BCE
+二分类问题的交叉熵损失
+
+常用于GAN 因为GAN就是二分类问题
+
+$$
+BCE = -[y \log D(x) + (1-y) \log(1-D(x))]
+$$
+
 ## 梯度下降
 通过沿着损失函数的梯度的反方向更新参数来减少损失函数的值
 
@@ -1668,6 +1677,156 @@ class GCN(nn.Module):
         x = self.conv2(x, edge_index)
         return x
 ```
+## GAN
+生成对抗网络
+
+生成对抗网络主要的部分是一个**生成器**和一个**判别器**
+
+生成器的目的是通过生成数据最终骗过判别器
+
+判别器的目的是分辨图像是真的还是生成器生成的
+
+最终达到**纳什均衡**
+
+$$
+\min_G \max_D V(D,G)
+= \mathbb{E}*{x\sim p*{\text{data}}}[\log D(x)]
+
+* \mathbb{E}_{z\sim p_z}[\log(1 - D(G(z)))]
+$$
+
+其中:
+- minmax: 纳什均衡的数学形式
+- $\mathbb{E}_{x \sim p_data}[\log D(x)]$: 对于真实的样本x 希望D(x)越接近1越好
+- $\mathbb{E}_{z \sim p_z}[log(1- D(G(z)))]$: 对于假样本G(z) 希望D(G(Z))越接近0越好
+
+### 损失函数
+判别器:
+
+$$
+Loss_D = -E[logD(x)] - E[log(1 - D(G(z)))]
+$$
+
+生成器:
+
+$$
+Loss_G = -E[logD(G(z))]
+$$
+### 反向传播
+在GAN中 训练D时要阻断G
+
+训练G时不用阻断D
+### 示例
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+
+z_dim = 100
+hidden_dim = 256
+image_dim = 28 * 28
+
+# 生成器 两层MLP
+class Generator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(z_dim, hidden_dim),
+            nn.ReLU(True),
+            nn.Linear(hidden_dim, image_dim),
+            nn.Tanh(),
+        )
+
+    def forward(self, z):
+        return self.net(z)
+
+# 判别器 两层MLP
+class Discriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(image_dim, hidden_dim),
+            nn.LeakyReLU(0.2, True),
+            nn.Linear(hidden_dim, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
+
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,)),  # [-1,1]
+])
+
+dataset = datasets.MNIST(root="./data", train=True, transform=transform, download=True)
+loader = DataLoader(dataset, batch_size=64, shuffle=True)
+
+
+G = Generator()
+D = Discriminator()
+
+optimizer_G = optim.Adam(G.parameters(), lr=2e-4)
+optimizer_D = optim.Adam(D.parameters(), lr=2e-4)
+
+epochs = 100
+
+for epoch in range(epochs):
+    for real, _ in loader:
+        real = real.view(-1, image_dim)
+        batch_size = real.size(0)
+
+        
+        z = torch.randn(batch_size, z_dim)
+		# 阻断G的梯度 训练D时不传播到G
+        fake = G(z).detach()
+
+        D_real = D(real)
+        D_fake = D(fake)
+
+        loss_D = - (torch.log(D_real + 1e-8).mean() +
+                    torch.log(1 - D_fake + 1e-8).mean())
+
+        optimizer_D.zero_grad()
+        loss_D.backward()
+        optimizer_D.step()
+
+        
+        z = torch.randn(batch_size, z_dim)
+        fake = G(z)
+
+	    
+        D_fake = D(fake)
+        loss_G = - torch.log(D_fake + 1e-8).mean()
+
+        optimizer_G.zero_grad()
+        loss_G.backward()
+        optimizer_G.step()
+
+    print(f"Epoch [{epoch+1}/{epochs}]  Loss_D: {loss_D:.4f} | Loss_G: {loss_G:.4f}")
+
+
+
+z = torch.randn(16, z_dim)
+samples = G(z).view(-1, 1, 28, 28)
+
+
+import matplotlib.pyplot as plt
+
+grid = samples.detach().numpy()
+fig, axs = plt.subplots(4, 4, figsize=(4,4))
+
+for i, ax in enumerate(axs.flatten()):
+    ax.imshow(grid[i][0], cmap='gray')
+    ax.axis('off')
+
+plt.show()
+```
 ## PCGrad
 投影解决梯度冲突
 
@@ -1738,6 +1897,9 @@ Maximum Mean Discrepancy 最大均值差异
 
 在再生希尔伯特空间(RKHS)中计算两个分布的均值差距
 
+然后将MMD的值整合到**损失函数**中
+
+MMD的训练是训练MK-MMD中多个核的偏重 如果只有一个核 那么不需要训练
 ###### 希尔伯特空间
 首先我们介绍希尔伯特空间
 
@@ -1822,12 +1984,265 @@ $$
 再生性赋予了再生希尔伯特空间一个独特的能力: 在这个空间里 你可以通过纯粹的几何操作**内积**来读取函数在特定点上的值
 
 **也就是说 我们并不需要直接计算f(x) 可以通过计算核函数和f来直接得到f(x)**
+
+
+###### 核均值嵌入
+现在我们需要将分布映射到再生希尔伯特空间
+
+一个分布P映射到RKHS中的元素p'的定义是
+
+$$
+p' = E_{X \sim P}[\phi(X)] = \int \phi(x) dP(x)
+$$
+
+简单来说 核均值嵌入 $p'$ 就是分布P下的特征映射$\phi(X)$的期望
+###### 最大均值差异
+MMD表示的是两个分布在RKHS中对应**核均值**之间的距离
+
+$$
+\text{MMD}^2(P, Q) = \mathbf{E}_{X, X' \sim P}[k(X, X')] + \mathbf{E}_{Y, Y' \sim Q}[k(Y, Y')] - 2 \mathbf{E}_{X \sim P, Y \sim Q}[k(X, Y)]
+$$
+
+也就等于
+
+$$
+\text{MMD}_{\text{V}}^2(X, Y) = \frac{1}{N^2} \sum_{i=1}^{N} \sum_{j=1}^{N} k(\mathbf{x}_i, \mathbf{x}_j) + \frac{1}{M^2} \sum_{i=1}^{M} \sum_{j=1}^{M} k(\mathbf{y}_i, \mathbf{y}_j) - \frac{2}{NM} \sum_{i=1}^{N} \sum_{j=1}^{M} k(\mathbf{x}_i, \mathbf{y}_j)
+$$
+
+
+###### 整合进损失函数
+
+$$
+Loss = Loss_source + \lamba \cdot Loss_MMD
+$$
+###### MK-MMD
+多核MMD 其实就是把原来的一个核函数变成多个核函数的和
+
+我们知道 多个核函数的和仍然是**正定**的 所以可以让多个核的和来作为核函数
+
+
 ##### CORAL
 Correlation Alignment 相关性对齐
 
 对齐源域和目标域特征的**二阶统计量**
+
+通过最小化源域和目标域特征的**协方差矩阵（或相关矩阵）**之间的差异，来减小领域漂移（Domain Shift）。
+
+在统计学意义上 若两个分布的
+
+- 均值一样
+- 协方差一样
+
+那么在二阶统计意义上,它们是基本上是对齐的
+
+至于更高阶的统计量没有必要去计算 前两阶已经足够有效
+
+所以在CORAL中 研究的是**协方差矩阵的差异**
+
+$$
+Loss_CORAL = \frac{1}{4 d^2} \| C_s - C_t \|_F^2
+$$
+
+其中
+- d: 特征维度
+- $\| \|_F$: Frobenius范数
+- C_s/C_t: 源域和目标域的协方差矩阵
+###### 二阶统计量
+一阶统计量就是均值 
+
+$$
+\mu = E[x]
+$$
+
+二阶统计量描述均值之外的第二层结构
+
+比如 方差 协方差 协方差矩阵
+###### Frobenius范数
+协方差矩阵是一个**对称矩阵** 要衡量两个对称矩阵的相似程度，最自然的距离度量就是矩阵的 Frobenius 范数
+
+Frobenius 范数把每个元素都平等对齐
+
+$$
+\| C_s - C_t\|_F^2 = \sum_{i,j}(C_{s,ij} - C_{t,ij})^2
+$$
+###### 协方差矩阵
+首先我们从协方差入手
+
+对于两个特征 x,y
+
+$$
+Cov(x,y) = E[(x-\mu_x)(y - \mu_y)]
+$$
+
+也就是说  
+- 若x增加时y也增加 Cov >0
+- x增加时y减少 Cov <0
+
+所以协方差衡量两个特征是否一起变换
+
+若特征维度是d 那么协方差矩阵就是一个d*d的矩阵
+
+$$
+C_{ij} =  Cov(x_i,x_j)
+$$
+
+
+
+$$
+C = \frac{1}{n-1} (X^T X)
+$$
+
 ##### DANN
+
 Doamin-Adversarial Neural  Networks 基于对抗学习的方法
+
+DANN主要分为三个部分
+
+- 特征提取器F: 提取域不可分性 
+
+F的目标是让C容易分类 让D难以分域
+
+- 标签分类器C: 在源域上正常的分类
+
+C在源域的标签的数据上训练 **让特征对标签有区分能力**
+
+- 域分类器D: 判断样本来自源域还是目标域
+
+D想让源域和目标域能被分开
+
+###### 对抗
+**其中F与D的对抗关系是DANN的核心**
+
+D与F的关系是对抗的
+
+其中 GAN的对抗发生在输入空间 而DANN的对抗发生在特征空间
+
+GAN的目标是让fake像real 无法让判别器D区分
+
+DANN的目标是让源域和目标域无法区分
+###### GRL
+梯度翻转层
+
+在前向传播时什么也不做 在反向传播时转换梯度为相反数 乘-1
+
+这样就能实现F和D的对抗 让梯度尽可能小 取反后让梯度尽可能大
+###### 架构
+![DANN](../resource/dann.png)
+
+
+- 绿色的是特征提取器F
+- 蓝色的是标签分类器C
+- 红色的是域分类器D
+
+首先 F与C组成了前馈神经网络 最终得到了概率分布
+
+通过这个概率分布我们得到了损失$L_y$.$L_y$的作用是反向传播更新F和C
+
+然后 F与D组成了对抗神经网络 通过GRL层实现梯度反转 
+
+最后训练出来的分类器C可以直接到目标域工作
+###### 示例
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.autograd import Function
+
+
+class GRL(Function):
+    @staticmethod
+    def forward(ctx, x, lambda_):
+        ctx.lambda_ = lambda_
+        return x.view_as(x)
+    
+    @staticmethod
+    def backward(ctx, grad_output):
+        return -ctx.lambda_ * grad_output, None
+
+def grl(x, lambda_):
+    return GRL.apply(x, lambda_)
+
+
+class DANN(nn.Module):
+    def __init__(self, input_dim=784, feature_dim=128, class_num=10):
+        super().__init__()
+        # F: Feature Extractor
+        self.feature = nn.Sequential(
+            nn.Linear(input_dim, 256),
+            nn.ReLU(),
+            nn.Linear(256, feature_dim),
+            nn.ReLU()
+        )
+        # C: Label Classifier
+        self.class_classifier = nn.Sequential(
+            nn.Linear(feature_dim, 100),
+            nn.ReLU(),
+            nn.Linear(100, class_num)
+        )
+        # D: Domain Classifier
+        self.domain_classifier = nn.Sequential(
+            nn.Linear(feature_dim, 100),
+            nn.ReLU(),
+            nn.Linear(100, 2)  # 2 domains: source/target
+        )
+        
+    def forward(self, x, lambda_=0.1):
+        f = self.feature(x)
+        y = self.class_classifier(f)
+        d = self.domain_classifier(grl(f, lambda_))
+        return y, d, f
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+input_dim = 28*28
+feature_dim = 128
+class_num = 10
+lr = 1e-3
+lambda_grl = 0.1
+epochs = 5
+batch_size = 64
+
+model = DANN(input_dim, feature_dim, class_num).to(device)
+optimizer = optim.Adam(model.parameters(), lr=lr)
+criterion_class = nn.CrossEntropyLoss()
+criterion_domain = nn.CrossEntropyLoss()
+
+source_data = torch.randn(500, input_dim)
+source_labels = torch.randint(0, class_num, (500,))
+target_data = torch.randn(500, input_dim)
+source_dataset = torch.utils.data.TensorDataset(source_data, source_labels)
+source_loader = torch.utils.data.DataLoader(source_dataset, batch_size=batch_size, shuffle=True)
+
+
+target_dataset = torch.utils.data.TensorDataset(target_data, torch.zeros(500).long())
+target_loader = torch.utils.data.DataLoader(target_dataset, batch_size=batch_size, shuffle=True)
+
+
+for epoch in range(epochs):
+    for (x_s, y_s), (x_t, _) in zip(source_loader, target_loader):
+        x_s, y_s = x_s.to(device), y_s.to(device)
+        x_t = x_t.to(device)
+        
+        x = torch.cat([x_s, x_t], dim=0)
+        domain_labels = torch.cat([torch.zeros(len(x_s)), torch.ones(len(x_t))], dim=0).long().to(device)
+        
+        # 前向
+        class_pred, domain_pred, features = model(x, lambda_=lambda_grl)
+        
+        # 分类损失只计算源域
+        loss_class = criterion_class(class_pred[:len(x_s)], y_s)
+        # 域损失计算所有样本
+        loss_domain = criterion_domain(domain_pred, domain_labels)
+        loss = loss_class + loss_domain
+        
+        # 反向传播
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+    print(f"Epoch [{epoch+1}/{epochs}]  Loss_class: {loss_class.item():.4f} | Loss_domain: {loss_domain.item():.4f}")
+
+```
+
 #### 实例自适应
 实例自适应不是对样本**更改分布** 或者**对齐** 而是对样本进行**加权**
 
