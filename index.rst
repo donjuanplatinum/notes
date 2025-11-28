@@ -7,6 +7,8 @@
 
 - `Mail <donjuan@barrensea.org>`_
 
+
+  
 我的gpg指纹:
 
 .. code-block::
@@ -30,3 +32,18 @@
 友链:
 
 - `0xa7973908 <https://mahiro.ink>`_
+
+
+
+
+
+.. toctree::
+   :maxdepth: 1
+
+   cs/index
+   math/index
+   blog/index
+   todo/index
+   latex
+   principle
+  
