@@ -10,4 +10,5 @@ emacs
    elisp
    eaf
    gptel
+   mcp
    

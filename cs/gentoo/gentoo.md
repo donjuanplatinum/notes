@@ -1,9 +1,4 @@
-
-
-
-<a id="org2f84ce5"></a>
-
-# 安装
+## 安装
 
 
 <a id="org2af0dd7"></a>
@@ -261,12 +256,12 @@
 
 <a id="org4eb373e"></a>
 
-# Chroot安装
+## Chroot安装
 
 
 <a id="org6bab371"></a>
 
-# 后续
+## 后续
 
 
 <a id="org429572b"></a>
@@ -304,7 +299,7 @@ F4选择即可
 
 <a id="orgf6cbb0e"></a>
 
-# 注意
+## 注意
 
 更新后记得执行 因为gentoo有时更新会换一些库的位置 dispatch-conf可以帮助你迁移配置文件
 
@@ -313,7 +308,7 @@ F4选择即可
 
 <a id="org3847814"></a>
 
-# 部分包配置
+## 部分包配置
 
 
 <a id="org72ffef1"></a>
@@ -325,7 +320,7 @@ F4选择即可
 
 <a id="org854e0e6"></a>
 
-# portage
+## portage
 
 
 <a id="org765bb86"></a>
@@ -588,7 +583,7 @@ F4选择即可
 
 <a id="org90eaac3"></a>
 
-# 配置文件
+## 配置文件
 
 
 <a id="org1017673"></a>
@@ -1531,14 +1526,14 @@ F4选择即可
 
 <a id="org0ff5b57"></a>
 
-# 应该安装的包
+## 应该安装的包
 
     fcitx-gtk
 
 
 <a id="orgee4e1c2"></a>
 
-# 问题
+## 问题
 
 -   当遇到编译出错时 可以试着先更新portage包
 -   也可以用equery看看出错包的依赖 然后先更新那些包
@@ -1546,7 +1541,7 @@ F4选择即可
 
 <a id="org99d9fc2"></a>
 
-# Ebuild
+## Ebuild
 
 
 <a id="orgdeb829d"></a>
@@ -2043,4 +2038,18 @@ USE关系
 修改系统时间到未来
 ```shell
 date -s "2094-06-11 15:30:00"
+```
+## 二进制包
+ make.conf
+```
+FEATURES="${FEATURES} binpkg-request-signature"
+```
+
+运行Getuto
+```
+getuto
+```
+
+```
+cat /etc/portage/gnupg/pass
 ```

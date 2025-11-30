@@ -29,9 +29,6 @@
 
 如果你也是我的世界玩家 欢迎一起讨论游玩!
 
-友链:
-
-- `0xa7973908 <https://mahiro.ink>`_
 
 
 
@@ -47,3 +44,6 @@
    latex
    principle
   
+友链:
+
+- `0xa7973908 <https://mahiro.ink>`_

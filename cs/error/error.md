@@ -187,6 +187,11 @@ pip install pyqt5 -i https://mirrors.ustc.edu.cn/pypi/web/simple
 
 <a id="org828deb3"></a>
 
+#### 很多软件无法fcitx键入
+指定环境变量启动
+```shell
+QT_IM_MODULE="fcitx" GTK_IM_MODULE="fcitx" XMODIFIERS="@im=fcitx" command
+```
 ### gnome
 
 

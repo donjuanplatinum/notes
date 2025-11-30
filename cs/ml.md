@@ -15,6 +15,76 @@
 数学里面有那么多逼近函数的方式: Taylor展开 Lagrange插值 傅立叶....
 
 其他数学方法的泛化能力都非常的弱 比如逼近sinx. 拉格朗日插值就会在边界震荡 而神经网络可很好的泛化
+### 过程
+我们用一个MLP来拟合一条复杂的曲线
+
+$$
+e^{-0.1 * x} * sin(2x) + 0.1 x^3 - 3 x^2 + 2x
+$$
+
+#### 模型
+首先我们定义一个MLP模型
+```python
+class MLP(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+```
+它具有2层全连接层 其中第一个全连接层后面连接了一个**非线性**的激活函数,有了非线性的函数才能拟合曲线.
+
+forward是模型的**前向传播**的过程 先经过`fc1` 然后经过`relu`激活函数 最后过一层`fc2`
+
+#### 数据集的处理
+在这里我们的数据集是 x为函数的横轴 y为函数值
+
+```python
+def target_function(x):
+    return np.exp(-0.1 * x) * np.sin(2 * x) + 0.1 * x**3 - 3 * x**2 + 2 * x
+	
+x_data = np.linspace(-5, 5, 100)
+y_data = target_function(x_data)
+
+x_tensor = torch.tensor(x_data,dtype=torch.float32).view(-1,1)
+y_tensor = torch.tensor(y_data,dtype=torch.float32).view(-1,1)
+
+```
+
+#### 优化器和损失函数的选择
+我们选择优化器和损失函数
+```python
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(),lr=0.001)
+```
+#### 开始训练
+每一次训练的过程是: 
+
+```
+梯度清零 -> 正向传播得到预测值 -> 使用损失函数根据预测值和真实值计算损失 -> 将损失进行反向传播 更新模型的参数
+```
+
+```python
+for epoch in range(epochs):
+    model.train()
+    optimizer.zero_grad()
+    y_pred = model(x_tensor)
+    loss = criterion(y_pred, y_tensor)
+    loss.backward()
+    optimizer.step()
+```
+
+#### 使用模型
+```python
+model.eval()
+y_mlp_pred = model(x_tensor).detach().numpy()
+```
 ## Tensor
 张量
 
@@ -188,12 +258,42 @@ $$
 ## 全连接层
 神经网络的分类器
 
+这是整个层的公式
+
+$$
+y = W x ^ T + b
+$$
+
+### 每个神经元
+神经元是全连接层的基本单元
+
+假设神经元从上一层接收n个输入信号$x_1,x_2,...,x_n$
+
+每个对应的$x_i$都有对应的权重$w_i$ 神经元计算加权和
+
+$$
+y = \sum^{n} w_i x_i + b
+$$
+
+我们把输入$x_i$ 权重$w_i$看成行向量
+
+$$
+X = [x_1,x_2,...,x_n] \\
+W = [w_1,w_2,...,w_n] \\
+
+$$
+
+于是
+
+$$
+y = \sum^{n} w_i x_i + b = W X^T + b
+$$
+### 在CNN中
 全连接层输出对分类的`预测分数logits`
 
 logits的张量为: `shape(batch_size,n)`
 
 
-$output = W x ^ T + b$
 
 其中x为图片展平后的向量 W为权重矩阵shape[out_size,in_size] b为偏置向量shape[out_size]
 
@@ -212,14 +312,9 @@ $$
 
 在初始时 W和b是随机的(形状不随机) 而在模型训练过程中通过反向传播等进行更新
 
-
-
-
 `所以模型训练的过程之一可以说就是在更新和确定全连接层参数`
 
-
 在Mnist CNN中 使用了两个全连接层
-
 
 第一层linear(in_dim,out_dim): in_dim为池化后的张量shape(num,dim)中的dim out_dim为第一次粗分类
 
@@ -465,6 +560,8 @@ $$
 因为在神经网络中 各种变换都是矩阵间的线性变换 它变来变去永远是直线 那么它永远无法表达曲线
 
 加入非线性的激活函数后 直线会变为曲线 能更好的去逼近曲线
+
+为了**反向传播** 激活函数必须是**可微**的
 ### ReLU
 
 $$
@@ -2252,3 +2349,66 @@ for epoch in range(epochs):
 $$
 min\frac{1}{n}\sum_{i=1}^{n}w_i L(x_i,y_i,\theta)
 $$
+## BackBone
+特征提取网络
+### AlexNet
+非常经典的CNN
+AlexNet一共有8层
+
+#### 五层卷积
+- C1: 96 个核，大小 11×11，stride=4，padding=0，激活=ReLU（原实现中 conv1 在两卡上分组；这里可用 groups=1）。
+
+- LRN1: 局部响应归一化（Local Response Normalization），紧随 C1。
+
+- MaxPool1: 池化核大小 3×3，stride=2。
+
+- C2: 256 个核，大小 5×5，stride=1，padding=2，激活=ReLU（原实现中 conv2 在两卡上分组，常见实现 groups=1/2）。
+
+- LRN2: 局部响应归一化，紧随 C2。
+
+- MaxPool2: 池化核大小 3×3，stride=2。
+
+- C3: 384 个核，大小 3×3，stride=1，padding=1，激活=ReLU。
+
+- C4: 384 个核，大小 3×3，stride=1，padding=1，激活=ReLU（原实现 conv3–conv5 有分组设计，用于两卡并行）。
+
+- C5: 256 个核，大小 3×3，stride=1，padding=1，激活=ReLU。
+
+- MaxPool3: 池化核大小 3×3，stride=2。
+
+- FC6: 全连接 4096 单元，激活=ReLU，Dropout p=0.5。
+
+- FC7: 全连接 4096 单元，激活=ReLU，Dropout p=0.5。
+
+- FC8: 全连接 1000 单元（分类层），激活=Softmax（用于 ImageNet 1000 类）。
+
+
+**现在一般用BatchNorm而非LRU** 
+
+## 度量学习
+Metric Learning
+
+学习特征之间的距离度量 不同于传统的分类任务损失函数, Metric Loss更关注样本间的距离关系 **相似样本应该靠近 不同样本应该远离**
+
+### 角度Margin损失
+通过引入一个 **角度 margin** 来增强特征的判别性，使得 同类样本更加接近，异类样本更加远离
+#### ArcFace
+ArcFace 是目前应用最广泛的 大角度 margin 方法，主要用于人脸识别等任务，通过 角度 margin 来增强 类间距离 和 类内紧凑度。
+
+适合softmax
+
+$$
+cos(\theta + m) = cos(\theta) * cos(m) - sin(\theta) * sin(m)
+$$
+
+- $\theta$: 输入特征和类中心的角度
+- $m$: 加在 $\theta$上的margin 控制类与类的间隔
+- $s$: 尺度因子 用来放大或缩小特征向量的norm
+
+#### SphereFace
+基于**球面距离**的方法 Sphere的margin操作是通过球面旋转实现的
+
+$$
+cos(m * \theta)
+$$
+
