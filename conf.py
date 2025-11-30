@@ -19,7 +19,9 @@ extensions = [
     'sphinx_copybutton',
     'sphinxcontrib.images',
 ]
-
+images_config = {
+    "override_image_directive": True,
+}
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
