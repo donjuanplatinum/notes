@@ -57,6 +57,11 @@ y_t = C h_t + D x_t
 - 内积: $\langle x, y \rangle$ -> $\langle x, y \rangle$
 - 范数: $\|x\|$ -> \|x\|
 - 积分: $\int$ -> \int
+- 属于: $\in$ -> \in
+- 属于: $\subset$ -> \subset
+- 向下取整: $\lfloor .. \rfloor$ -> \lfloor .. \rfloor
+- 向上取整: $\lceil .. \rceil$ -> \lceil .. \rceil
+- n次开根: $\sqrt[n]{a}$ -> \sqrt[n]{a}
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
@@ -71,3 +76,4 @@ y_t = C h_t + D x_t
 - $\rho$ -> \rho
 - $\infty$ -> \infty
 - $\xi$ -> \xi
+- $\bigcup$ -> \bigcup

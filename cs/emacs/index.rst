@@ -11,4 +11,5 @@ emacs
    eaf
    gptel
    mcp
+   ediff
    

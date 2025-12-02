@@ -5,3 +5,4 @@
    analysis
    number_theory
    common
+   theory

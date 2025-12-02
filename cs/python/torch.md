@@ -21,6 +21,8 @@ python的深度学习框架
 ## Hook
 Pytorch中的Hook触发对象为`Tensor`或者`nn.Module` 在对象的**前向传播**或者**反向传播**中触发
 
+由于torch的设计 **非叶子节点的张量是不保留梯度的** 我们在非叶子节点即使使用`require_grad=True`也是不保留梯度的 此时无法通过tensor.grad来获取梯度信息 但是我们可以通过hook来进行处理
+
 ### module_hook
 作用于模块的钩子
 
@@ -162,3 +164,18 @@ register_hook(hook_fn)
 
 #### 例子
 
+
+
+## torch.nn
+torch的神经网络模块
+
+### 卷积层
+- Conv1d/Conv2d: 一维/二维卷积
+- ConvTransposed1d/ConvTransposed2d: 一维/二维反卷积
+### 池化层
+- Maxpool1d/maxpool2d: 一维/二维最大池化
+- AvgPool1d/AvgPool2d: 一维/二维平均池化
+- FractionalMaxPool2d: 二维分数最大池化
+- LPPool1d/LPPool2d: 一维和二维的LP最大池化
+- AdaptiveMaxPool1d/AdaptiveMaxPool2d: 自适应最大池化
+- AdaptiveAvgPool1d/AdaptiveAvgPool2d: 自适应平均池化
