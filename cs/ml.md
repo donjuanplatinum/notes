@@ -1,4 +1,10 @@
 # ML
+## Todo
+- KL散度
+- K近临
+- 桥回归
+- 岭回归
+- FNO
 ## 神经网络
 神经网络的本质是
 
@@ -16,6 +22,91 @@
 
 其他数学方法的泛化能力都非常的弱 比如逼近sinx. 拉格朗日插值就会在边界震荡 而神经网络可很好的泛化
 ### 过程
+机器学习的过程 以一个只有线性层为例
+
+假设我们的模型只有一个线性层: $y = w x + b$
+#### 初始化
+在神经网络的开始 我们会对神经网络的参数进行**有规律的随机初始化**(可能是纯随机 或者是带分布的初始化)
+
+那么实际上当x是一维标量的时候 这就是一个直线.
+
+我们先随机化w和b. 然后来进行一次前向传播预测
+
+#### 前项传播
+我们的输入是几个不同的x 比如x=1 x=2 x=3...
+
+假设我们在初始化的适合 w=2 b=1
+
+那么有
+
+$$
+y = 2x + 1
+$$
+
+我们前向传播得到的结果是 y = 3 , 5 , 7....
+
+#### 损失函数
+我们从输入得到了模型的预测值: [3,5,7]
+
+这个时候我们需要一个**标准来衡量模型的预测和实际的差距**
+
+来衡量模型的预测和实际的差距的就是损失函数
+
+比如一个损失函数MAE 把真实值和预测值的绝对值的差加起来
+
+假设我们的模型的真实值应该是[2,4,6]
+
+那么
+
+$$
+MAE_LOSS = |2-3| + |4-5| + |6-7| = 3
+$$
+
+而我们模型的训练的目的就是通过梯度下降来减少预测值和真实值的差距. 所以要降低loss的值
+
+而为了得到损失函数关于每个参数的梯度 **所以我们要求损失函数可导**
+#### 梯度下降
+我们这里拿MSE损失举例
+
+MSE是在MAE的基础上给差值加个平方.
+
+$$
+MSE_LOSS = \sum(w x + b - y_true)^2
+$$
+
+现在我们需要**分别**修改w和b 来减少这个函数值
+
+先来调整w
+
+来复盘一下我们现在知道什么: 
+
+这一点的w,b,x,y_predict,y_true 所以我们可以**关于LOSS对w求导**
+
+但是注意 我们只是有了这一点关于w的**导数** **它仅能反应函数大概的趋势**
+
+首先我们肯定知道是往斜率朝下的地方去调整w 但是调整多少的策略由**优化器决定**
+
+b也同理看成LOSS关于b的一元函数 然后求导得到LOSS关于b的导数
+#### 优化器
+在上一步中 我们得到了损失分别关于w和b的导数
+
+那么如何通过导数来调整w和b呢
+
+通过这个通式
+
+$$
+w_new = w - \theta \frac{dLoss}{dw}
+$$
+
+b同理
+
+一般$\theta$就是学习率
+
+但是$\theta$的策略根据不同的优化器和学习率不同
+
+根据优化器给出的策略 我们调整了w和b 于是重复这个过程 直到更好的拟合 这就是机器学习
+
+#### 代码
 我们用一个MLP来拟合一条复杂的曲线
 
 $$
@@ -57,12 +148,14 @@ y_tensor = torch.tensor(y_data,dtype=torch.float32).view(-1,1)
 
 ```
 
-#### 优化器和损失函数的选择
+#### 优化器和损失函数
 我们选择优化器和损失函数
 ```python
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(),lr=0.001)
 ```
+
+
 #### 开始训练
 每一次训练的过程是: 
 
@@ -92,6 +185,65 @@ UAT证明了神经网络逼近任意函数的**正确性**和**可行性**
 
 UAT的通俗解释: 神经网络在**足够的神经元数量和至少一层hidden layer**可以近似欧几里得空间上的任意函数
 
+## 回归和分类
+回归和分类是机器学习的基本任务
+
+- 回归主要用于预测**连续**的数据
+
+- 分类主要用于预测**离散**的数据
+## 线性回归
+线性回归是一个**回归**模型 是用一条直线来拟合
+
+假设我们的样本是$\mathbf{X} \in \mathbb{R}^{N \times n}$ 权重是$w \in \mathbb{R}^{n \times 1}$ 预测值是$\hat{y} \in \mathbb{R}^{N \times 1}$
+
+其中样本矩阵X代表有N个样本 每个样本有n个特征
+
+$$
+\mathbf{X} =
+\begin{bmatrix}
+x_{11} & x_{12} & \cdots & x_{1n}\
+x_{21} & x_{22} & \cdots & x_{2n}\
+\vdots & \vdots & \ddots & \vdots\
+x_{N1} & x_{N2} & \cdots & x_{Nn}
+\end{bmatrix}
+$$
+
+$$
+w =
+\begin{bmatrix}
+w_1 & \
+w_2 & \
+\vdots & \
+w_n &
+\end{bmatrix}
+$$
+
+$$
+\hat{y} = \mathbf{X} w + b
+$$
+
+### 损失函数
+线性回归一般使用**残差平方和RSS** 也就是MSE不做平均
+
+$$
+RSS(w,b) = \| y - \hat{y} \|^2 = \| y - b - \mathbf{X} w \|
+$$
+
+### 最小二乘
+在线性回归问题 **是有直接的闭式解的**(在大多数前提满足下) 因为最小二乘是一个严格的二次函数的凸优化问题
+
+我们只需要求解这个线性方程就能得到闭合解
+
+$$
+w = (\mathbf{X}^T \mathbf{X})^{-1} X^T y \
+b = \tilde{y} - \tilde{x}^T w
+$$
+### 梯度下降
+虽然最小二乘可以直接用闭式解得到最优的w和b 但是是具有一些限制的 比如矩阵要可逆等
+
+而且若样本和特征很大 我们需要很多的计算
+
+所以我们仍然可以使用梯度下降来拟合直线
 ## Tensor
 张量
 
@@ -369,7 +521,6 @@ $$
 
 而第二层linear(out_dim,out_dim2): 把第一层的分类结果分类为最后的out_dim2
 ## 损失函数
-
 $$
 L(x_i,y_i,\theta)
 $$
@@ -379,15 +530,18 @@ $$
 - y_i: 这个样本的标签
 - $\theta$: 模型参数
 - L: 损失函数
-### nll
-负对数似然损失
+
+### NLL/CrossEntropy
+负对数似然与交叉熵 核心在于**最大化正确类别的概率**
+#### NLL
+负对数似然损失 适用于**单标签分类**
 
 它希望模型给正确类别分配的概率越高越好，错的越低越好。
 
-真实标签是索引y
+真实标签是索引y 其中p是**对数概率**
 
 $$
-NLLLose(p,y) = - log(p_{y})
+NLLLoss(p,y) = - log(p_{y})
 $$
 
 即取出真实类别对应的预测概率$p_{y}$
@@ -397,11 +551,18 @@ $$
 $$
 CrossEntropyLoss(z,y) = NLLLoss(log_softmax(z),y)
 $$
+##### 示例
+```python
+import torch.nn.functional as F
+logits = model()
+log_logits = F.log_softmax(logits,dim=1)
+criterion = nn.NLLLoss()
+loss = criterion(log_logits,labels)
+```
+#### CrossEntropy
+交叉熵 用于 **分类任务** 的常用损失函数 **适用于单标签分类** 是NLL的改进
 
-### cross_entropy
-交叉熵 用于 分类任务 的常用损失函数
-
-它衡量的是 真实标签与 预测概率分布 之间的差异 差异越小 模型性能越好
+它衡量的是 **真实标签与 预测概率分布 之间的差异** 差异越小 模型性能越好
 
 如果模型正确预测了类别，损失会小（概率接近 1，log(1) = 0）。
 
@@ -415,7 +576,38 @@ $$
 
 - $p_{i}$是真实标签的概率分布 通常是一个one-hot向量(即除了真实的标签的数组下标为1 其他为0)
 - $q_{i}$是模型预测的概率分布 通常是通过softmax得到的概率分布
-### 均方差损失
+##### 示例
+```python
+logits = model()
+criterion = nn.CrossEntroypyLoss()
+loss = criterion(logits,labels)
+```
+#### 适用场景
+1. 适用于单标签分类 不适合回归任务
+
+NLL和CrossEntropy的目标在于 **匹配类别的概率** 优化目标在于 **最大化正确类别的预测概率**
+
+NLL/CrossEntropy要求的target向量是one-hot的 所以不是连续的 所以不适合回归
+
+2. 对样本数量要求平衡(若一个样本数远大于其他类别的样本 那么权重会很高) 
+
+这是pytoch对batch的loss公式
+
+$$
+Loss_{batch} = \frac{1}{n}\sum_{n=1}^{n}Loss_n
+$$
+
+假设一个batch有90个是类别A 10个是类别B 那么计算梯度时 A会贡献90%的梯度 模型很不容易学习B 所以要求样本数量是差不多的
+
+
+
+3. 对小概率很敏感 若概率接近0 则LOSS会很大 需要对数值稳定进行处理
+
+我们不难发现 当p -> 0 时, 负对数趋近于无穷 所以若模型预测正确类别的概率非常低 那么LOSS会非常大
+### MSE/MAE
+均方误差和平均绝对损失 适用
+#### MSE
+均方误差损失
 
 $$
 L = \frac{1}{n} \sum_{i=1}^{n}(y_i - \hat{y_i})^2
@@ -428,6 +620,15 @@ $$
 
 在这种情况下，损失函数度量的是预测值与真实值之间的差异，模型的目标是最小化这个损失。
 
+MSE对异常值是**很敏感**的 因为平方项的存在 异常值会被放的很大
+
+#### MAE
+平均绝对损失
+
+L = \frac{1}{n} \sum{i=1}^{n}|y_i - \hat{y_i}|
+
+**对大误差没有MSE敏感 没有MSE平滑 数值稳定性比MSE高 梯度恒定**
+#### 适用场景
 ### BCE
 二分类问题的交叉熵损失
 
@@ -611,6 +812,12 @@ $$
 为了**反向传播** 激活函数必须是**可微**的
 
 神经网络的激活函数是很重要的 神经网络拟合的结果是 **激活函数经过线性变换后的叠加**
+
+若不考虑训练速度
+```
+Mish > GELU(Transformer标配) > SiLU(Swish) > CELU > ELU > SELU* > Softplus > PReLU > LeakyReLU > RReLU > ReLU6 > Tanh > Sigmoid > ReLU
+```
+
 ### ReLU
 $$
 f(x) = max(0,x)
@@ -628,6 +835,7 @@ $$
 - 神经元死亡: 很多神经元<0 则一直梯度为0
 - 输出没有上界: 容易梯度爆炸 (最好加个BatchNorm)
 - 偏向正区间
+
 #### ELU
 我们将负数域改为 $a(e^x -1)$便得到了ELU
 
@@ -662,7 +870,59 @@ ax, & x \leq 0
 \end{cases}
 $$
 
+#### PReLU
+将LeakyReLU的a从超参数改为可学习参数 便得到了PReLU
 
+$$
+PReLU(x) = 
+\begin{cases}
+x , & x > 0 \\
+ax, & x \leq 0
+\end{cases}
+$$
+#### RReLU
+把a改成: 在训练期间从上界和下界随机 在推理期间为上界和下界的中值 就是RReLU
+
+
+$$
+PReLU(x) = 
+\begin{cases}
+x , & x > 0 \\
+ax, & x \leq 0
+\end{cases}
+$$
+
+#### SELU
+
+$$
+SELU(x) = \lambda
+\begin{cases}
+x, & x > 0
+a(e^x - 1), x \leq 0
+\end{cases}
+$$
+
+其中 
+
+$$
+a \approx 1.6733 \\
+\lambda \approx 1.0507
+$$
+
+- 自归一化: SELU可以让神经元的输出在深层网络中保持均值约等于0 方差约等于1
+
+#### CELU
+将ELU的$e^x$ 改成 $e^{\frac{x}{a}}$ 就是CELU
+
+$$
+ELU(x) = 
+\begin{cases}
+x,   & x>0 \\
+a(e^\frac{x}{a} - 1),&    x \leq 0
+\end{cases}
+$$
+
+- 处处可导 训练更稳
 ### tanh
 
 $$
@@ -710,6 +970,7 @@ Hardshrink(x) =
 \begin{cases}
 x,  & x > \lambda or x < - \lambda \\
 0,  & x \in [-\lambda,\lambda]
+\end{cases}
 $$
 
 把 $[-\lambda,\lambda]$的值全设置为0 其他值不变
@@ -719,7 +980,7 @@ $$
 - 特征稀疏化
 - 小值抑制
 
-### Wish
+### Mish
 
 $$
 Mish(x) = x * Tanh(Softplus(x))
@@ -730,10 +991,22 @@ $$
 高斯误差线性单元
 
 $$
+GELU(x) = x \cdot P(X \leq x) 其中 X \sim N(0,1) \\
 GELU(x) = x \cdot \Phi(x) \\
 \Phi(x) = \frac{1}{2} [1 + erf(\frac{x}{\sqrt{2}})] \\
-erf(x) = \frac{2}{\sqrt{\pi}\infty_0^x e^{-t^2} dt}
+erf(x) = \frac{2}{\sqrt{\pi}\int_0^x e^{-t^2} dt}
 $$
+
+在实现中 一般使用近似式
+
+$$
+GELU(x) \approx 0.5x(1 + tanh [\sqrt{\frac{2}{\pi}}] (x+0.044715 x^3))
+$$
+
+优点:
+- 在0附近可导
+- 保留了非线性能力
+- 小的负数输入不会归零 而是平滑缩小
 ## tokenizer
 实际上就是一个KV表 但是加入了一些适用于自然语言处理的映射算法
 
@@ -1249,17 +1522,56 @@ $$
 
 归一化可以缓解这些问题，让网络训练更稳定、更快收敛。
 
+![norm](../resource/norm.png)
 ### BatchNorm
 对同一特征在一个batch内计算均值和标准差然后归一化
+
+优点
+- 加速训练
+- 提高收敛稳定性
+- CNN常用
+
+缺点
+- bach_size小时万万不可用 效果很差
+- 对batch不敏感的框架不要用 transformer/mamba 以及时间序列等
 ### LayerNorm
 对单个样本的所有特征维度计算均值和标准差然后归一化
+
+优点
+- 和batch无关
+- Transformer用的
+
+缺点
+- 不适合CNN: 会把CNN的各个通道的统计信息搅和在一起
+- 对空间结构不敏感
 ### InstanceNorm
 对单个样本的每个通道进行归一化
+
+InstanceNorm去掉了
+- 亮度变化
+- 对比度
+- 风格性统计
+
+所以InstanceNorm**极其适合风格迁移 极其不适合分类**
 ### GroupNorm
 把通道分成G组 每组内计算均值和方差然后归一化 是BatchNorm和InstanceNorm的折中方案
+
+优点
+- 不依赖batch_size
+- 对CNN友好
+
+缺点
+- 比BatchNorm慢
 ### RMSNorm
 LayerNorm的变体 不同于 LayerNorm： RMSNorm 不减去均值（no centering），只做标准差/幅值归一化
 
+优点
+- 稳定
+- 小模型很好
+- Transformer的新宠
+
+缺点
+- CNN不适合
 
 ## Transformers
 这是由谷歌提出的框架 也是目前应用最广泛的框架
@@ -2489,9 +2801,10 @@ $$
 特征提取网络
 ### AlexNet
 非常经典的CNN
+
 AlexNet一共有8层
 
-#### 五层卷积
+#### 结构
 - C1: 96 个核，大小 11×11，stride=4，padding=0，激活=ReLU（原实现中 conv1 在两卡上分组；这里可用 groups=1）。
 
 - LRN1: 局部响应归一化（Local Response Normalization），紧随 C1。
@@ -2520,6 +2833,159 @@ AlexNet一共有8层
 
 
 **现在一般用BatchNorm而非LRU** 
+
+#### 代码
+```python
+import torch
+import torch.nn as nn
+
+class AlexNet(nn.Module):
+    def __init__(self, num_classes=1000):
+        super(AlexNet, self).__init__()
+        
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+
+            nn.Linear(4096, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+```
+### ResNet
+也是非常经典的CNN
+
+能力远强于AlexNet
+
+ResNet增加了残差连接
+
+同时ResNet有5种 从浅到深 分别为ResNet-18 ResNet-34 ResNet-50 ResNet-101 ResNet-152
+
+#### 实现
+BasicBlock (18/34) 这是ResNet-18和ResNet-34的基本网络块
+```python
+class BasicBlock(nn.Module):
+    expansion = 1
+ 
+    def __init__(self, in_planes, planes, stride=1, downsample=None):
+        super(BasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride,
+                               padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.relu = nn.ReLU(inplace=True)
+
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1,
+                               padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.downsample = downsample
+
+    def forward(self, x):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+
+        if self.downsample is not None:
+            identity = self.downsample(x)
+
+        out = out + identity
+        out = self.relu(out)
+        return out
+class ResNet(nn.Module):
+    def __init__(self, block, layers, num_classes=1000):
+        super(ResNet, self).__init__()
+
+        self.in_planes = 64
+
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        
+        self.layer1 = self._make_layer(block, 64,  layers[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1,1))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+
+    def _make_layer(self, block, planes, blocks, stride=1):
+        downsample = None
+
+        
+        if stride != 1 or self.in_planes != planes * block.expansion:
+            downsample = nn.Sequential(
+                nn.Conv2d(self.in_planes, planes * block.expansion,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes * block.expansion),
+            )
+
+        layers = []
+        layers.append(block(self.in_planes, planes, stride, downsample))
+        self.in_planes = planes * block.expansion
+
+        for _ in range(1, blocks):
+            layers.append(block(self.in_planes, planes))
+
+        return nn.Sequential(*layers)
+
+
+    def forward(self, x):
+	# 1层卷积
+        x = self.conv1(x) 
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+	# 1个layer有2层卷积
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+
+        return x		
+```
 
 ## 度量学习
 Metric Learning

@@ -6,3 +6,4 @@
    number_theory
    common
    theory
+   statistics

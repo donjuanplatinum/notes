@@ -21,3 +21,4 @@
    qemu
    openssl
    ffmpeg
+   ssh

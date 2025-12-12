@@ -12,6 +12,7 @@ $$
 
 ## 公式
 - 求和: $ \sum_{i=0}^{n}(i)  ->  $ \sum_{i=0}^{n}(i)
+- 乘法: $\times$ -> \times
 - 小于/大于等于:  $ \leq \geq $  -> \leq \geq
 - 点乘: $ a \cdot b$ -> a \cdot b
 - 下标: $ x_i $ -> x_i
@@ -54,6 +55,7 @@ y_t = C h_t + D x_t
 ```
 - 累乘: $\prod_{k=1}^{n} k$ ->\prod_{k=1}^{n} k
 - 省略号: $\cdots$ -> \cdots
+- 竖着的省略号: $\vdots$ -> \vdots
 - 内积: $\langle x, y \rangle$ -> $\langle x, y \rangle$
 - 范数: $\|x\|$ -> \|x\|
 - 积分: $\int$ -> \int
