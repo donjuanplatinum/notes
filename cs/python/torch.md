@@ -239,3 +239,5 @@ torch的神经网络模块
 - MultiLabelSoftMarginLoss： 多标签软间隔损失
 - CosineEmbeddingLoss: 度量两个向量是否相似或不相似
 - MultiMarginLoss: 多类分类损失的一种 hinge 形式
+### 优化器
+- SGD(params,lr,momentum,nesterov)

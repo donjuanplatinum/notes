@@ -1,5 +1,5 @@
 # scikit-learn
-深度学习库
+深度学习库 基于matplotlib scipy和numpy
 
 ## gaussian_process
 高斯过程是**非参数监督**学习方法 用于解决 **回归** 与 **概率分类** 的问题

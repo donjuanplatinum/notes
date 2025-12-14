@@ -11,7 +11,7 @@ $$
 $$
 
 ## 公式
-- 求和: $ \sum_{i=0}^{n}(i)  ->  $ \sum_{i=0}^{n}(i)
+- 求和: $ \sum_{i=0}^{n}(i)$  -> \sum_{i=0}^{n}(i)
 - 乘法: $\times$ -> \times
 - 小于/大于等于:  $ \leq \geq $  -> \leq \geq
 - 点乘: $ a \cdot b$ -> a \cdot b
@@ -79,3 +79,4 @@ y_t = C h_t + D x_t
 - $\infty$ -> \infty
 - $\xi$ -> \xi
 - $\bigcup$ -> \bigcup
+- $\nabla$ -> \nabla

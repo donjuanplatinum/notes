@@ -36,9 +36,56 @@ ndarray的内容为:
 - `itemsize`: 内部元素的大小
 - `flags`: 内存布局信息
 - `data`: 内部实际存储的缓冲区
+- `T`: 转置
 ### 方法
+#### 变形与操作
 - `reshape(shape)`: 变形
 - `flatten()`: 展平一维
 - `ravel()`: 返回视图
 - `squeeze()`: 去掉维度为1的轴
-- `linspace(start,end,num)`: 在start到end之间 生成num个均匀的点的ndarray
+#### 维度统计
+- `argmax(dim)`: 给定维度上最大值的索引
+- `argmin(dim)`: 同理
+- `sum(dim)`: 给定维度求和
+- `mean(dim)`: 给定维度的均值
+- `var(dim)`: 给定维度的方差
+- `std(dim)`: 给定维度的标准差
+- `prod(dim)`: 给定维度的积
+
+#### 合并
+- `concat(arrays,axis)`: 沿axis轴合并 **数组维度必须匹配除了拼接轴以外的所有维度**
+- `stack(arrays,axis)`: 沿axis轴合并 增加一个新的维度 **所有数组形状必须完全相同**
+- `block(arrays)`: 块状拼接 **对应拼接方向上尺寸匹配**
+#### 快速傅立叶变换
+一般用scipy.fft
+#### 线性代数
+- `dot`: 点积
+- `outer`: 外积
+- `matmul`: 矩阵乘法
+- `kron`: 科洛内克积
+#### 数学
+- `sin/cos/tan/arcsin/arccos/arctan`: 三角函数
+- `degrees/radians`: 角度弧度的转换
+- `sinh/cosh/tanh/arcsinh/arccosh/arctanh`: 双曲三角函数
+- `exp`: e的指数
+- `log`: 自然对数
+## numpy 
+numpy主模块
+### 常量
+- `e`: 2.718...
+- `euler_gamma`: 0.577.. 就是调和级数和自然对数的差的极限
+- `inf`: 无穷大
+- `nan`: NaN
+- `pi`: 圆周率
+### ndarray的构建函数
+- `empty(shape)`: 按照形状创建数组
+- `empty_like(array)`: 按照array的形状和类型创建空数组
+- `eye(n,m,k=0)`: 返回一个n*m对角线矩阵(对角线为1) k为对角线偏移
+- `identity(n)`: n*n单位矩阵
+- `ones(shape)`: 全1的矩阵
+- `ones_like(array)`: 和array形状类型一样的全1矩阵
+- `zeros(shape)`: 全0矩阵
+- `full(shape,value)`: 全是value矩阵
+- `arange(start,stop)`: 起点到终点 公差为1的向量
+- `linspace(start,end,num)`: 在start到end之间 有num个**均匀**的点的向量
+

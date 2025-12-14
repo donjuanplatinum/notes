@@ -5,6 +5,8 @@
 - 桥回归
 - 岭回归
 - FNO
+- VAE
+- 算子神经网络
 ## 神经网络
 神经网络的本质是
 
@@ -191,7 +193,7 @@ UAT的通俗解释: 神经网络在**足够的神经元数量和至少一层hidd
 - 回归主要用于预测**连续**的数据
 
 - 分类主要用于预测**离散**的数据
-## 线性回归
+### 线性回归
 线性回归是一个**回归**模型 是用一条直线来拟合
 
 假设我们的样本是$\mathbf{X} \in \mathbb{R}^{N \times n}$ 权重是$w \in \mathbb{R}^{n \times 1}$ 预测值是$\hat{y} \in \mathbb{R}^{N \times 1}$
@@ -221,15 +223,29 @@ $$
 $$
 \hat{y} = \mathbf{X} w + b
 $$
+#### 先验假设
+真实的数据应该长这样
 
-### 损失函数
+$$
+y = \mathbf{X} w + b + \epsilon
+$$
+
+其中$\epsilon$是噪声
+
+根据**中心极限定理**我们一般假设它**服从高斯分布**
+
+$$
+\epsilon \sim \mathcal{N}(0,\sigma^2)
+$$
+
+#### 损失函数
 线性回归一般使用**残差平方和RSS** 也就是MSE不做平均
 
 $$
 RSS(w,b) = \| y - \hat{y} \|^2 = \| y - b - \mathbf{X} w \|
 $$
 
-### 最小二乘
+#### 最小二乘
 在线性回归问题 **是有直接的闭式解的**(在大多数前提满足下) 因为最小二乘是一个严格的二次函数的凸优化问题
 
 我们只需要求解这个线性方程就能得到闭合解
@@ -238,12 +254,145 @@ $$
 w = (\mathbf{X}^T \mathbf{X})^{-1} X^T y \
 b = \tilde{y} - \tilde{x}^T w
 $$
-### 梯度下降
+#### 梯度下降
 虽然最小二乘可以直接用闭式解得到最优的w和b 但是是具有一些限制的 比如矩阵要可逆等
 
 而且若样本和特征很大 我们需要很多的计算
 
 所以我们仍然可以使用梯度下降来拟合直线
+#### 代码
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+class MyLinear(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.w = nn.Parameter(torch.randn(1))
+        self.b = nn.Parameter(torch.zeros(1))
+
+    def forward(self, x):
+        return self.w * x + self.b # y = wx + b
+    
+torch.manual_seed(42)
+n = 100
+X = torch.rand(n) * 10
+Y = 20.0 * X + 33.3 + torch.randn(n)
+
+X = X.unsqueeze(1)
+Y = Y.unsqueeze(1)
+
+
+model = MyLinear()
+criterion = nn.MSELoss()  # 均方差损失
+optimizer = optim.SGD(model.parameters(), lr=0.01)
+
+for epoch in range(1000):
+    pred = model(X)
+    loss = criterion(pred, Y)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if epoch % 100 == 0:
+        print(
+            f"{epoch}: loss={loss.item():.4f}, "
+            f"w={model.w.item():.4f}, "
+            f"b={model.b.item():.4f}"
+        )
+```
+### 逻辑回归
+逻辑回归是一个**回归**模型 是用sigmoid曲线来拟合概率
+
+逻辑回归是在预测一个二分类结果
+
+$$
+p(y=1|X) = \sigma (\mathbf{X} w + b)
+$$
+
+我们可以看出 相当于在线性模型上套了一个sigmoid函数
+#### 损失函数
+逻辑回归的损失是**交叉熵**的二分类版本
+
+我们知道 交叉熵的公式是
+
+$$
+H(p,q) = - \sum_{i=1}^{n} p_{i} log{q_{i}}
+$$
+
+在二分类问题我们有
+
+真实的分布是
+
+$$
+p(y) = 
+\begin{cases}
+y (y=1) & \
+1-y (y=0) &
+\end{cases}
+$$
+
+模型的预测是
+
+$$
+q(y=1) = \hat{p} & \
+q(y=0) = 1 - \hat{p} &
+$$
+
+我们带入交叉熵可以得到
+
+$$
+-[y log \hat{p} + (1-y) log(1-\hat{p})]
+$$
+#### 代码
+```python
+class LogisticRegression(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.w = nn.Parameter(torch.randn(1))
+        self.b = nn.Parameter(torch.zeros(1))
+
+    def forward(self, x):
+        z = self.w * x + self.b
+        return torch.sigmoid(z) ## y = sigmoid(wx + b)
+n = 200    
+X = torch.rand(n) * 10
+Y = (X > 5).float()   
+
+X += torch.randn(n) * 0.3
+
+X = X.unsqueeze(1)    
+Y = Y.unsqueeze(1)    
+
+model = LogisticRegression()
+criterion = nn.BCELoss() # 交叉熵的二分类特殊版
+optimizer = optim.SGD(model.parameters(), lr=0.1)
+epochs = 1000
+
+for epoch in range(epochs):
+    pred = model(X)               
+    loss = criterion(pred, Y)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if epoch % 100 == 0:
+        print(
+            f"{epoch}: loss={loss.item():.4f}, "
+            f"w={model.w.item():.4f}, "
+            f"b={model.b.item():.4f}"
+        )
+with torch.no_grad():
+    probs = model(X)
+    preds = (probs > 0.5).float()
+
+accuracy = (preds == Y).float().mean()
+print("accuracy:", accuracy.item())
+
+    		
+```
 ## Tensor
 张量
 
@@ -531,6 +680,13 @@ $$
 - $\theta$: 模型参数
 - L: 损失函数
 
+选用不同的损失函数可以适用于不同的场景:
+
+比如如果数据集中有异常值 可以适用鲁棒性的损失函数HuberLoss
+
+如果输出和输入不对齐 可以适用CTCLoss
+
+如果先验假设预测值服从高斯分布 使用MSE, 服从泊松分布可以使用PoisonNLL, 服从伯努利可以使用BCE
 ### NLL/CrossEntropy
 负对数似然与交叉熵 核心在于**最大化正确类别的概率**
 #### NLL
@@ -604,6 +760,7 @@ $$
 3. 对小概率很敏感 若概率接近0 则LOSS会很大 需要对数值稳定进行处理
 
 我们不难发现 当p -> 0 时, 负对数趋近于无穷 所以若模型预测正确类别的概率非常低 那么LOSS会非常大
+
 ### MSE/MAE
 均方误差和平均绝对损失 适用
 #### MSE
@@ -637,7 +794,58 @@ L = \frac{1}{n} \sum{i=1}^{n}|y_i - \hat{y_i}|
 $$
 BCE = -[y \log D(x) + (1-y) \log(1-D(x))]
 $$
+#### 适用场景
+一般用于二分类的逻辑回归
 
+### CTC
+输入序列和输出标签长度不对齐 没有逐帧标注的模型的损失函数 **输入长度要大于等于输出长度**
+
+原理是: **输入到目标的可能对齐的概率进行求和** 生成一个相对于每个输入节点可微分的损失值 
+
+比如语音识别 手写识别 ocr
+#### 适用场景
+一般用于输入输出不对齐的模型
+
+### PoissonNLL
+服从泊松分布时用的NLL
+
+**也就是说当标签是计数 并且方差约等于均值时** 适用PoissonNLL
+### GaussianNLL
+服从高斯分布时用的NLL
+
+MSE是GuassianNLL的特例
+
+### KLDiv
+KL散度
+
+用分布Q去近似分布P时 多付出的信息代价 可以衡量两个概率分布之间的相似性
+
+说到两个分布的相似性 你可能会回想起MMD
+
+MMD是把分布映射到再生希尔伯特空间 然后得到两个分布的距离
+
+而KL散度是**似然驱动的概率建模**
+
+输入必须是log-prob
+
+#### 适用场景
+- 知识蒸馏(小模型学习大模型的输出概率分布)
+- 软标签: 把one-hot平滑化 防止模型过拟合或者极度自信
+- 概率分布预测: 模型预测的是一个分布 而不是单纯的一个点
+
+
+### HuberLoss
+鲁棒性的损失 结合了MSE和MAE的优点
+
+在元素间的差小于delta时使用平方类似MSE 否则使用delta缩放MAE
+
+$$
+Loss = 
+\begin{cases}
+0.5(x_n - y_n)^2, & |x_n - y_n| < delta \
+delta(|x_n - y_n| - 0.5delta), & |x_n - y_n| >= delta
+\end{cases}
+$$
 ## 梯度下降
 通过沿着损失函数的梯度的反方向更新参数来减少损失函数的值
 
@@ -750,12 +958,55 @@ data augmentation
 
 有时会加入动量 来使下降更平滑
 
+损失函数是 $L(\theta)$ 模型参数是 $\theta$
+
+则SGD算法为
+
+$$
+\theta_{t+1} = \theta_{t} - \eta \cdot \nabla_{\theta} L(\theta_{t})
+$$
+
+其中
+- $\eta$是学习率
+- $\nabla_{\theta}L$是损失函数对这个参数的**梯度**
+
+#### 动量
+若加入动量Momentum
+
+$$
+v_t = \lambda v_{t-1} + \eta \nabla_{\theta}L(\theta_{t}) \
+\theta_{t+1} = \theta{t} - v_t
+$$
+
+其中
+- $\lambda$ 是动量系数 也就是torch的SGD的momentum参数
+- $v_t$ 类似速度 累计过去的梯度方向
+
+我们发现 其实加入动量的SGD很像LSTM的门控机制 又很像状态方程
+
+是因为动量保存了之前梯度的**惯性** 是一种缓冲机制
+
+动量在**鞍点**或小斜率区域，会让梯度沿着主方向前进，像门控机制控制信息流向
+#### Nesterov
+Nesterov Accelerated Gradient NAG
+
+NAG是动量的改进 **它先沿着上一次的速度方向预先移动然后计算梯度**
+
+$$
+v_t = \lambda v_{t-1} + \eta \nabla_{\theta}L(\theta_{t} - \lambda v_{t-1}) \
+\theta_{t+1} = \theta{t} - v_t
+$$
+
 ### Adam
 最常用的优化器之一
+
+
 
 - 每个参数都自动调整自己的学习率；
 - 保留历史梯度的均值和方差，更新更平滑；
 - 通常训练速度更快、收敛效果更稳定。
+
+
 ### RMSProp
 适合非平稳目标(如RNN)
 
@@ -770,6 +1021,7 @@ data augmentation
 Adam的改进版 加入正则化
 
 目前非常推荐在 Transformer 和 CNN 中使用。
+
 ## 概率
 将输入转换为概率分布
 
@@ -3014,3 +3266,6 @@ $$
 cos(m * \theta)
 $$
 
+
+## FNO
+傅立叶神经网络
