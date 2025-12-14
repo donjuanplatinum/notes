@@ -843,6 +843,7 @@ $$
 Loss = 
 \begin{cases}
 0.5(x_n - y_n)^2, & |x_n - y_n| < delta \
+
 delta(|x_n - y_n| - 0.5delta), & |x_n - y_n| >= delta
 \end{cases}
 $$
@@ -975,6 +976,7 @@ $$
 
 $$
 v_t = \lambda v_{t-1} + \eta \nabla_{\theta}L(\theta_{t}) \
+
 \theta_{t+1} = \theta{t} - v_t
 $$
 
@@ -994,6 +996,7 @@ NAG是动量的改进 **它先沿着上一次的速度方向预先移动然后�
 
 $$
 v_t = \lambda v_{t-1} + \eta \nabla_{\theta}L(\theta_{t} - \lambda v_{t-1}) \
+
 \theta_{t+1} = \theta{t} - v_t
 $$
 
