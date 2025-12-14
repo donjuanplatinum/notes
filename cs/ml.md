@@ -204,8 +204,11 @@ $$
 \mathbf{X} =
 \begin{bmatrix}
 x_{11} & x_{12} & \cdots & x_{1n}\
+
 x_{21} & x_{22} & \cdots & x_{2n}\
+
 \vdots & \vdots & \ddots & \vdots\
+
 x_{N1} & x_{N2} & \cdots & x_{Nn}
 \end{bmatrix}
 $$
