@@ -7,7 +7,7 @@ Huggingface研发的Rust的LLM框架
 张量
 
 方法:
-- `max_pool2d<T: ToUsize2>(&self,sz: T)-> Result<Self>`: 将4维的张量`shape(batch_size,channels,high,weigth)`最大池化 池化核的尺寸为`sz` 默认没有填充 步长默认为sz
+#### 形状改变
 - `flatten_all(&self) -> Result<Tensor>`: 将整个张量展平为一维
 ```rust
 [[0,1],[2,3],[4,5]] -> [0,1,2,3,4,5]
@@ -21,16 +21,30 @@ let tensor = tensor.flatten_from(1)?; // to shape(3,4)
 ```
 - `flatten_to<D: Dim>(&self,end_dim: D) -> Result<Tensor>`: 从0维度展平到end_dim维度 [0,end_dim]
 - `flatten<D1:Dim,D2: Dim>(&self,start_dim: D1,end_dim:D2)-> Result<Tensor>`: 从start_dim展平到end_dim [start_dim,end_dim]
-- `dim<D: Dim>(&self,dim:D)-> Result<usize>`: 返回指定维度的大小
-- `narrow<D: Dim>(&self,dim:D,start:usize,len:usize) -> Result<Self>`: 从原始张量中取出(不复制 高性能)一部分子张量 沿维度dim 从索引start开始 提取长度为len的子张量
-- `argmax<D: Dim>(&self, dim: D) -> Result<Self>`: 沿着D维度返回最大值
-- `shape(&self) -> &Shape`: 返回张量形状
 - `reshape<S: ShapeWithOneHole>(&self, s: S) -> Result<Tensor>`: 按照s元组指定的形状将张量变形 ()表示自动推断
 ``` rust
 let c = a.reshape((2, (), 1))?;
 assert_eq!(c.shape().dims(), &[2, 3, 1]);
 ```
+#### 运算
+- `max_pool2d<T: ToUsize2>(&self,sz: T)-> Result<Self>`: 将4维的张量`shape(batch_size,channels,high,weigth)`最大池化 池化核的尺寸为`sz` 默认没有填充 步长默认为sz
+- `cmp<T: TensorOrScalar>(&self,rhs: T,op:CmpOp) -> Result<Self`: 对两个张量逐元素比较 比较函数为op 返回结果张量
+- `mean<D: Dims>(&self,mean_dims: D)-> Result<Self>`: 对mean_dims维度求均值
+- `var<D: Dims>(&self,dim: D)-> Result<Self>`: 对dim求方差
+- `t(&self) -> Result<Self>`: 转置
+#### 初始化
 - `randn<S: Into<Shape>,T: FloatDType>(mean: T,std:T,s: S,device: &Device) -> Result<Self>`: 按照指定的形状s 均值mean 标准差std创建张量
+
+#### 信息接口
+- `dim<D: Dim>(&self,dim:D)-> Result<usize>`: 返回指定维度的大小
+- `shape(&self) -> &Shape`: 返回张量形状
+#### 取出子张量
+- `narrow<D: Dim>(&self,dim:D,start:usize,len:usize) -> Result<Self>`: 从原始张量中取出(不复制 高性能)一部分子张量 沿维度dim 从索引start开始 提取长度为len的子张量
+#### 查询
+- `argmax<D: Dim>(&self, dim: D) -> Result<Self>`: 沿着D维度返回最大值
+- `argmin<D: Dim>(&self, dim: D) -> Result<Self>`: 沿着D维度返回最大值
+
+#### 多张量拼接
 - `stack<A: AsRef<Tensor>, D: Dim>(args: &[A], dim: D) -> Result<Self>`: 把一组形状相同的张量沿着一个维度拼接 
 - `chunk<D: Dim>(&self,chunks:usize,dim: D)-> Result<Vec<Self>>`: 把张量沿着dim维度切分成chunks个 但可能小于chunks个
 t1 = [[1,2],[3,4]];

@@ -61,9 +61,16 @@ y_t = C h_t + D x_t
 - 积分: $\int$ -> \int
 - 属于: $\in$ -> \in
 - 属于: $\subset$ -> \subset
+- 交集: $\cap$ -> \cap
 - 向下取整: $\lfloor .. \rfloor$ -> \lfloor .. \rfloor
 - 向上取整: $\lceil .. \rceil$ -> \lceil .. \rceil
 - n次开根: $\sqrt[n]{a}$ -> \sqrt[n]{a}
+- 框框: $\boxed{abcd}$ -> \boxed{abcd}
+- argmax: $\arg\max_{c} f(c)$ -> \arg\max_{c} f(c)
+- "|": $\mid$ -> \mid
+- 正相关: $\propto$ -> \propto
+- 左右箭头: $\xrightarrow \xleftarrow$ -> \xrightarrow \xleftarrow
+
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
@@ -80,3 +87,8 @@ y_t = C h_t + D x_t
 - $\xi$ -> \xi
 - $\bigcup$ -> \bigcup
 - $\nabla$ -> \nabla
+- $\omega$ -> \omega
+- $\Sigma$ -> \Sigma
+- $\mathbb{X}$ -> \mathbb{X}
+- $\mathbf{X}$ ->\mathbf{X}
+

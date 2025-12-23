@@ -1,6 +1,26 @@
 # scikit-learn
 深度学习库 基于matplotlib scipy和numpy
 
+是很多模型的最佳实现
+## 线性模型
+
+- `LinearRegression`: 最小二乘线性回归
+- `Ridge`: 岭回归 就是线性回归+L2正则
+- `RidgeClassifier`: 岭回归分类器
+- `Lasso`: Lasso回归 就是线性回归+L1正则 用于估计稀疏系数c
+- `ElasticNet`: L1+L2的线性回归
+### LogisticRegression
+逻辑回归分类器
+
+参数
+- `penalentine='l2'`: 惩罚项
+None: 不惩罚
+
+l2: L2惩罚
+
+l1: L1惩罚
+
+elasticnet: L1+L2
 ## gaussian_process
 高斯过程是**非参数监督**学习方法 用于解决 **回归** 与 **概率分类** 的问题
 

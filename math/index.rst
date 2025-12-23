@@ -7,3 +7,5 @@
    common
    theory
    statistics
+   sign
+   linear
