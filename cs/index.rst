@@ -27,3 +27,4 @@
    dbg/index
    protocols
    mcp
+   lean4

@@ -17,6 +17,7 @@ $$
 - 点乘: $ a \cdot b$ -> a \cdot b
 - 下标: $ x_i $ -> x_i
 - 尖帽: $\hat{a}$ -> \hat{a}
+- 均值帽: $\bar{x}$ -> \bar{x}
 - 波浪帽: $\tilde{C}_t$ -> \tilde{C}_t
 - 哈达玛乘积: $\circ$ -> \circ
 - 约等于: $\approx$ -> \approx

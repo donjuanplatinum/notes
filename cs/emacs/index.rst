@@ -12,4 +12,5 @@ emacs
    gptel
    mcp
    ediff
+   rgrep
    

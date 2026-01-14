@@ -3,24 +3,30 @@
 
 是很多模型的最佳实现
 ## 线性模型
+线性模型基本有几个共同的参数
+
+penalty: 用于指定正则化类型 `l1`,`l2`,`elasticnet` 分别为L1 L2 L1+L2正则
+
+若后面加个CV代表交叉验证
 
 - `LinearRegression`: 最小二乘线性回归
+- `PassiveAggressiveClassifer`: 被动攻击分类器(废弃) 被封装进了SGDClassifier的learning_rate="pa1"或pa2
 - `Ridge`: 岭回归 就是线性回归+L2正则
-- `RidgeClassifier`: 岭回归分类器
 - `Lasso`: Lasso回归 就是线性回归+L1正则 用于估计稀疏系数c
-- `ElasticNet`: L1+L2的线性回归
-### LogisticRegression
-逻辑回归分类器
+- `LogisticRegression/LogisticRegressionCV`: 逻辑回归
 
-参数
-- `penalentine='l2'`: 惩罚项
-None: 不惩罚
+- `Perceptron`: 线性感知分类器 使用梯度下降回归 是`SGDClassifier`的参数封装 使用的是perceptron感知机损失函数
+- `SGDClassifier/SGDRegressor`: SGD训练的线性分类器/回归器
+通过指定不同的损失函数来应用到不同的任务
+| Loss          | 任务                  |
+|---------------|-----------------------|
+| hinge         | SVM                   |
+| log           | 逻辑回归的对数损失    |
+| perceptron    | 感知机                |
+| squared_hinge | 平方后的hinge 用于SVM |
+| huber         | huber损失             |
+- `ElasticNet/`: L1+L2的线性回归
 
-l2: L2惩罚
-
-l1: L1惩罚
-
-elasticnet: L1+L2
 ## gaussian_process
 高斯过程是**非参数监督**学习方法 用于解决 **回归** 与 **概率分类** 的问题
 

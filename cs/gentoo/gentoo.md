@@ -2053,3 +2053,27 @@ getuto
 ```
 cat /etc/portage/gnupg/pass
 ```
+## Gentoo LaTeX
+1. 安装`media-fonts/noto-cjk`
+```shell
+emerge media-fonts/noto-cjk
+eselect fontconfig list
+eselect fontconfig enable 70-noto-cjk.conf
+```
+
+
+2. 安装LaTeX
+
+先修改USE
+
+`/etc/portage/package.use/latex`
+
+```
+app-text/texlive cjk xetex
+app-text/texlive-core cjk xetex
+```
+
+然后安装
+```
+emerge app-text/texlive app-text/texlive-core
+```
