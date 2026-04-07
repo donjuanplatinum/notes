@@ -148,7 +148,35 @@ raw_syscalls:sys_enter // 系统调用进入
 raw_syscalls:sys_exit // 系统调用退出
 vsyscall:emulate_vsyscall // vsyscall机制的仿真执行
 ```
-追踪
+追踪进程的系统调用
+```shell
+sudo perf trace -p <PID>
+```
+### 追踪键盘的系统中断
+先确认键盘的中断名称
+```shell
+cat /proc/interrupts | grep -Ei "keyboard|i8042|i2c"
 ```
 
+> 注意 这里的i8042与i2c是笔记本键盘常用的
+
+irq号请看在linux/fs.md中对interrupts的说明
+
+使用 `perf record` 录制所有中断（或通过 --filter 过滤指定中断）
+```shell
+sudo perf record -e irq:irq_handler_entry -a sleep 5
+```
+
+解析并查看特定中断（如键盘中断 irq=1）
+```shell
+sudo perf script | grep "irq=1"
+```
+
+使用`perf trace`追踪中断
+```shell
+# 实时显示键盘中断的进入（Entry）
+sudo perf trace -e irq:irq_handler_entry --filter "irq == 1"
+
+# 实时显示键盘中断的退出（Exit）
+sudo perf trace -e irq:irq_handler_exit --filter "irq == 1"
 ```

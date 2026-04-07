@@ -19,7 +19,8 @@ $$
 - 尖帽: $\hat{a}$ -> \hat{a}
 - 均值帽: $\bar{x}$ -> \bar{x}
 - 波浪帽: $\tilde{C}_t$ -> \tilde{C}_t
-- 哈达玛乘积: $\circ$ -> \circ
+- 哈达玛乘积: $\odot$ -> \odot
+- 圈乘: $\circ$ -> \circ
 - 约等于: $\approx$ -> \approx
 - 等价无穷小 $\sim$ -> \sim
 - 矩阵:

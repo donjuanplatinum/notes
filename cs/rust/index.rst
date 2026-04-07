@@ -8,3 +8,4 @@ Rust
    std
    criterion
    asm
+   secret

@@ -1104,6 +1104,9 @@ data/id<sub>ed25519.pub</sub>
 <a id="orgf0c169c"></a>
 
 ## mail-server
+邮件服务器
+
+注意: 反向DNS(rdns) 要指向 **发件hostname**
 
 
 <a id="orge08f54d"></a>
@@ -1115,8 +1118,8 @@ services:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     container_name: mailserver
     # Provide the FQDN of your mail server here (Your DNS MX record should point to this value)
-    # hostname: mail.example.com
-    domainname: donplat.top
+    hostname: mail.barrensea.org
+    domainname: barrensea.org
       #    env_file: mailserver.env
     # More information about the mail-server ports:
     # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
@@ -1963,3 +1966,120 @@ services:
 ## stable-diffusion-webui
 
 
+## Misskey
+1. clone仓库
+```shell
+git clone -b master https://github.com/misskey-dev/misskey.git
+cd misskey git checkout master
+```
+
+2. 配置
+```shell
+cp .config/docker_example.yml .config/default.yml
+cp .config/docker_example.env .config/docker.env
+cp ./compose_example.yml ./docker-compose.yml
+```
+
+或者改docker-compose.yml
+
+```docker-compose
+services:
+  web:
+    #build: .
+	image: misskey/misskey:latest
+    restart: always
+    links:
+      - db
+      - redis
+#     - mcaptcha
+#     - meilisearch
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - internal_network
+      - external_network
+    env_file:
+      - .config/docker.env
+    volumes:
+      - ./files:/misskey/files
+      - ./.config:/misskey/.config:ro
+
+  redis:
+    restart: always
+    image: redis:7-alpine
+    networks:
+      - internal_network
+    volumes:
+      - ./redis:/data
+    healthcheck:
+      test: "redis-cli ping"
+      interval: 5s
+      retries: 20
+
+  db:
+    restart: always
+    image: postgres:18-alpine
+    networks:
+      - internal_network
+    env_file:
+      - .config/docker.env
+    volumes:
+      - ./db:/var/lib/postgresql
+    healthcheck:
+      test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
+      interval: 5s
+      retries: 20
+
+#  mcaptcha:
+#    restart: always
+#    image: mcaptcha/mcaptcha:latest
+#    networks:
+#      internal_network:
+#      external_network:
+#        aliases:
+#          - localhost
+#    ports:
+#      - 7493:7493
+#    env_file:
+#      - .config/docker.env
+#    environment:
+#      PORT: 7493
+#      MCAPTCHA_redis_URL: "redis://mcaptcha_redis/"
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#      mcaptcha_redis:
+#        condition: service_healthy
+#
+#  mcaptcha_redis:
+#    image: mcaptcha/cache:latest
+#    networks:
+#      - internal_network
+#    healthcheck:
+#      test: "redis-cli ping"
+#      interval: 5s
+#      retries: 20
+
+#  meilisearch:
+#    restart: always
+#    image: getmeili/meilisearch:v1.3.4
+#    environment:
+#      - MEILI_NO_ANALYTICS=true
+#      - MEILI_ENV=production
+#    env_file:
+#      - .config/meilisearch.env
+#    networks:
+#      - internal_network
+#    volumes:
+#      - ./meili_data:/meili_data
+
+networks:
+  internal_network:
+    internal: true
+  external_network:
+```

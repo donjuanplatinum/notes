@@ -21,8 +21,7 @@ Rust核心库是Rust标准库的无依赖基础 它没有链接到上游库 没�
 
 *迭代器是指实现了Iterator trait的类型*
 
-#### Traits
-##### Iterator
+#### Iterator
 迭代器的Trait
 ```rust
 pub trait Iterator {
@@ -41,3 +40,85 @@ pub trait Iterator {
 fn next(&mut self) -> Option<Self::Item>
 ```
 
+##### fold
+累加器
+
+```rust
+fn fold<B,F>(self,init: B,f: F) -> B 
+	where
+	Self: Sized,
+	F: FnMut(B,Self::Item) -> B,
+```
+
+init为初始值 f为累加的闭包
+### ops
+可重载运算符
+
+#### Fn/FnMut/FnOnce
+闭包实现的Trait
+
+1. Fn: 接收`&self` `Fn`的实例可以在**不改变状态**的情况下**重复调用**。
+```rust
+pub trait Fn<Args: Tuple>: FnMut<Args> {
+    // Required method
+    extern "rust-call" fn call(&self, args: Args) -> Self::Output;
+}
+
+```
+
+2. FnOnce: 接收`self` 调用会消耗自身 只能调用一次
+```rust
+pub trait FnOnce<Args: Tuple> {
+    type Output;
+
+    // Required method
+    extern "rust-call" fn call_once(self, args: Args) -> Self::Output;
+}
+```
+
+3. FnMut: 接收`&mut self` 可以在**改变状态**的情况下**重复调用**
+```rust
+pub trait FnMut<Args: Tuple>: FnOnce<Args> {
+    // Required method
+    extern "rust-call" fn call_mut(
+        &mut self,
+        args: Args
+    ) -> Self::Output;
+}
+```
+`
+### sync
+线程同步原语
+#### atomic
+原子类型 提供线程之间的原始共享内存通信
+
+##### Ordering
+原子类型的内存排序严格程度
+
+```rust
+pub enum Ordering {
+	Relaxed,
+	Release,
+	Acquire,
+	AcqRel,
+	SeqCst,
+}
+```
+
+- `Relaxed`: 没有排序约束 只有原子操作
+
+即: 
+
+1. 对同一个原子变量 所有线程观察到的值的**变化顺序**一致. 若变量从0->1->2 所有线程看到的都是0->1->2
+
+2. 指令本身具有原子性 在`fetch_add`之类的指令执行时 不会出现执行一半的情况
+
+- `Release`/`Acquire`: 这对组合建立前序与后序的关系
+
+Acquire保证此操作之后的读取与写入不会被排到此操作前
+
+Release保证此操作之前的读取与写入不会被排到此操作后
+
+- `AcqRel`: 等于Relase+Acquire
+
+- `SeqCst`: 最严格的约束 在AcqRel的基础上要求 所有线程看到的SeqCst的操作顺序必须一致

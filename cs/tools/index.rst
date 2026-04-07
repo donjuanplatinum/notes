@@ -22,3 +22,8 @@
    openssl
    ffmpeg
    ssh
+   valgrind
+   ldconfig
+   paxutils
+   mtr
+   systemd

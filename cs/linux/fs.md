@@ -88,6 +88,28 @@ cat /proc/interrupts |grep -i 'CPU\|94:'
 | Locked          | 锁定内存: 被mlock等调用锁定                                                                            |
 ### /proc/mounts
 已挂载文件系统表
+### /proc/interrupts
+系统中断统计信息
+
+示例格式:
+```
+            CPU0       CPU1       CPU2       CPU3       CPU4       CPU5       CPU6       CPU7       CPU8       CPU9       CPU10      CPU11      CPU12      CPU13      CPU14      CPU15      CPU16      CPU17      CPU18      CPU19      
+   0:         44          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    2-edge      timer
+   1:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0       3252          0          0 IR-IO-APIC    1-edge      i8042
+   3:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    3-edge      AMDI0010:00
+   4:          0          0          0     187823          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    4-edge      AMDI0010:01
+   7:          0          0          0          0          0       5771          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    7-fasteoi   pinctrl_amd
+   8:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    8-edge      rtc0
+   9:          0        910          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 IR-IO-APIC    9-fasteoi   acpi
+  27:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 PCI-MSI-0000:00:00.2    0-edge      AMD-Vi
+  28:          0          0          0          0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0 amd_gpio    0  ACPI:Event
+  29:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 amd_gpio    7  ACPI:Event
+  30:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0 amd_gpio   61  ACPI:Event
+
+```
+
+其中 第一列显示的就是irq的编号，最后一列显示的就是irq的来源，倒数第二列显示的就是irq的触发方式，倒数第三列显示的就是irq的名称
+
 ## sysfs
 ### /sys/devices/system/cpu/CPUID/cpufreq
 内核的cpu频率调节接口

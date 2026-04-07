@@ -47,3 +47,4 @@
 友链:
 
 - `0xa7973908 <https://mahiro.ink>`_
+- `cyliu <https://cyliu.cc>`_

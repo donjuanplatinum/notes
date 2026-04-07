@@ -13,3 +13,4 @@
    acan
    2025-12-19
    ml
+   article/index

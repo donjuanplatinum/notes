@@ -28,3 +28,4 @@
    protocols
    mcp
    lean4
+   rcore/index

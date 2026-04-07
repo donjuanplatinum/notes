@@ -90,6 +90,25 @@ match Nat.zero with
 	| Nat.zero => true
 	| Nat.succ k => false
 ```
+### Rat
+有理数类型 写为ℚ
+
+实现为一对整数的分数 其中: 分母为正数,且分子与分母**互质**
+
+```lean
+structure Rat where
+  -- 通过各个组件构造一个有理数。 我们将构造函数重命名为 mk'，以避免与“智能构造函数”发生冲突
+  -- 建议使用封装后的智能构造函数而不是mk'
+  mk' :: -- 原始的构造函数
+  num : Int -- 分子
+  den : Nat := 1 -- 分母
+  den_nz : den ≠ 0 := by decide -- 属性: 分母不为0
+  reduced : num.natAbs.Coprime den := by decide -- 属性: 分子分母必须互质
+  deriving DecidableEq, Hashable -- 类似Rust的#[derive]
+```
+## 关键字
+- `let`: 赋值
+- `have`: 提出一个假设或中间证明
 ## 函数
 在rust中函数定义为
 ```rust
@@ -118,6 +137,19 @@ Tactics在Lean中用于处理证明任务 通过tactics来控制证明过程
 example : 1 + 1 = 2 := by
 	rfl
 ```
+
+### Built-in
+Lean4的内置Tatics
+#### 逻辑操作
+- `intro`: 引入一个假设或目标 
+
+假设命题成立为h
+```lean
+theorem two_not_square_rat : ¬ ∃ q : ℚ, q^2 = 2 := by
+  intro h
+```
+
+- `cases`: 对命题进行拆解 分类讨论
 - `induction`: 递归证明 比如归纳法
 ```lean
 induction n with d hd
@@ -131,11 +163,22 @@ rfl
 其中 n为要归纳的变量 d为归纳假设的变量名 hd为归纳假设的名称
 
 hd相当于我们在数学归纳法中 假设的n=k时成立时的式子
-- `intro`: 引入一个假设或目标
-- `exact`: 提供一个具体的证明对象
-- `apply`: 尝试应用一个定理或者引理来证明
-- `assumption`: 若当前目标是某个假设的结论 就使用它来证明
-- `refl`: 如果目标是一个等式 且相等
-- `split`: 当目标是一个AND时 分解为两个子目标
 
+#### 等式化简/转化
+- `rw`: 带入
+- `refl`: 证明自反性
+### Mathlib
+Mathlib库的tatics
 
+#### 逻辑操作
+- `rcases`: 递归cases
+
+把h拆开为 q: 若命题成立 q^2=2的q, hq: 证明q^2 = 2的证据
+```lean
+theorem two_not_square_rat : ¬ ∃ q : ℚ, q^2 = 2 := by
+  intro h
+  rcases h with ⟨q, hq⟩
+```
+#### 等式化简/转化
+
+- `norm_cast`: 类型转换
