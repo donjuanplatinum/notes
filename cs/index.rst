@@ -29,3 +29,6 @@
    mcp
    lean4
    rcore/index
+   ebd
+   dl/index
+   system/index

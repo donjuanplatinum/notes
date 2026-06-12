@@ -73,6 +73,10 @@ y_t = C h_t + D x_t
 - 正相关: $\propto$ -> \propto
 - 左右箭头: $\xrightarrow \xleftarrow$ -> \xrightarrow \xleftarrow
 
+## 字体
+- $\mathbb{X}$ -> \mathbb{X}
+- $\mathbf{X}$ ->\mathbf{X}
+- $\mathcal{X}$ -> \mathcal{X}
 ## 符号
 - $\theta$ -> \theta
 - $\eta$ -> \eta
@@ -91,6 +95,5 @@ y_t = C h_t + D x_t
 - $\nabla$ -> \nabla
 - $\omega$ -> \omega
 - $\Sigma$ -> \Sigma
-- $\mathbb{X}$ -> \mathbb{X}
-- $\mathbf{X}$ ->\mathbf{X}
+
 

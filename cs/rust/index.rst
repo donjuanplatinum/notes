@@ -9,3 +9,4 @@ Rust
    criterion
    asm
    secret
+   esp

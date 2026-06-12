@@ -27,3 +27,4 @@
    paxutils
    mtr
    systemd
+   stty

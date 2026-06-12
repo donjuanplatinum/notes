@@ -9,5 +9,6 @@ Linux
    inotify
    selinux
    man
-   
+   serial
+   hw/index
    

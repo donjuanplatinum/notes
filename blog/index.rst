@@ -14,3 +14,4 @@
    2025-12-19
    ml
    article/index
+   why_pin_init
