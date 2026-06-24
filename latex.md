@@ -72,7 +72,7 @@ y_t = C h_t + D x_t
 - "|": $\mid$ -> \mid
 - 正相关: $\propto$ -> \propto
 - 左右箭头: $\xrightarrow \xleftarrow$ -> \xrightarrow \xleftarrow
-
+- 组合数: $\binom{x-1}{0}$ -> \binom{x-1}{0}
 ## 字体
 - $\mathbb{X}$ -> \mathbb{X}
 - $\mathbf{X}$ ->\mathbf{X}

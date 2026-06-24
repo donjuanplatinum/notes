@@ -13,4 +13,4 @@ emacs
    mcp
    ediff
    rgrep
-   
+   gnus
