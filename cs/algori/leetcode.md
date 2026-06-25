@@ -330,6 +330,8 @@ impl Solution {
 
 ### 题解
 #### 动态规划 前缀和
+O(n x m)的时间复杂度
+
 根据 **任意两个元素不相等**,**任意3个连续元素不能构成严格的增减性** 我们可以发现: 整个数组的增减其实是固定的 只有两个情况
 
 1. 增->减->增->减...
@@ -433,6 +435,8 @@ impl Solution {
 ```
 
 #### 离散数学
+O(n^2)的复杂度
+
 我们来看一下dp的数组:
 
 - $dp[1][x] = 1$
@@ -602,4 +606,225 @@ for k in 1..=maxk {
         }
         let total = (ans_a * 2) % Self::MOD;
         ((total + Self::MOD) % Self::MOD) as i32
+```
+## 3670. 锯齿形数组的总数II
+```
+给你 三个整数 n、l 和 r。
+
+长度为 n 的锯齿形数组定义如下：
+
+每个元素的取值范围为 [l, r]。
+任意 两个 相邻的元素都不相等。
+任意 三个 连续的元素不能构成一个 严格递增 或 严格递减 的序列。
+返回满足条件的锯齿形数组的总数。
+
+由于答案可能很大，请将结果对 109 + 7 取余数。
+
+序列 被称为 严格递增 需要满足：当且仅当每个元素都严格大于它的前一个元素（如果存在）。
+
+序列 被称为 严格递减 需要满足，当且仅当每个元素都严格小于它的前一个元素（如果存在）。
+```
+注意 这题和3699的区别在于 n会很大 但是l与r的范围小.
+
+3699的两个方法 一个是 $O(n x m)$ 一个是 $O(n^2)$ 这两个会极其的慢 当n大时
+
+所以这题的题解侧重点是不一样的
+
+这个3699和3700都是动态规划问题 区别在于如何优化这个动态规划问题
+
+在3699问题中 使用**前缀和**优化了升步与降步的累加 从 $O(n \times m^2)$ 变为 $O(n \times m)$ 但是外层的n步必须要走 
+
+而3700中 优化的是外层的O(n)为O(logn) 变为 $O(m^3 logn)$
+### 题解
+
+#### 矩阵快速幂优化动态规划
+我们来重新考察这个动态规划的状态转移.
+
+升降分别为:
+
+$$
+dp[i][x] = \sum_{u=1}^{x} dp[i-1][u]
+$$
+
+$$
+dp[i][x] = \sum_{u=x+1}^{1+r-l} dp[i-1][u]
+$$
+
+其实这个状态转移是一个线性的求和 那么其实可以表示为**矩阵乘法**
+
+而升降都是线性的 所以我们可以把升降的过程放一起 也是线性的.
+
+而升操作实际上就是**乘下三角矩阵** 降操作就是**上三角** 因为下三角代表筛出大的值.
+
+
+我们把升降放到一个矩阵里. 其中UP是下三角 DOWN是上三角
+
+$$
+\begin{bmatrix}
+0 & DOWN \\
+UP & 0
+\end{bmatrix}
+$$
+
+然后我们写出状态转移的这个线性公式
+
+$$
+\begin{bmatrix}
+dp[i+1][x] \\  
+dp[i][x]
+\end{bmatrix} =  
+
+\begin{bmatrix}
+0 & UP \\
+DOWN & 0
+\end{bmatrix}
+
+\cdot 
+
+\begin{bmatrix}
+dp[i][x] \\
+dp[i-1][x]
+\end{bmatrix}
+$$
+
+然后我们可以把这个
+
+$$
+\begin{bmatrix}
+dp[i][x] \\
+dp[i-1][x]
+\end{bmatrix}
+$$
+
+再展开为
+
+$$
+\begin{bmatrix}
+dp[i][x] \\  
+dp[i-1][x]
+\end{bmatrix} =  
+
+\begin{bmatrix}
+0 & UP \\
+DOWN & 0
+\end{bmatrix}
+
+\cdot 
+
+\begin{bmatrix}
+dp[i-1][x] \\
+dp[i-2][x]
+\end{bmatrix}
+$$
+
+以此类推 得到 很多
+
+$$
+\begin{bmatrix}
+0 & UP \\
+DOWN & 0
+\end{bmatrix}
+$$
+
+矩阵的乘积 可以使用快速幂.
+
+```rust
+impl Solution {
+    const MOD: i64 = 1_000_000_007;
+
+    pub fn zig_zag_arrays(n: i32, l: i32, r: i32) -> i32 {
+        let n = n as usize;
+        let m = (r - l + 1) as usize;
+        if m == 0 { return 0; }
+        if n == 1 { return (m as i64 % Self::MOD) as i32; }
+        if m == 1 { return 0; }
+
+        // 构造转移矩阵 
+        // M = D * U  (先升后降)
+        let mut m_mat = vec![vec![0i64; m]; m];
+        // N = U * D  (先降后升)
+        let mut n_mat = vec![vec![0i64; m]; m];
+        for i in 0..m {
+            for j in 0..m {
+                m_mat[i][j] = ((m - 1 - i.max(j)) as i64) % Self::MOD;
+                n_mat[i][j] = (i.min(j) as i64) % Self::MOD;
+            }
+        }
+
+        // UP矩阵 下三角
+        let mut u_mat = vec![vec![0i64; m]; m];
+        for i in 0..m {
+            for j in 0..i {
+                u_mat[i][j] = 1;
+            }
+        }
+
+        // 结果向量
+        let v0 = vec![1i64; m];
+
+        
+        let v_final = if n % 2 == 1 {
+            let p = n / 2;
+            let mp = Self::mat_pow(&m_mat, p);
+            Self::mat_vec_mul(&mp, &v0)
+        } else {
+            let p = n / 2;
+            let v1 = Self::mat_vec_mul(&u_mat, &v0); // 先走一步升
+            if p == 1 {
+                v1
+            } else {
+                let np_minus_1 = Self::mat_pow(&n_mat, p - 1);
+                Self::mat_vec_mul(&np_minus_1, &v1)
+            }
+        };
+
+        let mode_a = v_final.iter().sum::<i64>() % Self::MOD;
+        let ans = (mode_a * 2) % Self::MOD;
+        ans as i32
+    }
+
+    
+    fn mat_mul(a: &Vec<Vec<i64>>, b: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
+        let n = a.len();
+        let mut c = vec![vec![0i64; n]; n];
+        for i in 0..n {
+            for k in 0..n {
+                if a[i][k] == 0 { continue; }
+                let aik = a[i][k];
+                for j in 0..n {
+                    c[i][j] = (c[i][j] + aik * b[k][j]) % Self::MOD;
+                }
+            }
+        }
+        c
+    }
+
+    fn mat_pow(mat: &Vec<Vec<i64>>, mut exp: usize) -> Vec<Vec<i64>> {
+        let n = mat.len();
+        let mut res = vec![vec![0i64; n]; n];
+        for i in 0..n { res[i][i] = 1; }
+        let mut base = mat.clone();
+        while exp > 0 {
+            if exp & 1 == 1 {
+                res = Self::mat_mul(&res, &base);
+            }
+            base = Self::mat_mul(&base, &base);
+            exp >>= 1;
+        }
+        res
+    }
+
+    fn mat_vec_mul(mat: &Vec<Vec<i64>>, vec: &Vec<i64>) -> Vec<i64> {
+        let n = mat.len();
+        let mut res = vec![0i64; n];
+        for i in 0..n {
+            let mut sum = 0;
+            for j in 0..n {
+                sum = (sum + mat[i][j] * vec[j]) % Self::MOD;
+            }
+            res[i] = sum;
+        }
+        res
+    }
+}
 ```

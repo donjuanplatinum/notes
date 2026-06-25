@@ -79,6 +79,7 @@ y_t = C h_t + D x_t
 - $\mathcal{X}$ -> \mathcal{X}
 ## 符号
 - $\theta$ -> \theta
+- $\Theta$ -> \Theta
 - $\eta$ -> \eta
 - $\partial$ -> \partial
 - $\lambda$ -> \lambda
