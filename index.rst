@@ -23,7 +23,7 @@
 
 - 喜欢的游戏: 我的世界(欢迎一起玩) 上古卷轴5 上古卷轴4 辐射4 辐射新维加斯
 
-- 加入的组织: Lecturify Ircnow Barrensea
+- 加入的组织: Lecturify Ircnow Barrensea CTNH-Team
 
 - 交流群: 1044676507
 
