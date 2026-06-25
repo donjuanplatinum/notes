@@ -47,27 +47,21 @@
 友链
 ====
 
-- **0xa7973908** - `mahiro.ink <https://mahiro.ink>`_
+**0xa7973908** - `mahiro.ink <https://mahiro.ink>`_
 
-  .. image:: _static/avatars/0xa7973908.png
-     :width: 80px
-     :alt: 0xa7973908
-     :align: left
+.. image:: _static/avatars/0xa7973908.png
+   :width: 80px
+   :alt: 0xa7973908
 
+----
 
-
-- **cyliu** - `cyliu.cc <https://cyliu.cc>`_
-
-  .. image:: _static/avatars/cyliu.png
-     :width: 80px
-     :alt: cyliu
-     :align: left
+**cyliu** - `cyliu.cc <https://cyliu.cc>`_
 
 
+----
 
-- **Himekawa** - `链接 <https://himekawa.top>`_
+**Himekawa** - `链接 <https://himekawa.top>`_
 
-  .. image:: _static/avatars/himekawa.png
-     :width: 80px
-     :alt: Himekawa
-     :align: left
+.. image:: _static/avatars/himekawa.png
+   :width: 80px
+   :alt: Himekawa
