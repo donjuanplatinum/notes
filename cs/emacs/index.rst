@@ -14,3 +14,4 @@ emacs
    ediff
    rgrep
    gnus
+   vterm

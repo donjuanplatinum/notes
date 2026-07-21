@@ -37,6 +37,239 @@ pub(super) const unsafe fn ptr_rotate<T>(left: usize, mid: *mut T, right: usize)
     }
 }
 ```
+
+### 贪心算法
+每一步只做当前看起来最好的选择（局部最优），并期望这些局部最优能累积成全局最优。
+
+贪心算法通常有两个特质:
+
+1. 贪心选择性质: 全局最优可以通过局部最优选择来达到.
+
+2. 最优子结构: 一个问题的最优解包含其字问题的最优解.
+
+接下来我会给出各种贪心算法的证明
+
+#### 区间覆盖
+1. 对于任意最短路径 如果第一步没有走到当前能到达的最远点 那么把第一步替换成最远点 不会增加后续步数
+### DP动态规划
+动态规划的本质只有一件事
+
+> 把重复计算的搜索 变成**状态复用**的递推
+
+$$
+dp[state] = min/max/\sum dp[sub_state] + cost
+$$
+#### 线性递推的动态规划
+#### 矩阵的动态规划
+#### 字符串的动态规划
+#### DFS/BFS的动态规划
+### 搜索算法
+#### BFS
+广度优先搜索.
+
+直观的来说 就是浅显的访问同一层的所有节点 然后再去下一层.
+
+用二叉树来直观的看 就是: 先访问一层的所有兄弟节点 然后再往儿子节点去.
+
+用矩阵来直观的看: 先访问上下左右的四个邻居 然后再访问这四个邻居的邻居...
+
+在实现上 BFS使用一个**队列**来记录已经遍历了哪些.
+
+那么BFS具有一个非常好的性质: 
+
+> BFS 算法找到的路径是从起点开始的 最短 合法路
+
+- 遍历二叉树
+
+```rust
+#[derive(Debug,PartialEq,Eq)]
+pub struct TreeNode<T> {
+	pub val: T,
+	pub left: Option<Box<TreeNode<T>>>,
+	pub right: Option<Box<TreeNode<T>>>,
+}
+
+use std::collections::VecDeque;
+
+pub fn bfs(root: TreeNode<T>) -> Vec<T> {
+    let mut queue = VecDeque::new();
+    let mut result = Vec::new();
+    queue.push_back(root);
+    while let Some(node) = queue.pop_front() {
+        result.push(node.val);
+        if let Some(left) = node.left {
+            queue.push_back(*left);
+        }
+        if let Some(right) = node.right {
+            queue.push_back(*right);
+        }
+    }
+    result
+}
+
+```
+	
+#### DFS
+
+### 并查集
+并查集能很好的处理**连通性**问题.
+
+并查集可以快速的解决两个问题: **查询与合并**.
+
+并查集其实和树结构极其类似 但是: **它更注重于子节点最终属于谁**
+```rust
+/// 并查集
+pub struct Dsu {
+	/// 父节点指针
+	parent: Vec<usize>,
+	/// 
+	rank: Vec<usize>,
+}
+```
+#### 一个示例
+
+```
+假设有4而城市: 1 2 3 4
+
+一开始每个城市都是独立的 用数组 parent[u]来表示 城市u 的上级
+
+```
+
+那么并查集在这里的**查询**就是: `parent[u]`
+
+而合并操作为: 给定一条道路 比如(1,2) 意味着1与2联通了
+
+
+
+
+## 图
+图有两种元素: G = (V,E)
+
+- 顶点Vertex
+- 边Edge
+
+根据**边**的性质 图可以分为如下几种
+
+### 图的类型
+1. 无向图
+
+边没有方向
+
+2. 有向图
+
+边有方向
+
+3. 加权图
+
+边带有数值
+
+- 特殊图
+
+比如树 二分图
+### 图的性质
+1. 度: 这个顶点有相邻的边的数量
+2. 路径: 顶点的序列.
+3. 连通性: 从**任意**一个顶点出发 都能通过路径到达其他顶点.
+4. 环: 起始和结束于同一个点的路径
+### 抽象为类型
+计算机抽象图主要有两个方式
+#### 邻接矩阵
+一个 $V \times V$ 的 二维数组.
+
+- 若i到j有边 则(i,j)=权重
+- 优点: 查询任意两点是否直接相连 O(1)
+- 缺点: 空间复杂度大
+
+#### 邻接表
+长度为V的数组 每个元素是一个链表
+
+- 数组索引i对应顶点i,其中的元素链表存放了连向的邻居节点.
+- 优点: 空间效率高O(V+E) 
+- 缺点: 查询两点是否相连需要遍历链表
+### 环
+判断有向无环图DAG是一个非常广泛的问题 比如Gentoo的Portage循环依赖发现, Linux内核的一些结构,神经网络的计算图. 所以我们将研究 **如何在有向图中判断是否有环**.
+
+主流的两个方法是
+
+1. DFS
+
+2. Kahn拓扑排序
+
+#### DFS
+DFS判断有向图里是否有环需要额外维护一个 **三状态信息**
+
+我们看看下面的情况: 我们发现b虽然被访问了两次 但是是两次不同的DFS访问了b 而不是一次DFS访问了两次b
+
+所以需要维护3个状态: 0 没访问过,1 正在访问,2 访问完了
+
+```
+a ----> b
+      ^
+	  |
+c-----|
+```
+
+
+## 字符串
+### 字符串匹配算法
+#### KMP
+KMP算法是先预处理一个`pattern`数组 它记录了: 如果匹配到这没匹配成功 就直接跳转相应的位置.
+
+比如
+```
+a b a b a b c
+match
+a b a b c
+```
+
+我们注意到第一次的abab匹配完后 其实可以直接把ab跳了 注意 不能把abab都跳了.
+
+而KMP算法是求出它的pattern数组 也就是对应跳转多少
+
+```
+a b a b c
+match
+a b a b
+
+-> 
+a b a b c
+match
+    a b a b
+```
+
+我们发现 当前缀ab和后缀ab相等时可以跳.
+
+所以这个pattern其实就是前缀与后缀的最长相等长度.
+
+我们可以引入前缀函数的概念了
+
+> 前缀函数的值为 最长的前缀与后缀的相等的长度.
+#### 前缀函数算法
+KMP的问题转换为了对前缀函数的快速求解问题.
+
+朴素的算法为: 从前往后 和 从后往前匹配
+
+```rust
+pub fn prefix_func(s: String) {
+	let s = s.bytes();
+	let len = s.len();
+	let mut prefix_func_arr = vec![0;len];
+	for i in 0..len {
+		let mut max = 0;
+		for k in (1..i+1).rev() {
+			let prefix = &s[0..k];
+			let suffix = &s[i+1-k..i+1];
+			if prefix == suffix {
+				prefix_func_arr[i] = k;
+				break;
+			}
+		}
+	}
+}
+```
+
+### Manacher算法
+在 $O(N)$ 时间复杂度下 求出以每个位置为回文中心的回文半径.
 ## 数学算法
 ### 快速幂
 用于在 $\Theta(logn)$时间计算$a^n$的算法.
@@ -184,3 +417,74 @@ fn mod_inv(a: i64, m: i64) -> i64 {
 - 矩阵快速幂优化：求递推数列第n项
 
 
+### 质因数分解
+#### 试除法
+对n 用2,3,5,7...整除 当除数大于$\sqrt{n}$停止.
+
+#### Pollard Rho算法
+
+
+
+### 最大公因数gcd
+#### 欧几里得算法
+```rust
+fn gcd(a: i32, b: i32) -> i32 {
+        if b == 0 {
+        a
+    } else {
+        Self::gcd(b, a % b)
+    }
+```
+这个算法的思想是:
+
+若 a和b有最大公约数
+
+那么
+
+$$
+a = qb + r
+$$
+
+假设
+
+$$
+d = gcd(a,b)
+$$
+
+而
+
+$$
+r = a - qb
+$$
+
+我们假设 a = md , b = nd
+
+则
+
+$$
+r = (m - qn) d
+$$
+
+
+所以
+
+$$\boxed{d也整除r}$$
+
+所以我们只需要求
+
+$$
+gcd(a,r) = gcd(a, a mod b)
+$$
+### 容斥原理
+
+$$
+|\bigcup_{i=1}^{n} A_i| = \sum_{i=1}^{n} |A_i| - \sum_{1 \leq i \< j \leq n} |A_i \cap A_j| + \sum_{1 \leq i < j < k \leq n} |A_i \cap A_j \cap A_k ... + (-1)^{n-1} |A_1 \cap ... \cap A_n|
+$$
+
+常用的有两个集合的与三个集合的
+
+$$
+|A \cup B| = |A| + |B| - |A \cap B|
+
+|A \cup B \cup C| = |A| + |B| + |B| - |A \cap B| - |A \cap C| - |B \cap C| + |A \cap B \cap C|
+$$

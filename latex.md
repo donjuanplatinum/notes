@@ -64,6 +64,7 @@ y_t = C h_t + D x_t
 - 属于: $\in$ -> \in
 - 属于: $\subset$ -> \subset
 - 交集: $\cap$ -> \cap
+- 并集: $\cup$ -> \cup
 - 向下取整: $\lfloor .. \rfloor$ -> \lfloor .. \rfloor
 - 向上取整: $\lceil .. \rceil$ -> \lceil .. \rceil
 - n次开根: $\sqrt[n]{a}$ -> \sqrt[n]{a}

@@ -1,4 +1,163 @@
 # Elisp
+## GNU Emacs原生库
+### C库
+| 库      | 作用             |   |               |
+|---------|------------------|---|---------------|
+| editfns | 文本编辑内建函数 |   | src/editfns.c |
+| eval    | 执行代码         |   | src/eval.c    |
+| search  | 搜索逻辑         |   | src/search.c  |
+| fns     | 通用函数         |   | src/fn.c      |
+| alloc   | 堆分配           |   | src/alloc.c   |
+| data    | 数据类型的操作   |   | src/data.c              |
+### elisp库
+| 库      | 作用                     |                             |         |
+|---------|--------------------------|-----------------------------|---------|
+| subr    | 最底层最重要的公共函数库 | 相当于std                   | lisp/subr.el |
+| subr-x  | subr的扩展               |                             | lisp/emacs-lisp/subr-x.el        |
+| seq     | 序列的接口               | 类似于rust的slice vec array |         |
+| map     | 各种map 如 hash-table等  |                             |         |
+| cl-lib  | common-lisp的拓展        |                             |         |
+| pcase   | 模式匹配                 | rust的match                 |         |
+| nadvice | advice系统 动态修改函数  |                             |         |
+| eieio   | OO系统                   |                             |         |
+| json    | json解析                 |                             |         |
+| url     | http解析                 |                             |         |
+| project | 官方project管理          |                             |         |
+| xref    | 统一跳转接口             | eglot什么的几乎都用这个     |         |
+| imenu   | 代码索引                 |                             |         |
+| compile |                          |                             |         |
+| flymake | 实时诊断                 |                             |         |
+| treesit | tree-sitter官方接口      |                             |         |
+|         |                          |                             |         |
+## 库介绍
+### editfns
+#### save-excursion
+
+`(save-excursion &rest BODY)`: 临时移动编辑器状态 执行`BODY`中的代码 然后无条件恢复. 
+
+#### goto-char
+
+`(goto-char POSITION)`: 设置光标到`POSITION` 例如 buffer的开始是`(point-min)`,结尾是`(point-max)` .
+
+返回POSITION
+
+### eval
+#### let
+`(let VARLIST BODY)`: 设置一些变量`VARLIST` 然后执行`BODY`
+
+#### let*
+设置变量 然后执行BODY. 与let的区别是 设置的变量可以互相赋值.
+
+`(let VARLIST BODY)`
+
+
+#### while
+
+`(while TEST BODY)`: 若`TEST != nil` 则执行BODY
+
+示例
+```emacs-lisp
+(while () ())
+```
+#### and
+
+`(and CONDITIONS)`: 对`CONDITIONS`逐个AND
+
+示例
+
+```emacs-lisp
+(and t t nil)
+(and t t t)
+(and t nil t)
+```
+
+#### catch
+执行`BODY` 允许非局部退出 有点像rust的`'label` 其中label就是TAG
+
+`(catch TAG BODY...)`
+#### if
+如果`COND`非`nil` 执行`THEN` 否则 `ELSE`
+
+`(if COND THEN ELSE)`
+
+
+### subr
+#### not
+`(not OBJECT)`: 取反
+
+示例
+
+```emacs-lisp
+(not nil)
+```
+#### dotimes
+循环固定次数 类似rust的 for i in 0..len.
+
+`(dotimes (VAR COUNT [RESULT]) BODY...)`
+### search
+Emacs内部会维护一个全局的`match data` 底层为`current_thread->m_search_regs` 保存最近一次成功搜索的结果.
+
+当REGEXP为纯字符串匹配时 尝试使用Boyer-Moore算法.
+
+
+
+#### re-search-forward
+向后搜索REGEXP正则表达式. 移动光标到匹配结果的结尾
+`(re-search-forward REGEXP &optional BOUND NOERROR COUNT)`
+
+可选参数
+- BOUND 代表 搜索不超过这个范围 BOUND是缓冲区的绝对位置
+- NOERROR 错误处理
+  - 若为nil 产生error
+  - 若为t 失败后point不移动
+  - 如果不是t或者nil 失败后point移动到搜索边界
+- COUNT 指定搜索方向与搜索个数 正数为前 负数为反向搜 
+
+```emacs-lisp
+one
+(re-search-forward "one" -20 nil -1)
+
+
+one 
+(re-search-forward "one" 20 nil -1)
+
+one 
+(re-search-forward "one" 20 nil -2)
+
+;; 报错 因为BOUND=20的话 我们现在在缓冲区的几百行 如果往后搜索必然>20
+(re-search-forward "one" 20)
+
+(re-search-forward "one" (+ (point) 20)) 
+one
+
+(re-search-forward "one" nil 1)
+two
+```
+
+
+#### match-beginning
+返回
+### fns
+#### length
+返回向量 列表或者序列的长度
+
+`(length SEQUENCE)`
+
+### alloc
+#### make-vector
+创建向量 长度`length` 初始化为`init`
+
+`(make-vector length init)`
+### data
+#### aset
+设置数组`ARRAY` 索引`IDX`上的值为`NEWELT`
+
+`(aset ARRAY IDX NEWELT)`
+
+#### aref
+获取数组`ARRAY` 索引`IDX`上的值
+
+`(aref ARRAY IDX)`
 ## Lisp语法
 ### 函数
 ```lisp

@@ -64,7 +64,41 @@ Linux内核开发与其他项目不同. 采用邮件列表的补丁式贡献.
 
 Linux内核分为很多子系统 比如Hwmon dma等 每个子系统都有不同的维护者.
 
+这里会介绍很多的LKML技巧
 
+### LKML技巧
+1. 使用git format-patch命令生成补丁.
+
+- 生成最近一个提交的补丁: `git format-patch -1`
+
+- 生成最近n个提交的补丁: `git format-patch -n` 这在邮件列表里对应的 PATCH[1/n] ... PATH[n/n]
+
+- 添加封面信: `git format-patch --cover-letter -5` 即为给多个提交的补丁系列添加一个[0/n]的封面信来介绍整个系列
+
+- rfc: `git format-patch --rfc`
+
+- 版本: `git format-patch -v2 `
+
+2. 通过`get_maintainer.pl`获取需要抄送的维护者列表 `./scripts/get_maintainer.pl v2-0001-*.patch`
+
+3. 检查与发送根据列表发送邮件
+
+```
+git send-email --dry-run *.patch
+git send-email \
+    --to="platform-driver-x86@vger.kernel.org" \
+        --cc="ilpo.jarvinen@linux.intel.com" \
+            --cc="hdegoede@redhat.com" \
+                v2-0001-*.patch
+
+```
+
+
+### b4技巧
+拉取整个补丁中所有的回复邮件
+```
+b4 mbox 20260623-pr-ratelimited-v1-0-cc922f544dc0@google.com
+```
 ### 子系统
 下面列出Linux的子系统
 
@@ -247,4 +281,5 @@ Rust 内核代码的主要特点：
 | init | `init/` | 内核初始化与启动流程 |
 | ipc | `ipc/` | System V IPC、POSIX消息队列等 |
 | module | `kernel/module/` | 内核模块加载、卸载、符号解析 |
+
 

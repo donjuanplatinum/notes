@@ -21,6 +21,10 @@ Rust核心库是Rust标准库的无依赖基础 它没有链接到上游库 没�
 方法
 - `trailing_zeros`: 返回`尾随的0` 即从右往左的第一个1右边有几个0.
 - `leading_zeros`: 返回`前导0` 即从左往右的第一个1右边有几个0.
+#### bool
+
+- `then(self, f: F)`: 如果是true 则返回f 否则None
+- `then_some(self, t: T)`: 如果是true 则返回T 否则None
 ### iter
 迭代器
 
@@ -127,3 +131,10 @@ Release保证此操作之前的读取与写入不会被排到此操作后
 - `AcqRel`: 等于Relase+Acquire
 
 - `SeqCst`: 最严格的约束 在AcqRel的基础上要求 所有线程看到的SeqCst的操作顺序必须一致
+
+### cmp
+比较模块
+#### Ordering
+两个值比较的结果
+
+- `then(self, other: Ordering) -> Ordering`: 链接两个排序.若self不是`Equal` 则返回self. 否则返回`other`
