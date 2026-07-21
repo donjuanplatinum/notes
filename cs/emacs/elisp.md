@@ -143,6 +143,22 @@ two
 
 `(length SEQUENCE)`
 
+#### sort
+稳定排序序列
+
+`(sort SEQ &key KEY LESSP REVERSE IN-PLACE)`
+
+- SEQ: 排序的序列
+- &key: 标记后面的参数为按照名字传
+- KEY: 用于比较的键值
+- LESSP: 决定如何比较
+- REVERSE: 是否倒序
+- IN-PLACE: 是否原址
+
+示例
+```emacs-lisp
+(sort )
+```
 ### alloc
 #### make-vector
 创建向量 长度`length` 初始化为`init`
@@ -184,8 +200,8 @@ two
 | 参数      | 行为                                                                     |
 |-----------|--------------------------------------------------------------------------|
 | &optional | 代表此参数可选 可以传入或不传入(只能使用一次 且置于必选参数后,&rest之前) |
-| &rest     | 可变长度参数                                                             |
-| &key      | 在elisp不可用,但可用cl-defun等效                                         |
+| &rest     | 将后面的参数合并为列表                                          |
+| &key      | 将后面的参数按名字传                                         |
 
 
 ## 注释

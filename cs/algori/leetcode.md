@@ -2,6 +2,7 @@
 LeetCode我的题解
 
 | 题号      | 题目                         | 类别                                       | 难度     |
+|-----------|------------------------------|--------------------------------------------|----------|
 | 3699      | 锯齿形数组的总数I            | 动态规划 组合数学(解法2) 前缀和优化(解法1) | 困难     |
 | 3670      | 锯齿形数组的总数II           | 矩阵快速幂 BM算法                          | 困难     |
 | 3737/3739 | 统计主要元素子数组数目       | 前缀和 转换条件为贡献                      |          |
@@ -17,6 +18,7 @@ LeetCode我的题解
 | 931       | 下降路径最小和               | 中等                                       | 动态规划 |
 | 3754      | 连接非零数字并乘以其数字和 I | 数学                                       | 简单     |
 | 72        | 编辑距离                     | 动态规划 字符串                            | 困难     |
+| 1143      | 最长公共子序列               | 动态规划 字符串                            | 中等         |
 ## 1518.换水问题
 ### 题目
 ```
@@ -2213,7 +2215,7 @@ s 仅由小写英文字母组成
 这题和**最长回文字符串**的区别是: 最长回文字符串的朴素DP的状态转移是
 
 $$
-dp[i][j] = (s[i] == s[j]) && (dp[i+1][j-1] == true)
+dp[i][j] = (s[i] == s[j]) \&\& (dp[i+1][j-1] == true)
 $$
 
 然后遇到false就停止中心拓展.
@@ -2472,5 +2474,223 @@ impl Solution {
 插入一个字符
 删除一个字符
 替换一个字符
- 
+
 ### 题解
+我们看看这题能不能分解为字问题
+
+假设我们知道dp[i][j] 即为: s1的0..i 到s2的0..j需要执行的操作数量
+
+那么dp[i+1][j+1]有几个情况
+
+1. s1[i+1] == s2[j+1] 那么不需要操作
+2. s1[i+1] != s2[j+1] 可以进行3个操作
+
+- 替换: 若是替换 则 dp[i+1][j+1] = dp[i][j] + 1
+- 删除: 删除的话 i会减少1 那么问题转变为 dp[i+1][j+1] = dp[i][j+1] + 1
+- 插入: 若是插入 则**实际上是**可以理解为 给s2删除一个 dp[i+1][j+1] = dp[i+1][j] + 1
+ 
+比如
+```
+s1: abc  -> abcd
+s2: abcd
+```
+
+实际上就是删除s2
+```
+s1: abc
+s2: abcd -> abc
+```
+
+那么我们得到了状态转移方程
+
+$$
+dp[i][j] = 
+\begin{cases}
+dp[i-1][j-1], & s_1[i] = s_2[j], \
+min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+1)
+\end{cases}
+$$
+
+```rust
+impl Solution {
+    pub fn min_distance(word1: String, word2: String) -> i32 {
+        let (s1,s2) = (word1.as_bytes(),word2.as_bytes());
+	let mut dp: Vec<usize> = (0..s2.len()+1).collect();
+	for i in 1..s1.len() + 1 {
+	    let mut prev = dp[0]; // dp[i-1][0]
+		dp[0] = i; // dp[i][0]
+	    for j in 1..s2.len() + 1{
+		let tmp = dp[j];
+		dp[j] = if s1[i-1] == s2[j-1] {
+		    prev
+		} else {
+		    core::cmp::min(prev,dp[j-1]).min(dp[j]) + 1
+		};
+		prev = tmp;
+	    }
+	}
+	dp[s2.len()] as i32
+    }
+}
+
+```
+### 题解
+
+## 1143. 最长公共子序列
+```
+给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
+
+一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+
+例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
+两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。
+
+```
+
+### 题解
+我们称 最长公共子序列是**LCS**.
+
+我们在想 这个最长公共子序列问题 **是否存在一个字问题** ?
+
+如果存在一种子问题 并且能得到**转移方程** 那么就是动态规划了.
+
+我们随便来思考一串
+
+```
+a b c d e
+a c e
+```
+
+我们想得到这两个的LCS 那么能不能通过**减一个字符的LCS**得到 或者有什么关系吗?
+
+于是我们考察减一个字符的情况
+
+```
+a b c d | e
+a c | e
+```
+
+假设 abcd和ac的LCS我们得到了. 那么e=e , 是可以加1的.
+
+那如果最后一个不相等呢
+
+```
+a b c | d
+a | c 
+```
+
+那 LCS(abcd与ac) 应该只能等于LCS(abc与ac)或者LCS(abcd与a)的最大值 显然是前者 也就是第二个里面取个c.
+
+那么状态转移清晰了 我们令i和j为第一个和第二个序列的下标.
+
+$$
+LCS[i][j]=
+\begin{cases}
+LCS[i-1][j-1]+1, & s_1[i-1]=s_2[j-1],\
+\max(LCS[i-1][j],,LCS[i][j-1]), & s_1[i-1]\ne s_2[j-1].
+\end{cases}
+$$
+
+
+
+对于这种有两个变量的动态规划 我们在上面的 62题 中 可以使用同样的**空间优化**: 即 因为只有LCS[i-1][j] LCS[i-1][j-1] LCS[i][j-1] 那么只需要保存上一行 以及旧的左上角lcs[i][j-1].
+
+```rust
+impl Solution {
+    pub fn longest_common_subsequence(text1: String, text2: String) -> i32 {
+        let (s1,s2) = (text1.as_bytes(),text2.as_bytes());
+	let mut lcs = vec![0;s2.len()+1];
+	for i in 1..s1.len() + 1 {
+	    let mut prev = 0;
+	    for j in 1..s2.len() + 1 {
+		let tmp = lcs[j];
+		lcs[j] = if s1[i-1] == s2[j-1] {
+		    prev + 1
+		} else {
+		    core::cmp::max(lcs[j-1],lcs[j])
+		};
+		prev = tmp;
+	    }
+	}
+	lcs[s2.len()] as i32
+    }
+}
+
+```
+## 1877. 数组中最大数对和的最小值
+```
+一个数对 (a,b) 的 数对和 等于 a + b 。最大数对和 是一个数对数组中最大的 数对和 。
+
+比方说，如果我们有数对 (1,5) ，(2,3) 和 (4,4)，最大数对和 为 max(1+5, 2+3, 4+4) = max(6, 5, 8) = 8 。
+给你一个长度为 偶数 n 的数组 nums ，请你将 nums 中的元素分成 n / 2 个数对，使得：
+
+nums 中每个元素 恰好 在 一个 数对中，且
+最大数对和 的值 最小 。
+请你在最优数对划分的方案下，返回最小的 最大数对和 。
+```
+
+### 题解
+这题根据题意 我们发现 将最小的和最大的配对可以互补 也就是说: 给排序后的数组对称分配然后遍历找最大值即可.
+
+贪心证明: 
+
+我们假设排序后的数组为
+
+$$
+a_1 \leq a_2 \leq ... \leq a_n
+$$
+
+那么最大与最小为 $a_1$ 和 $a_n$
+
+我们考虑 $a_i$ 与$a_j$ 其中 1 < i < j < n
+
+$$
+(a_1,a_i) 与 (a_j,a_n). M_1 = max(a_1 + a_i,a_j + a_n, ohters..) = max(a_j+a_n,others..)
+
+(a_1,a_n) 与 (a_i,a_j). M_2 = max(a_1 + a_n,a_i + a_j, others..)
+$$
+
+因为
+
+$$
+a_1 + a_n \leq a_j + a_n 
+
+a_i + a_j \leq a_j + a_n
+$$
+
+所以
+M_2 \geq M_1
+$$
+
+也就是说 交换前结果一定不大于交换后.
+
+这道题是 **最小的** 最大数对和 那么交换前的结果一定不大于交换后 证明了 我们的交换不会让答案变差.
+
+```rust
+impl Solution {
+    pub fn min_pair_sum(mut nums: Vec<i32>) -> i32 {
+        nums.sort_unstable();
+	let mut max = 0;
+	for i in 0..nums.len() {
+	    let sum = nums[i] + nums[nums.len() - i - 1];
+	    max = core::cmp::max(sum,max);
+	}
+	max
+    }
+}
+
+```
+
+```emacs-lisp
+(defun min-pair-sum (nums)
+  (let ((num_sorted (sort nums))
+	(mx 0))	
+    (dotimes (i (/ (length num_sorted) 2))
+	     (let ((sum (+ (aref num_sorted i)
+			  (aref num_sorted (- (length num_sorted) i 1)) )))
+	       (setq mx (max mx sum) )
+	       ))
+    mx
+    )
+)
+```
