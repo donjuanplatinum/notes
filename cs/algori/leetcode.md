@@ -2671,7 +2671,7 @@ impl Solution {
     pub fn min_pair_sum(mut nums: Vec<i32>) -> i32 {
         nums.sort_unstable();
 	let mut max = 0;
-	for i in 0..nums.len() {
+	for i in 0..nums.len()/2 {
 	    let sum = nums[i] + nums[nums.len() - i - 1];
 	    max = core::cmp::max(sum,max);
 	}
@@ -2685,6 +2685,7 @@ impl Solution {
 (defun min-pair-sum (nums)
   (let ((num_sorted (sort nums))
 	(mx 0))	
+	; i 0..len/2
     (dotimes (i (/ (length num_sorted) 2))
 	     (let ((sum (+ (aref num_sorted i)
 			  (aref num_sorted (- (length num_sorted) i 1)) )))
