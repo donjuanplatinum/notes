@@ -8,29 +8,34 @@
 | search  | 搜索逻辑         |   | src/search.c  |
 | fns     | 通用函数         |   | src/fn.c      |
 | alloc   | 堆分配           |   | src/alloc.c   |
-| data    | 数据类型的操作   |   | src/data.c              |
+| data    | 数据类型的操作   |   | src/data.c    |
+| syntax  | 语法表解析       |   | src/syntax.c              |
 ### elisp库
-| 库      | 作用                     |                             |         |
-|---------|--------------------------|-----------------------------|---------|
-| subr    | 最底层最重要的公共函数库 | 相当于std                   | lisp/subr.el |
-| subr-x  | subr的扩展               |                             | lisp/emacs-lisp/subr-x.el        |
-| seq     | 序列的接口               | 类似于rust的slice vec array |         |
-| map     | 各种map 如 hash-table等  |                             |         |
-| cl-lib  | common-lisp的拓展        |                             |         |
-| pcase   | 模式匹配                 | rust的match                 |         |
-| nadvice | advice系统 动态修改函数  |                             |         |
-| eieio   | OO系统                   |                             |         |
-| json    | json解析                 |                             |         |
-| url     | http解析                 |                             |         |
-| project | 官方project管理          |                             |         |
-| xref    | 统一跳转接口             | eglot什么的几乎都用这个     |         |
-| imenu   | 代码索引                 |                             |         |
-| compile |                          |                             |         |
-| flymake | 实时诊断                 |                             |         |
-| treesit | tree-sitter官方接口      |                             |         |
-|         |                          |                             |         |
+| 库      | 作用                     |                             |                           |
+|---------|--------------------------|-----------------------------|---------------------------|
+| subr    | 最底层最重要的公共函数库 | 相当于std                   | lisp/subr.el              |
+| subr-x  | subr的扩展               |                             | lisp/emacs-lisp/subr-x.el |
+| seq     | 序列的接口               | 类似于rust的slice vec array |                           |
+| map     | 各种map 如 hash-table等  |                             |                           |
+| cl-lib  | common-lisp的拓展        |                             |                           |
+| pcase   | 模式匹配                 | rust的match                 |                           |
+| nadvice | advice系统 动态修改函数  |                             |                           |
+| eieio   | OO系统                   |                             |                           |
+| json    | json解析                 |                             |                           |
+| url     | http解析                 |                             |                           |
+| project | 官方project管理          |                             |                           |
+| xref    | 统一跳转接口             | eglot什么的几乎都用这个     |                           |
+| imenu   | 代码索引                 |                             |                           |
+| compile |                          |                             |                           |
+| flymake | 实时诊断                 |                             |                           |
+| treesit | tree-sitter官方接口      |                             |                           |
+| syntax  | 语法分析                 |                             | lisp/emacs-lisp/syntax.el |
 ## 库介绍
 ### editfns
+#### save-restriction
+临时修改当前buffer的可见范围 执行BODY 然后恢复
+
+`(save-restriction &rest BODY)`
 #### save-excursion
 
 `(save-excursion &rest BODY)`: 临时移动编辑器状态 执行`BODY`中的代码 然后无条件恢复. 
@@ -41,6 +46,10 @@
 
 返回POSITION
 
+#### point-max
+返回缓冲区的结尾
+
+`(point-max)`
 ### eval
 #### let
 `(let VARLIST BODY)`: 设置一些变量`VARLIST` 然后执行`BODY`
@@ -94,6 +103,15 @@
 循环固定次数 类似rust的 for i in 0..len.
 
 `(dotimes (VAR COUNT [RESULT]) BODY...)`
+#### when
+若`COND`为非nil 执行BODY 否则返回nil
+
+`(when COND &reset BODY)`
+#### derived-mode-p
+判断当前Major模式是否是某个Mode的子Mode
+
+`(derived-mode-p &reset MODES)`
+
 ### search
 Emacs内部会维护一个全局的`match data` 底层为`current_thread->m_search_regs` 保存最近一次成功搜索的结果.
 
@@ -136,7 +154,17 @@ two
 
 
 #### match-beginning
-返回
+返回最后一次匹配的**开头**的位置
+
+`(match-beginning SUBEXP)`
+
+- SUBEXP: 返回第SUBEXP个正则表达式组的位置
+#### match-end
+返回最后一次匹配的**结尾**的位置
+
+`(match-end SUBEXP)`
+
+- SUBEXP: 返回第SUBEXP个正则表达式组的位置
 ### fns
 #### length
 返回向量 列表或者序列的长度
@@ -157,7 +185,9 @@ two
 
 示例
 ```emacs-lisp
-(sort )
+(let ((list [0 1 3 2 4 4 0 2])) 
+	(sort list)
+)
 ```
 ### alloc
 #### make-vector
@@ -165,6 +195,10 @@ two
 
 `(make-vector length init)`
 ### data
+#### eq
+若两个对象是相同的Lisp对象 则返回t
+
+`(eq OBJ1 OBJ2)`
 #### aset
 设置数组`ARRAY` 索引`IDX`上的值为`NEWELT`
 
@@ -174,6 +208,51 @@ two
 获取数组`ARRAY` 索引`IDX`上的值
 
 `(aref ARRAY IDX)`
+#### car
+获取LIST的`car`
+
+`car`代表`cons-cell`的car
+
+`(car LIST)`
+#### cdr
+获取LIST的`cdr`
+
+`(cdr LIST)`
+### syntax.c
+#### parse-partial-sexp
+从FROM到TO扫描lisp代码返回一个状态列表
+
+`(parse-partial-sexp FROM TO &optional TARGETDEPTH STOPBEFORE OLDSTATE COMMENTSTOP)`
+
+- FROM: 开始解析的位置
+- TO: 解析到的位置
+- TARGETDEPTH: 最大目标括号深度
+- STOPBEFORE: 遇到一个sexp开始字符时停止
+- OLDSTATE: 从已有parser状态继续解析
+- COMMENTSTOP: 遇到commet/string停止
+
+状态列表具有12个字段
+
+- 0 括号深度
+- 1 当前所在最内层lisp的开括号位置
+- 2 最近一个完整sexp结束的位置
+- 3 当前是否在字符串里
+- 4 当前是不是在注释里
+- 5 是否读到的是quote
+- 6 扫描过程中遇到的最低括号深度
+- 7 注释的类型 比如行注释 块注释
+- 8 当前comment或者string开始的位置
+- 9 当前打开的括号的位置
+- 10 处理两个字符组成的syntax 比如//这种 只扫到第一个/ 还没扫到第二个/
+
+### syntax.el
+#### syntax-ppss
+返回`POS`处 或者 `point`处的语法解析状态 同时会**缓存**这个状态 返回一个和`parse-partial-sexp`一样的列表.
+
+> 注意 在syntax-ppss中的parse-partial-sexp列表 不保证2和6字段的正确性
+
+`(syntax-ppss &optional POS)`
+
 ## Lisp语法
 ### 函数
 ```lisp
@@ -327,6 +406,7 @@ Z -- 编码系统，如果没有前缀参数则为 nil。
 基于此信息排除哪些命令由 'read-extended-command-predicate' 的值控制，详见其说明。
 
 ## 数据结构
+### cons-cell
 ### alist
 关联列表 存储键值对
 ```emacs-lisp

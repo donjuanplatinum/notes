@@ -527,3 +527,5 @@ $$
 
 |A \cup B \cup C| = |A| + |B| + |B| - |A \cap B| - |A \cap C| - |B \cap C| + |A \cap B \cap C|
 $$
+## RMQ
+区间最大/最小值
