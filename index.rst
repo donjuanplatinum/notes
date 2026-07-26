@@ -44,7 +44,7 @@
 
 **0xa7973908** - `mahiro.ink <https://mahiro.ink>`_
 
-.. image:: _static/avatars/JFZC.jpg
+.. image:: _static/avatars/0xa7973908.png
    :width: 80px
    :alt: 0xa7973908
 
@@ -52,9 +52,9 @@
 
 **JFZC** - `jfzc.barrensea.org <https://jfzc.barrensea.org>`_
 
-.. image:: _static/avatars/0xa7973908.png
+.. image:: _static/avatars/JFZC.jpg
    :width: 80px
-   :alt: 0xa7973908
+   :alt: JFZC
 
 ----
 
