@@ -46,10 +46,18 @@
 
 返回POSITION
 
+#### point-min
+返回缓冲区的开头
+
+`(point-min)`
 #### point-max
 返回缓冲区的结尾
 
 `(point-max)`
+#### char-after
+返回`POS`处的字符 默认为`POINT`处
+
+`(char-after &optional POS)`
 ### eval
 #### let
 `(let VARLIST BODY)`: 设置一些变量`VARLIST` 然后执行`BODY`
@@ -107,11 +115,19 @@
 若`COND`为非nil 执行BODY 否则返回nil
 
 `(when COND &reset BODY)`
+#### when-let
+在`SPEC`中绑定变量 并条件执行`BODY`
+
+`(when-let SPEC &rest BODY)`
 #### derived-mode-p
 判断当前Major模式是否是某个Mode的子Mode
 
 `(derived-mode-p &reset MODES)`
 
+#### if-let
+绑定变量到`SPEC` 然后执行`THEN`
+
+`(if-let SPEC THEN &rest ELSE)`
 ### search
 Emacs内部会维护一个全局的`match data` 底层为`current_thread->m_search_regs` 保存最近一次成功搜索的结果.
 

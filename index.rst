@@ -27,11 +27,6 @@
 
 - 交流群: 1044676507
 
-如果你也是我的世界玩家 欢迎一起讨论游玩!
-
-
-
-
 
 
 .. toctree::
@@ -48,6 +43,14 @@
 ====
 
 **0xa7973908** - `mahiro.ink <https://mahiro.ink>`_
+
+.. image:: _static/avatars/JFZC.jpg
+   :width: 80px
+   :alt: 0xa7973908
+
+----
+
+**JFZC** - `jfzc.barrensea.org <https://jfzc.barrensea.org>`_
 
 .. image:: _static/avatars/0xa7973908.png
    :width: 80px
