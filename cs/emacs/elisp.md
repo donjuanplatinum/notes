@@ -9,7 +9,9 @@
 | fns     | 通用函数         |   | src/fn.c      |
 | alloc   | 堆分配           |   | src/alloc.c   |
 | data    | 数据类型的操作   |   | src/data.c    |
-| syntax  | 语法表解析       |   | src/syntax.c              |
+| syntax  | 语法表解析       |   | src/syntax.c  |
+| buffer  | 缓冲区操作       |   | src/buffer.c              |
+|         |                  |   |               |
 ### elisp库
 | 库      | 作用                     |                             |                           |
 |---------|--------------------------|-----------------------------|---------------------------|
@@ -31,6 +33,27 @@
 | treesit | tree-sitter官方接口      |                             |                           |
 | syntax  | 语法分析                 |                             | lisp/emacs-lisp/syntax.el |
 ## 库介绍
+### buffer
+#### generate-new-buffer-name
+生成一个不会与现有buffer重名的buffer名称.
+
+用于创建唯一buffer时调用
+
+`(generate-new-buffer-name name &optional IGNORE)`
+
+- `NAME`: 希望使用的buffer名称
+- `IGNORE`: 一个buffer对象.若存在这个buffer 则在检测重名时忽略
+
+示例
+```emacs-lisp
+(generate-new-buffer-name "foo")
+
+```
+若不存在foo的缓冲区 则返回foo 存在则返回foo<2>
+#### set-buffer
+切换操作到`BUFFER-OR-NAME` buffer. 以便后续的`insert`等操作. 注意 emacs不会切换那个buffer,仅会给elisp用.
+
+`(set-buffer BUFFER-OR-NAME)`
 ### editfns
 #### save-restriction
 临时修改当前buffer的可见范围 执行BODY 然后恢复
@@ -97,7 +120,14 @@
 
 `(if COND THEN ELSE)`
 
+#### unwind-protect
+无论`BODYFORM`是正常结束 抛出错误 还是非局部跳转 `UNWINDFORMS`都会执行 同时返回 `BODYFORM`的返回值
 
+`(unwind-protect BODYFORM UNWINDFORMS...)`
+#### progn
+合并执行`BODY1` `BODY1` 返回最后一个值
+
+`(progn BODY...)`
 ### subr
 #### not
 `(not OBJECT)`: 取反
@@ -128,6 +158,10 @@
 绑定变量到`SPEC` 然后执行`THEN`
 
 `(if-let SPEC THEN &rest ELSE)`
+#### with-current-buffer
+临时切换到`BUFFER-OR-NAME`执行`BODY` 然后回到当前buffer
+
+`(with-current-buffer BUFFER-OR-NAME &reset BODY)`
 ### search
 Emacs内部会维护一个全局的`match data` 底层为`current_thread->m_search_regs` 保存最近一次成功搜索的结果.
 
@@ -205,6 +239,14 @@ two
 	(sort list)
 )
 ```
+#### string-distance
+返回`STRING1` 与 `STRING2` 之间的Levenshetin距离
+
+Levenshetin距离指的是: 将`STRING1`变换为`STRING2`所需进行的 `删除` `插入` `替换` 总次数
+
+`(string-distance STRING1 STRING2 BYTECOMPARE)`
+
+- 若BYTECOMPARE为nil或忽略 则以字符为单位计算距离 否则以字节
 ### alloc
 #### make-vector
 创建向量 长度`length` 初始化为`init`

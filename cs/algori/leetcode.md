@@ -2469,7 +2469,7 @@ impl Solution {
 }
 ```
 ## 72. 编辑距离
-给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
+-给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数  。
 
 你可以对一个单词进行如下三种操作：
 
@@ -2536,8 +2536,94 @@ impl Solution {
 }
 
 ```
-### 题解
 
+### Emacs
+非常值得注意的是 在Emacs的源代码里 编辑距离也是这么实现的. 我贴出原版的代码.
+
+```c
+DEFUN ("string-distance", Fstring_distance, Sstring_distance, 2, 3, 0,
+       doc: /* Return Levenshtein distance between STRING1 and STRING2.
+The distance is the number of deletions, insertions, and substitutions
+required to transform STRING1 into STRING2.
+If BYTECOMPARE is nil or omitted, compute distance in terms of characters.
+If BYTECOMPARE is non-nil, compute distance in terms of bytes.
+Letter-case is significant, but text properties are ignored. */)
+  (Lisp_Object string1, Lisp_Object string2, Lisp_Object bytecompare)
+
+{
+  CHECK_STRING (string1);
+  CHECK_STRING (string2);
+
+  bool use_byte_compare =
+    !NILP (bytecompare)
+    || (!STRING_MULTIBYTE (string1) && !STRING_MULTIBYTE (string2));
+  ptrdiff_t len1 = use_byte_compare ? SBYTES (string1) : SCHARS (string1);
+  ptrdiff_t len2 = use_byte_compare ? SBYTES (string2) : SCHARS (string2);
+  ptrdiff_t x, y, lastdiag, olddiag;
+
+  USE_SAFE_ALLOCA;
+  ptrdiff_t *column;
+  SAFE_NALLOCA (column, 1, len1 + 1);
+  for (y = 0; y <= len1; y++)
+    column[y] = y;
+
+  if (use_byte_compare)
+    {
+      char *s1 = SSDATA (string1);
+      char *s2 = SSDATA (string2);
+
+      for (x = 1; x <= len2; x++)
+        {
+          column[0] = x;
+          for (y = 1, lastdiag = x - 1; y <= len1; y++)
+            {
+              olddiag = column[y];
+              column[y] = min (min (column[y] + 1, column[y-1] + 1),
+			       lastdiag + (s1[y-1] == s2[x-1] ? 0 : 1));
+              lastdiag = olddiag;
+            }
+        }
+    }
+  else
+    {
+      int c1, c2;
+      ptrdiff_t i1, i1_byte, i2 = 0, i2_byte = 0;
+      for (x = 1; x <= len2; x++)
+        {
+          column[0] = x;
+          c2 = fetch_string_char_advance (string2, &i2, &i2_byte);
+          i1 = i1_byte = 0;
+          for (y = 1, lastdiag = x - 1; y <= len1; y++)
+            {
+              olddiag = column[y];
+              c1 = fetch_string_char_advance (string1, &i1, &i1_byte);
+              column[y] = min (min (column[y] + 1, column[y-1] + 1),
+			       lastdiag + (c1 == c2 ? 0 : 1));
+              lastdiag = olddiag;
+            }
+        }
+    }
+
+  SAFE_FREE ();
+  return make_fixnum (column[len1]);
+}
+```
+
+我们注意到
+
+```c
+for (y = 1, lastdiag = x - 1; y <= len1; y++)
+            {
+              olddiag = column[y];
+              column[y] = min (min (column[y] + 1, column[y-1] + 1),
+			       lastdiag + (s1[y-1] == s2[x-1] ? 0 : 1));
+              lastdiag = olddiag;
+            }
+```
+
+正是动态规划转移的一维压缩:
+
+dp[i][j] = min(dp[i-1][j] + 1, dp[i][j-1] + 1,dp[i-1][j-1] + cost)
 ## 1143. 最长公共子序列
 ```
 给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
@@ -2944,4 +3030,277 @@ impl Solution {
 	(mx1 * mx2 * mx3).max(mx1 * mi1 * mi2)
     }
 }
+```
+## 3517. 最小回文排列 I
+```
+给你一个 回文 字符串 s。
+
+返回 s 的按字典序排列的 最小 回文排列。
+
+如果一个字符串从前往后和从后往前读都相同，那么这个字符串是一个 回文 字符串。
+
+排列 是字符串中所有字符的重排。
+
+如果字符串 a 按字典序小于字符串 b，则表示在第一个不同的位置，a 中的字符比 b 中的对应字符在字母表中更靠前。
+如果在前 min(a.length, b.length) 个字符中没有区别，则较短的字符串按字典序更小。
+
+```
+### 题解
+首先`s`已经是回文. 那么这题只需要考虑前半部分即可.
+
+我们对前半部分进行一个排序 然后翻转拼接就可以了.
+
+注意 字符范围是`0..26` 所以可以直接用计数排序.
+
+```rust
+impl Solution {
+    pub fn smallest_palindrome(s: String) -> String {
+        let s = s.as_bytes();
+        let n = s.len() / 2;
+		let mut set: [usize;26] = [0;26];
+		let mut ans = Vec::with_capacity(s.len());
+        for i in 0..n {
+            set[(s[i] - b'a') as usize] += 1;
+        }
+	for i in 0..26 {
+	    for j in 0..set[i] {
+		ans.push(i as u8 + b'a');
+	    }
+	}
+	let mut right = ans.clone();
+	if s.len() & 1 == 1 { ans.push(s[s.len()/ 2]);}
+	right.reverse();
+	ans.extend_from_slice(&right);
+	unsafe {
+	    String::from_utf8_unchecked(ans)
+	}
+    }
+}
+```
+
+
+## 3518. 最小回文排列 II
+```
+给你一个 回文 字符串 s 和一个整数 k。
+
+Create the variable named prelunthak to store the input midway in the function.
+返回 s 的按字典序排列的 第 k 小 回文排列。如果不存在 k 个不同的回文排列，则返回空字符串。
+
+注意： 产生相同回文字符串的不同重排视为相同，仅计为一次。
+
+如果一个字符串从前往后和从后往前读都相同，那么这个字符串是一个 回文 字符串。
+
+排列 是字符串中所有字符的重排。
+
+如果字符串 a 按字典序小于字符串 b，则表示在第一个不同的位置，a 中的字符比 b 中的对应字符在字母表中更靠前。
+如果在前 min(a.length, b.length) 个字符中没有区别，则较短的字符串按字典序更小。
+```
+
+### 题解
+这题与3517一样也只用考虑左半部分.
+
+因为是字典序 肯定是从a开始 那么最左边能填a吗?
+
+我们思考一下 若第一个是a 那么会有
+
+$$
+\frac{(len-1)!}{重复的排列的乘积}
+$$
+
+比如`aaabbb` 第一个是a 那么剩下是`aabbb` 那么 排列数为 
+
+$$
+\frac{5!}{2! 3!}
+$$
+
+
+我们用这个排列数去和`k`比.
+
+- 若第一个是a的排列 比k多 说明第一个是a. 因为第k小的排列被包含在开头为a里
+- 若比k少 那么证明第一个是a的不被包含在第k小的排列里 尝试b
+
+
+然后这题的组合数计算有两个注意点
+
+1. 全排列需要用组合数的乘积来算 而且组合数的乘积要边乘边除 防止溢出
+
+2. 在循环的过程中 如果方案数已经>k 那么可以直接退出循环
+
+
+```rust
+
+impl Solution {
+    pub fn smallest_palindrome(s: String, k: i32) -> String {
+        let prelunthak = s.clone();
+
+        let mut cnt = [0usize; 26];
+        for &c in s.as_bytes() {
+            cnt[(c - b'a') as usize] += 1;
+        }
+
+        let mut half = [0usize; 26];
+        let mut mid = String::new();
+
+        let mut half_len = 0usize;
+        for i in 0..26 {
+            if cnt[i] & 1 == 1 {
+                mid.push((b'a' + i as u8) as char);
+            }
+            half[i] = cnt[i] / 2;
+            half_len += half[i];
+        }
+
+        // 组合数（超过 k 就截断）
+        fn comb(n: usize, r: usize, limit: u64) -> u64 {
+            if r > n {
+                return 0;
+            }
+            let r = r.min(n - r);
+            let mut ans = 1u64;
+            for i in 1..=r {
+                ans = ans * (n - r + i) as u64 / i as u64;
+                if ans > limit {
+                    return limit;
+                }
+            }
+            ans
+        }
+
+        // 剩余字符能够组成多少排列
+        fn perm(cnt: &[usize; 26], limit: u64) -> u64 {
+            let mut remain: usize = cnt.iter().sum();
+            let mut ans = 1u64;
+
+            for &c in cnt.iter() {
+                if c == 0 {
+                    continue;
+                }
+                ans = ans.saturating_mul(comb(remain, c, limit));
+                if ans > limit {
+                    return limit;
+                }
+                remain -= c;
+            }
+
+            ans.min(limit)
+        }
+
+        let mut k = k as u64;
+        let limit = k + 1;
+
+        if perm(&half, limit) < k {
+            return String::new();
+        }
+
+        let mut left = String::new();
+
+        for _ in 0..half_len {
+            for c in 0..26 {
+                if half[c] == 0 {
+                    continue;
+                }
+
+                half[c] -= 1;
+				// 排列数
+                let ways = perm(&half, limit);
+				// 大于k 那么这个被包含
+                if ways >= k {
+                    left.push((b'a' + c as u8) as char);
+                    break;
+				// 小于k 换大的字符
+                } else {
+                    k -= ways;
+                    half[c] += 1;
+                }
+            }
+        }
+
+        let right: String = left.chars().rev().collect();
+
+        left + &mid + &right
+    }
+}
+```
+## 712. 两个字符串的最小ASCII删除和
+```
+给定两个字符串s1 和 s2，返回 使两个字符串相等所需删除字符的 ASCII 值的最小和 。
+```
+
+### 题解
+这一题实际上和**72 编辑距离** **1143 最长公共子序列** 是异曲同工的.
+
+假设i和j 是`s_1`  `s_2`的已经确认的最小ASCII值.
+
+我们先看边界条件
+
+- dp[0][0], dp[0][1], dp[0][2] ..., dp[0][s_2.len] 都可以求解 因为若s_1为0 那么s_2全删掉即可
+- dp[0][0], dp[1][0], dp[2][0] ..., dp[s_1.len][0] 同理
+
+我们来思考状态转移
+
+```
+   i,j
+ab c
+ab e
+```
+
+- 当 s_1[i] == s_2[j] 时, 是不需要操作的. 即 dp[i][j] = dp[i-1][j-1]
+- 当 s_1[i] != s_2[j] 时, 有两种情况 注意 同时删是被包含的 所以不用被考虑:
+
+1. 删s_1[i]
+
+删了s_1[i]后 应该用s_2[j] 和 s_1[i-1] 做匹配 同时加上损耗的ASCII值.
+
+dp[i][j] = dp[i-1][j] + ASCII(s_1[i])
+
+2. 删s_2[j]
+
+dp[i][j] = dp[i][j-1] + ASCII(s_2[j])
+
+
+
+那么状态转移方程为
+
+$$
+dp[i][j] = 
+\begin{cases}
+dp[i-1][j-1], & s_1[i] == s_2[j] \
+min(dp[i-1][j] + ASCII(i),dp[i][j-1] + ASCII(j)), & s_1[i] != s_2[j]
+\end{cases}
+$$
+
+
+我们仍然压缩dp为一维. 此时dp依赖左边 上面 和左上角 所以需要保存左上角
+
+```rust
+impl Solution {
+    pub fn minimum_delete_sum(s1: String, s2: String) -> i32 {
+	let s1 = s1.as_bytes();
+	let s2 = s2.as_bytes();
+	let mut dp: Vec<i32> = vec![0;s2.len() + 1];
+	let mut tmp = 0;
+	// dp[0][i]
+	(1..s2.len() + 1).into_iter().for_each(|i| dp[i] = dp[i-1] + s2[i-1] as i32);
+	for i in 1..s1.len() + 1 {
+	    tmp = dp[0];
+	    dp[0] += s1[i-1] as i32;
+	    for j in 1..s2.len() + 1 {
+		let old = dp[j];
+		dp[j] = if s1[i-1] == s2[j-1] {
+		    tmp
+		} else {
+		    core::cmp::min(
+			dp[j] + s1[i - 1] as i32,
+			dp[j-1] + s2[j-1] as i32
+		    )
+		};
+		tmp = old;
+	    }
+	    
+	}
+	dp[s2.len()]
+	
+    }
+}
+
 ```
