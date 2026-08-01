@@ -20,7 +20,7 @@ LeetCode我的题解
 | 72        | 编辑距离                     | 动态规划 字符串                            | 困难     |
 | 1143      | 最长公共子序列               | 动态规划 字符串                            | 中等     |
 | 3513      | 中等                         | 数学                                       | 中等     |
-| 628       | 三个数的最大乘积             | 数组                                       | 简单         |
+| 628       | 三个数的最大乘积             | 数组                                       | 简单     |
 ## 1518.换水问题
 ### 题目
 ```
@@ -3304,3 +3304,195 @@ impl Solution {
 }
 
 ```
+## 3016. 输入单词需要的最少按键次数 II
+```
+给你一个字符串 word，由小写英文字母组成。
+
+电话键盘上的按键与 不同 小写英文字母集合相映射，可以通过按压按键来组成单词。例如，按键 2 对应 ["a","b","c"]，我们需要按一次键来输入 "a"，按两次键来输入 "b"，按三次键来输入 "c"。
+
+现在允许你将编号为 2 到 9 的按键重新映射到 不同 字母集合。每个按键可以映射到 任意数量 的字母，但每个字母 必须 恰好 映射到 一个 按键上。你需要找到输入字符串 word 所需的 最少 按键次数。
+
+返回重新映射按键后输入 word 所需的 最少 按键次数。
+
+下面给出了一种电话键盘上字母到按键的映射作为示例。注意 1，*，# 和 0 不 对应任何字母。
+```
+
+### 题解
+典型的贪心算法
+
+把最多的单词放在最前面即可.
+```rust
+impl Solution {
+    pub fn minimum_pushes(word: String) -> i32 {
+	// init: [(char,count)]
+	let mut set = [(0_u8,0_usize);26];
+	let mut res = 0;
+	(0..26).into_iter().for_each(|i| set[i].0 = i as u8);
+	let s = word.as_bytes();
+	s.iter().for_each(|ch| set[(ch - b'a') as usize].1 += 1);
+	// 其实可以计数排序
+	set.sort_unstable_by_key(|key| key.1);
+	(0..26).into_iter().rev().enumerate().for_each(|i| res += (i.0 /8 + 1) as i32 * set[i.1 as usize].1 as i32);
+	res
+    }
+}
+
+```
+## 486. 预测赢家
+```
+给你一个整数数组 nums 。玩家 1 和玩家 2 基于这个数组设计了一个游戏。
+
+玩家 1 和玩家 2 轮流进行自己的回合，玩家 1 先手。开始时，两个玩家的初始分值都是 0 。每一回合，玩家从数组的任意一端取一个数字（即，nums[0] 或 nums[nums.length - 1]），取到的数字将会从数组中移除（数组长度减 1 ）。玩家选中的数字将会加到他的得分上。当数组中没有剩余数字可取时，游戏结束。
+
+如果玩家 1 能成为赢家，返回 true 。如果两个玩家得分相等，同样认为玩家 1 是游戏的赢家，也返回 true 。你可以假设每个玩家的玩法都会使他的分数最大化。
+```
+### 题解
+这题我们先用DFS来看.
+
+如果我们保存玩家1和玩家2的分数的话 那么需要保存两个变量. 但其实我们可以仅保存 **玩家1和玩家2分数的差**.
+
+设玩家1 A分, 玩家2 B分.
+
+- 那么玩家1 每次只需要 取左或者右 使得 A - B最大
+
+- 玩家2 需要使得 B - A最大
+
+
+
+
+#### navie dfs
+朴素的DFS是: 我们定义dfs(l,r)为 在区间[l,r]中 这个玩家比另一个玩家多多少分. 最终的dfs(0,len)即为答案.
+
+一个节点可以连接另外两个节点:
+
+```
+dfs(0,len) -------> dfs(1,len)
+	       -------> dfs(0,len-1)
+```
+
+计算多多少分:
+
+```
+dfs(0,len) = max(nums[l] - dfs(1,len),nums[r] - dfs(0,len-1))
+```
+
+代码为
+```rust
+impl Solution {
+    pub fn predict_the_winner(nums: Vec<i32>) -> bool {
+	Self::dfs(&nums,0,nums.len() - 1) >= 0
+        
+    }
+    pub fn dfs(nums: &[i32],l: usize,r: usize) -> i32 {
+	if l == r {return nums[l];}
+	let pick_left = nums[l] - Self::dfs(nums,l+1,r);
+	let pick_right = nums[r] - Self::dfs(nums,l,r-1);
+	pick_right.max(pick_left)
+    }
+}
+
+```
+#### memory dfs
+我们加入记忆化 因为这题n很小 直接用二维数组
+```rust
+impl Solution {
+    pub fn predict_the_winner(nums: Vec<i32>) -> bool {
+	let mut memo = vec![vec![0_i32;nums.len()];nums.len()];
+	Self::dfs(&nums,0,nums.len() - 1,&mut memo) >= 0
+        
+    }
+    pub fn dfs(nums: &[i32],l: usize,r: usize,memo: &mut Vec<Vec<i32>>) -> i32 {
+	if l == r {return nums[l];}
+	if memo[l][r] != 0 {return memo[l][r];}
+	let pick_left = nums[l] - Self::dfs(nums,l+1,r,memo);
+	let pick_right = nums[r] - Self::dfs(nums,l,r-1,memo);
+	let res = pick_right.max(pick_left);
+	memo[l][r] = res;
+	res
+	
+    }
+}
+```
+#### dp
+实际上dfs的转移就是dp. 状态转移一模一样
+
+```
+dp[i][j] = max(num[i] - dp[i+1][j],nums[j] - dp[i][j-1])
+```
+
+我们看转移方程: dp[i][j] 与dp[i+1][j] 有关 ,那么 i要**从大到小**. 同理 j要**从小到大**.
+
+```rust
+
+impl Solution {
+    pub fn predict_the_winner(nums: Vec<i32>) -> bool {
+	let mut dp = vec![vec![0;nums.len()];nums.len()];
+	(0..nums.len()).into_iter().for_each(|i| dp[i][i] = nums[i]);
+	for i in(0..nums.len()).rev() {
+	    for j in i+1..nums.len() {
+		dp[i][j] = (nums[i] - dp[i+1][j]).max(nums[j] - dp[i][j-1]);
+	    }
+	}
+	dp[0][nums.len()-1] >= 0
+        
+    }
+}
+```
+## 877. 石子游戏
+```
+Alice 和 Bob 用几堆石子在做游戏。一共有偶数堆石子，排成一行；每堆都有 正 整数颗石子，数目为 piles[i] 。
+
+游戏以谁手中的石子最多来决出胜负。石子的 总数 是 奇数 ，所以没有平局。
+
+Alice 和 Bob 轮流进行，Alice 先开始 。 每回合，玩家从行的 开始 或 结束 处取走整堆石头。 这种情况一直持续到没有更多的石子堆为止，此时手中 石子最多 的玩家 获胜 。
+
+假设 Alice 和 Bob 都发挥出最佳水平，当 Alice 赢得比赛时返回 true ，当 Bob 赢得比赛时返回 false 。
+```
+ 
+
+### 题解
+这题是个很经典的问题 与486有个关键的区别: 这题一定是偶数个堆.
+
+那么假设有
+```
+a b c d e f
+0 1 2 3 4 5
+```
+
+Alice先拿 0
+
+然后 Bob可以拿1 或者5.
+
+那么Alice可以拿2 5 或者 1 4.
+
+我们发现 Alice永远可以看到奇数下标和偶数下标. 那么 **Alice可以一定拿原来序列中的偶数序列**.
+
+同理 **Alice可以一定拿原来序列中的奇数序列**
+
+那么Alice必然可以拿去奇数和偶数中大的 也就是必赢.
+
+所以这题答案十分朴素
+
+```rust
+impl Solution {
+    pub fn stone_game(piles: Vec<i32>) -> bool {
+        true
+    }
+}
+```
+
+
+
+我们来思考一些为什么奇数不可以.
+
+那么假设有
+```
+a b c d e
+0 1 2 3 4
+```
+
+1. Alice拿 0
+2. Bob可以拿 1 或 4
+3. Alice可以拿 2 4 或 1 3
+
+那么Alice不难保证全拿奇数或者偶数.
