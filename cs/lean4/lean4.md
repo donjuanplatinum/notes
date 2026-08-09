@@ -106,6 +106,33 @@ structure Rat where
   reduced : num.natAbs.Coprime den := by decide -- 属性: 分子分母必须互质
   deriving DecidableEq, Hashable -- 类似Rust的#[derive]
 ```
+## 函数与定义
+`def`关键字在Lean中进行定义.
+
+- 定义名称
+
+```lean
+def hello := "Hello"
+-- 标注类型
+def lean: String := "Lean"
+```
+
+- 定义函数
+
+```lean
+def add1 (n: Nat): Nat := n+1
+```
+
+## 结构体
+定义结构体在Lean4中引入新的类型. 这种类型无法简化为其他任何类型.
+
+```lean
+structure Point where
+  x : Nat
+  y : Nat
+  
+def origin: Point := {x := 0 , y := 0 }  
+```
 ## 关键字
 - `let`: 赋值
 - `have`: 提出一个假设或中间证明

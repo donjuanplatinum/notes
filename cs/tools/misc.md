@@ -7,3 +7,5 @@ upower -i $(upower -e)
 ```shell
 nmtui
 ```
+
+## iw

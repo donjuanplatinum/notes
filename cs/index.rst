@@ -27,7 +27,7 @@
    dbg/index
    protocols
    mcp
-   lean4
+   lean4/index.rst
    rcore/index
    ebd
    dl/index
