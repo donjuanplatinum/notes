@@ -20,6 +20,7 @@ $$
 - 均值帽: $\bar{x}$ -> \bar{x}
 - 波浪帽: $\tilde{C}_t$ -> \tilde{C}_t
 - 哈达玛乘积: $\odot$ -> \odot
+- 直和: $\oplus$ -> \oplus
 - 圈乘: $\circ$ -> \circ
 - 约等于: $\approx$ -> \approx
 - 等价无穷小 $\sim$ -> \sim
@@ -63,6 +64,8 @@ y_t = C h_t + D x_t
 - 积分: $\int$ -> \int
 - 属于: $\in$ -> \in
 - 属于: $\subset$ -> \subset
+- 包含于: $\subseteq$ -> \subseteq
+- 包含: $\supseteq$ -> \supseteq
 - 交集: $\cap$ -> \cap
 - 并集: $\cup$ -> \cup
 - 向下取整: $\lfloor .. \rfloor$ -> \lfloor .. \rfloor

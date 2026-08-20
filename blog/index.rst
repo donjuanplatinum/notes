@@ -17,3 +17,4 @@
    why_pin_init
    lkml/index
    emacs-str-search.md
+   harness/index

@@ -181,6 +181,12 @@ pub struct Dsu {
 
 
 
+### 线段树
+线段树是用来 **维护区间信息** 的 **二叉树**.
+
+将整个数组**递归的二分**成多个小区间.
+
+
 ## 图
 图有两种元素: G = (V,E)
 
@@ -250,6 +256,22 @@ c-----|
 
 
 ## 字符串
+### 最长重复字符的子串
+```rust
+fn max_substr(s: &str) -> usize {
+    if s.len() == 0 {return 0;}
+    let s = s.as_bytes();
+    let (mut mx,mut l) = (1,0);
+    for r in 1..s.len() {
+	if s[r] != s[r-1] {
+	    l = r;
+	} else {
+	    mx = mx.max(r - l + 1);
+	}
+    }
+    mx
+}
+```
 ### 字符串匹配算法
 #### KMP
 KMP算法是先预处理一个`pattern`数组 它记录了: 如果匹配到这没匹配成功 就直接跳转相应的位置.

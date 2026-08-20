@@ -3898,3 +3898,868 @@ impl Solution {
 }
 
 ```
+## 1510. 石子游戏 IV
+```
+Alice 和 Bob 两个人轮流玩一个游戏，Alice 先手。
+
+一开始，有 n 个石子堆在一起。每个人轮流操作，正在操作的玩家可以从石子堆里拿走 任意 非零 平方数 个石子。
+
+如果石子堆里没有石子了，则无法操作的玩家输掉游戏。
+
+给你正整数 n ，且已知两个人都采取最优策略。如果 Alice 会赢得比赛，那么返回 True ，否则返回 False 。
+
+ 
+
+示例 1：
+
+输入：n = 1
+输出：true
+解释：Alice 拿走 1 个石子并赢得胜利，因为 Bob 无法进行任何操作。
+示例 2：
+
+输入：n = 2
+输出：false
+解释：Alice 只能拿走 1 个石子，然后 Bob 拿走最后一个石子并赢得胜利（2 -> 1 -> 0）。
+示例 3：
+
+输入：n = 4
+输出：true
+解释：n 已经是一个平方数，Alice 可以一次全拿掉 4 个石子并赢得胜利（4 -> 0）。
+示例 4：
+
+输入：n = 7
+输出：false
+解释：当 Bob 采取最优策略时，Alice 无法赢得比赛。
+如果 Alice 一开始拿走 4 个石子， Bob 会拿走 1 个石子，然后 Alice 只能拿走 1 个石子，Bob 拿走最后一个石子并赢得胜利（7 -> 3 -> 2 -> 1 -> 0）。
+如果 Alice 一开始拿走 1 个石子， Bob 会拿走 4 个石子，然后 Alice 只能拿走 1 个石子，Bob 拿走最后一个石子并赢得胜利（7 -> 6 -> 2 -> 1 -> 0）。
+示例 5：
+
+输入：n = 17
+输出：false
+解释：如果 Bob 采取最优策略，Alice 无法赢得胜利。
+ 
+
+提示：
+
+1 <= n <= 10^5
+```
+### 题解
+这题我们我们首先想想 一个数能不能得到一个**唯一**的 **平方数** 分解 实际上是不可以的.
+
+比如 7 =  1 * 7 = 4 + 3* 1
+
+然后我们发现: 当拿取的次数是奇数次时 Alice胜.
+
+7我们可以去寻找 4 + 3的子问题 和 1 + 6的子问题.
+
+这两个子问题是Bob的选择 所以如果这两个问题中 有一个问题是输的 那么Alice就有一个赢的路径.
+
+我们就定义
+
+$$
+DFS(7) = (!DFS(3)) || (!DFS(6)) 
+$$
+
+然后最终DFS(0) = false
+
+那么通用的状态转移是
+
+$$
+DFS(i) = (!DFS(i - x_1^2)) || (!DFS(i - x_2^2)) || ... (!DFS( i - x_n^2))
+$$
+
+其中 $x_1^2 .. x_n^2$ 是 **小于i的平方数**.
+
+```rust
+impl Solution {
+    pub fn winner_square_game(n: i32) -> bool {
+        let n = n as usize;
+
+        let mut dp = vec![false; n + 1];
+
+        for i in 1..=n {
+            let mut j = 1;
+
+            while j * j <= i {
+                if !dp[i - j * j] {
+                    dp[i] = true;
+                    break;
+                }
+
+                j += 1;
+            }
+        }
+
+        dp[n]
+    }
+}
+```
+## 2958. 最多 K 个重复元素的最长子数组
+```
+给你一个整数数组 nums 和一个整数 k 。
+
+一个元素 x 在数组中的 频率 指的是它在数组中的出现次数。
+
+如果一个数组中所有元素的频率都 小于等于 k ，那么我们称这个数组是 好 数组。
+
+请你返回 nums 中 最长好 子数组的长度。
+
+子数组 指的是一个数组中一段连续非空的元素序列。
+
+ 
+
+示例 1：
+
+输入：nums = [1,2,3,1,2,3,1,2], k = 2
+输出：6
+解释：最长好子数组是 [1,2,3,1,2,3] ，值 1 ，2 和 3 在子数组中的频率都没有超过 k = 2 。[2,3,1,2,3,1] 和 [3,1,2,3,1,2] 也是好子数组。
+最长好子数组的长度为 6 。
+示例 2：
+
+输入：nums = [1,2,1,2,1,2,1,2], k = 1
+输出：2
+解释：最长好子数组是 [1,2] ，值 1 和 2 在子数组中的频率都没有超过 k = 1 。[2,1] 也是好子数组。
+最长好子数组的长度为 2 。
+示例 3：
+
+输入：nums = [5,5,5,5,5,5,5], k = 4
+输出：4
+解释：最长好子数组是 [5,5,5,5] ，值 5 在子数组中的频率没有超过 k = 4 。
+最长好子数组的长度为 4 。
+ 
+
+提示：
+
+1 <= nums.length <= 105
+1 <= nums[i] <= 109
+1 <= k <= nums.length
+```
+### 题解
+这题是让我们在所有**连续区间**里找一个**最长的合法区间**.
+
+我们固定右端点`r` , 那么问题变成寻找一个最靠左的`l` 使得 `[l,r]` 合法
+
+首先 因为数字的范围很大 所以我们使用一个HashMap来存储计数.
+
+然后我们遍历 **右指针**, 对于新加入的元素 right , 若right的出现次数超过k 不断 右移 **左指针** ,直到等于k.
+
+```rust
+impl Solution {
+    pub fn max_subarray_length(nums: Vec<i32>, k: i32) -> i32 {
+        use std::collections::HashMap;
+
+        let mut cnt: HashMap<i32, i32> = HashMap::new();
+        let mut l = 0;
+        let mut ans = 0;
+	// 遍历右边界r
+        for r in 0..nums.len() {
+            *cnt.entry(nums[r]).or_insert(0) += 1;
+	    // 频率大于k则收缩l
+            while cnt[&nums[r]] > k {
+                *cnt.get_mut(&nums[l]).unwrap() -= 1;
+                l += 1;
+            }
+
+            ans = ans.max((r - l + 1) as i32);
+        }
+
+        ans
+    }
+}
+```
+## TODO2213. 由单个字符重复的最长子字符串
+```
+给你一个下标从 0 开始的字符串 s 。另给你一个下标从 0 开始、长度为 k 的字符串 queryCharacters ，一个下标从 0 开始、长度也是 k 的整数 下标 数组 queryIndices ，这两个都用来描述 k 个查询。
+
+第 i 个查询会将 s 中位于下标 queryIndices[i] 的字符更新为 queryCharacters[i] 。
+
+返回一个长度为 k 的数组 lengths ，其中 lengths[i] 是在执行第 i 个查询 之后 s 中仅由 单个字符重复 组成的 最长子字符串 的 长度 。
+
+ 
+
+示例 1：
+
+输入：s = "babacc", queryCharacters = "bcb", queryIndices = [1,3,3]
+输出：[3,3,4]
+解释：
+- 第 1 次查询更新后 s = "bbbacc" 。由单个字符重复组成的最长子字符串是 "bbb" ，长度为 3 。
+- 第 2 次查询更新后 s = "bbbccc" 。由单个字符重复组成的最长子字符串是 "bbb" 或 "ccc"，长度为 3 。
+- 第 3 次查询更新后 s = "bbbbcc" 。由单个字符重复组成的最长子字符串是 "bbbb" ，长度为 4 。
+因此，返回 [3,3,4] 。
+示例 2：
+
+输入：s = "abyzz", queryCharacters = "aa", queryIndices = [2,1]
+输出：[2,3]
+解释：
+- 第 1 次查询更新后 s = "abazz" 。由单个字符重复组成的最长子字符串是 "zz" ，长度为 2 。
+- 第 2 次查询更新后 s = "aaazz" 。由单个字符重复组成的最长子字符串是 "aaa" ，长度为 3 。
+因此，返回 [2,3] 。
+ 
+
+提示：
+
+1 <= s.length <= 105
+s 由小写英文字母组成
+k == queryCharacters.length == queryIndices.length
+1 <= k <= 105
+queryCharacters 由小写英文字母组成
+0 <= queryIndices[i] < s.length
+```
+### 题解
+如果我们用**朴素的**方法的话, 每修改一次字符串 做一次最长子串统计 那么需要 O(nk)的时间.
+
+我们可以使用 **线段树** 将连续的区间存储 然后修改的时候只需要看这个区间左右即可.
+
+
+## 115. 不同的子序列
+```
+给你两个字符串 s 和 t ，统计并返回在 s 的 子序列 中 t 出现的个数。
+
+测试用例保证结果在 32 位有符号整数范围内。
+
+ 
+
+示例 1：
+
+输入：s = "rabbbit", t = "rabbit"
+输出：3
+解释：
+如下所示, 有 3 种可以从 s 中得到 "rabbit" 的方案。
+rabbbit
+rabbbit
+rabbbit
+示例 2：
+
+输入：s = "babgbag", t = "bag"
+输出：5
+解释：
+如下所示, 有 5 种可以从 s 中得到 "bag" 的方案。 
+babgbag
+babgbag
+babgbag
+babgbag
+babgbag
+ 
+
+提示：
+
+1 <= s.length, t.length <= 1000
+s 和 t 由英文字母组成
+```
+### 题解
+#### naive dfs
+我们以 **DFS** 的角度来思考这个匹配.
+
+比如 `rabbbit` 匹配 `rabbit`.
+
+那么应该
+
+```
+r -> a -> b_1 -> b_2 ..
+       -> b_2 -> b_3 ..
+	   -> b_3 
+```
+
+令dfs(i,j) 表示: 对于s的i来匹配t的j
+
+
+那么状态转移很清楚了: dfs(i+1,j+1) = s后面所有拥有t[j+1]的单词可能的情况去搜
+
+即为:
+
+```
+dfs(i,j) = for k in i.. {
+ if s[k] == t[j] {dfs(k,j+1) }
+}
+```
+
+然而这个时间复杂度是O(n^2 m) 主要的问题在于每次循环的搜索需要大量操作.
+#### dp
+我们定义dp[i][j]为: s从i开始匹配t从j开始的方案数量
+
+那么 
+
+- 若 s[i] != t[j] ,这个地方匹配不了 s直接下一个.
+
+dp[i][j] = dp[i+1][j]
+
+- 若 s[i] == t[j] 重点在于 **是否选择这个s[i]**
+
+如果不选择这个s[i] 那么直接用下一个i+1匹配t: dp[i+1][j]
+
+若果选择s[i] 那么s和t可以一起下一个: dp[i+1][j+1]
+
+所以转移方程为:
+
+```
+dp[i][j] = dp[i+1][j] + ( if s[i] == t[j]  {dp[i+1][j+1]})
+```
+
+状态压缩为一维后得到
+
+```rust
+impl Solution {
+    pub fn num_distinct(s: String, t: String) -> i32 {
+        let s = s.as_bytes();
+        let t = t.as_bytes();
+
+        let n = s.len();
+        let m = t.len();
+
+        let mut dp = vec![0i32; m + 1];
+        dp[0] = 1;
+
+        for i in 1..=n {
+            for j in (1..=m).rev() {
+                if s[i - 1] == t[j - 1] {
+                    dp[j] += dp[j - 1];
+                }
+            }
+        }
+
+        dp[m]
+    }
+}
+```
+## 300. 最长递增子序列
+```
+给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+
+子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
+
+ 
+示例 1：
+
+输入：nums = [10,9,2,5,3,7,101,18]
+输出：4
+解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
+示例 2：
+
+输入：nums = [0,1,0,3,2,3]
+输出：4
+示例 3：
+
+输入：nums = [7,7,7,7,7,7,7]
+输出：1
+ 
+
+提示：
+
+1 <= nums.length <= 2500
+-104 <= nums[i] <= 104
+ 
+
+进阶：
+
+你能将算法的时间复杂度降低到 O(n log(n)) 吗?
+```
+### 题解
+#### dp
+我们定义dp[i]为: 以nums[i]结尾的最长递增子序列的长度.
+
+那么dp[i+1]就是: 在[0,i]中寻找nums[i] <nums[i+1] 且dp最大的值 然后+1.
+
+即:
+
+$$
+dp[i+1] = 1 + dp[j] , 其中 j < i +1 且 nums[j] 是 小于nums[i+1]的 最大值.
+$$
+
+这仍然需要 $O(n^2)$ 的时间.
+```rust
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        let n = nums.len();
+	let mut dp = vec![0;n];
+	dp[0] = 1;
+	for i in 1..n {
+	    let mut mx = 0;
+	    for j in 0..i {
+		// find max j
+		if nums[j] < nums[i] {
+		    mx = mx.max(dp[j]);
+		}
+	    }
+	    dp[i] = mx + 1;
+	}
+        dp.into_iter().max().unwrap()
+    }
+}
+
+```
+#### 贪心二分
+实际上我们只需要维护 **尾部元素** 的一个数组就可以了 而且我们只需要让它 **尽量地小**.
+
+比如 [10,9,2,5,3,7].
+
+1. [10]
+2. 9比10小 [9]
+3. 2比9小 [2]
+4. 5比2大 [2,5]
+5. 3比5小 [2,3]
+5. 7比3大 [2,3,7]
+
+二分的插入即可.
+
+```rust
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        if nums.is_empty() {
+            return 0;
+        }
+
+        let mut res = vec![nums[0]];
+
+        for &x in nums.iter().skip(1) {
+			// 二分搜索到替换点
+            let pos = res.partition_point(|&v| v < x);
+
+            if pos == res.len() {
+                res.push(x);
+            } else {
+                res[pos] = x;
+            }
+        }
+
+        res.len() as i32
+    }
+}
+```
+## 88. 合并两个有序数组
+```
+给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
+
+请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
+
+注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。
+
+ 
+
+示例 1：
+
+输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+输出：[1,2,2,3,5,6]
+解释：需要合并 [1,2,3] 和 [2,5,6] 。
+合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
+示例 2：
+
+输入：nums1 = [1], m = 1, nums2 = [], n = 0
+输出：[1]
+解释：需要合并 [1] 和 [] 。
+合并结果是 [1] 。
+示例 3：
+
+输入：nums1 = [0], m = 0, nums2 = [1], n = 1
+输出：[1]
+解释：需要合并的数组是 [] 和 [1] 。
+合并结果是 [1] 。
+注意，因为 m = 0 ，所以 nums1 中没有元素。nums1 中仅存的 0 仅仅是为了确保合并结果可以顺利存放到 nums1 中。
+ 
+
+提示：
+
+nums1.length == m + n
+nums2.length == n
+0 <= m, n <= 200
+1 <= m + n <= 200
+-109 <= nums1[i], nums2[j] <= 109
+ 
+
+进阶：你可以设计实现一个时间复杂度为 O(m + n) 的算法解决此问题吗？
+```
+### 题解
+实际上这个算法就是**归并排序**的最重要的方法. 将两个有序的数组合并.
+
+我们倒序合并 这样可以**原址操作** .
+```rust
+
+impl Solution {
+    pub fn merge(
+        nums1: &mut Vec<i32>,
+        m: i32,
+        nums2: &mut Vec<i32>,
+        n: i32,
+    ) {
+        let mut l = m as usize;
+        let mut r = n as usize;
+        let mut idx = (m + n) as usize;
+
+        while l > 0 && r > 0 {
+            idx -= 1;
+
+            if nums1[l - 1] > nums2[r - 1] {
+                l -= 1;
+                nums1[idx] = nums1[l];
+            } else {
+                r -= 1;
+                nums1[idx] = nums2[r];
+            }
+        }
+
+        while r > 0 {
+            r -= 1;
+            idx -= 1;
+            nums1[idx] = nums2[r];
+        }
+    }
+}
+```
+## 1. 两数之和
+```
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
+
+你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
+
+你可以按任意顺序返回答案。
+
+ 
+
+示例 1：
+
+输入：nums = [2,7,11,15], target = 9
+输出：[0,1]
+解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+示例 2：
+
+输入：nums = [3,2,4], target = 6
+输出：[1,2]
+示例 3：
+
+输入：nums = [3,3], target = 6
+输出：[0,1]
+ 
+
+提示：
+
+2 <= nums.length <= 104
+-109 <= nums[i] <= 109
+-109 <= target <= 109
+只会存在一个有效答案
+ 
+
+进阶：你可以想出一个时间复杂度小于 O(n2) 的算法吗？
+```
+
+
+### 题解
+我们可以使用`HashMap` 在遍历的过程中存储遍历过的数字. 然后要得到 `target - nums[i]`是否存在 , 直接O(1)查表即可.
+
+```rust
+use std::collections::HashMap;
+impl Solution {
+    pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+	let mut map: HashMap<i32,usize> = HashMap::new();
+	
+	for i in 0..nums.len() {
+	    if let Some(idx) = map.get(&(target - nums[i])) {
+		return vec![i as i32, *idx as i32];
+	    }
+	    map.insert(nums[i],i);
+	}
+        vec![]
+    }
+}
+
+```
+## 49. 字母异位词分组
+```
+给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
+
+ 
+
+示例 1:
+
+输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+
+输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+解释：
+
+在 strs 中没有字符串可以通过重新排列来形成 "bat"。
+字符串 "nat" 和 "tan" 是字母异位词，因为它们可以重新排列以形成彼此。
+字符串 "ate" ，"eat" 和 "tea" 是字母异位词，因为它们可以重新排列以形成彼此。
+示例 2:
+
+输入: strs = [""]
+
+输出: [[""]]
+
+示例 3:
+
+输入: strs = ["a"]
+
+输出: [["a"]]
+
+ 
+
+提示：
+
+1 <= strs.length <= 104
+0 <= strs[i].length <= 100
+strs[i] 仅包含小写字母
+```
+## TODO673. 最长递增子序列的个数
+```
+给定一个未排序的整数数组 nums ， 返回最长递增子序列的个数 。
+
+注意 这个数列必须是 严格 递增的。
+
+ 
+
+示例 1:
+
+输入: [1,3,5,4,7]
+输出: 2
+解释: 有两个最长递增子序列，分别是 [1, 3, 4, 7] 和[1, 3, 5, 7]。
+示例 2:
+
+输入: [2,2,2,2,2]
+输出: 5
+解释: 最长递增子序列的长度是1，并且存在5个子序列的长度为1，因此输出5。
+ 
+
+提示: 
+
+1 <= nums.length <= 2000
+-106 <= nums[i] <= 106
+```
+
+### 题解
+#### dp
+这个DP本质上是在300题上 **多维护子序列的个数** 的状态.
+
+300题是
+
+$$
+dp[i+1] = 1 + dp[j] , 其中 j < i +1 且 nums[j] 是 小于nums[i+1]的 最大值.
+$$
+
+那么我们增加一个cnt[i]
+
+cnt[i]代表以nums[i]结尾 长度为dp[i]的序列个数
+
+我们来考虑cnt的状态转移
+
+- 若 nums[j] < nums[i], 即当前j是递增的. 那么若dp[j] + 1 > dp[i] 可以直接将最大长度+1,而方案数不变:
+
+dp[i] = dp[j] + 1
+
+cnt[i] = cnt[j]
+
+- 若dp[j] + 1 = dp[i] 说明发现了一批同样长度的不同方案: cnt[i] += cnt[j]
+```rust
+impl Solution {
+    pub fn find_number_of_lis(nums: Vec<i32>) -> i32 {
+	let n = nums.len();
+	let mut dp = vec![1;n];
+	let mut cnt = vec![1;n];
+	
+	for i in 1..n {
+	    let mut mx = 0;
+	    // find max j
+	    for j in 0..i {
+		if nums[j] < nums[i] {
+		    if dp[j] > mx {
+			mx = dp[j];
+			cnt[i] = cnt[j];
+		    } else if dp[j] == mx {
+			cnt[i] += cnt[j];
+		    }
+		}
+	    }
+	    dp[i] = mx + 1;
+	}
+	let mx = *dp.iter().max().unwrap();
+	dp.into_iter().zip(cnt.into_iter()).filter(|(a,_) | *a == mx).map(|(_,count)| count).sum()
+	
+    }
+}
+```
+#### 贪心二分前缀和
+## 27. 移除元素
+```
+给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素。元素的顺序可能发生改变。然后返回 nums 中与 val 不同的元素的数量。
+
+假设 nums 中不等于 val 的元素数量为 k，要通过此题，您需要执行以下操作：
+
+更改 nums 数组，使 nums 的前 k 个元素包含不等于 val 的元素。nums 的其余元素和 nums 的大小并不重要。
+返回 k。
+用户评测：
+
+评测机将使用以下代码测试您的解决方案：
+
+int[] nums = [...]; // 输入数组
+int val = ...; // 要移除的值
+int[] expectedNums = [...]; // 长度正确的预期答案。
+                            // 它以不等于 val 的值排序。
+
+int k = removeElement(nums, val); // 调用你的实现
+
+assert k == expectedNums.length;
+sort(nums, 0, k); // 排序 nums 的前 k 个元素
+for (int i = 0; i < k; i++) {
+    assert nums[i] == expectedNums[i];
+}
+如果所有的断言都通过，你的解决方案将会 通过。
+
+ 
+
+示例 1：
+
+输入：nums = [3,2,2,3], val = 3
+输出：2, nums = [2,2,_,_]
+解释：你的函数应该返回 k = 2, 并且 nums 中的前两个元素均为 2。
+你在返回的 k 个元素之外留下了什么并不重要（因此它们并不计入评测）。
+示例 2：
+
+输入：nums = [0,1,2,2,3,0,4,2], val = 2
+输出：5, nums = [0,1,4,0,3,_,_,_]
+解释：你的函数应该返回 k = 5，并且 nums 中的前五个元素为 0,0,1,3,4。
+注意这五个元素可以任意顺序返回。
+你在返回的 k 个元素之外留下了什么并不重要（因此它们并不计入评测）。
+ 
+
+提示：
+
+0 <= nums.length <= 100
+0 <= nums[i] <= 50
+0 <= val <= 100
+```
+### 题解
+双指针 遍历一次即可
+```rust
+impl Solution {
+    pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+	let mut l = 0;
+	let mut cnt = 0;
+	for i in 0..nums.len() {
+	    if nums[i] != val {
+		nums[l] = nums[i];
+		cnt += 1;
+		l += 1;
+	    } 
+	}
+	cnt
+    }
+}
+
+```
+
+## 49. 字母异位词分组
+```
+给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
+
+ 
+
+示例 1:
+
+输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+
+输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+解释：
+
+在 strs 中没有字符串可以通过重新排列来形成 "bat"。
+字符串 "nat" 和 "tan" 是字母异位词，因为它们可以重新排列以形成彼此。
+字符串 "ate" ，"eat" 和 "tea" 是字母异位词，因为它们可以重新排列以形成彼此。
+示例 2:
+
+输入: strs = [""]
+
+输出: [[""]]
+
+示例 3:
+
+输入: strs = ["a"]
+
+输出: [["a"]]
+
+ 
+
+提示：
+
+1 <= strs.length <= 104
+0 <= strs[i].length <= 100
+strs[i] 仅包含小写字母
+```
+### 题解
+判断两个字符串是不是 **异位**的 直接判断它的 **计数** 即可. 如果组成它们的 **字母数量** 一致 那么就是 **异位** 的. 
+
+我们直接用哈希表来存储它的计数表.
+
+```rust
+use std::collections::HashMap;
+impl Solution {
+    pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+	let mut map: HashMap<[u8;26],Vec<String>> = HashMap::new();
+	for s in strs {
+	    let mut set = [0_u8;26];
+	    s.bytes().into_iter().for_each(|ch| {set[(ch - b'a') as usize] += 1;});
+	    map.entry(set).or_default().push(s);
+	}
+        map.into_values().collect()
+    }
+}
+
+```
+
+## 3069. 将元素分配到两个数组中 I
+```
+给你一个下标从 1 开始、包含 不同 整数的数组 nums ，数组长度为 n 。
+
+你需要通过 n 次操作，将 nums 中的所有元素分配到两个数组 arr1 和 arr2 中。在第一次操作中，将 nums[1] 追加到 arr1 。在第二次操作中，将 nums[2] 追加到 arr2 。之后，在第 i 次操作中：
+
+如果 arr1 的最后一个元素 大于 arr2 的最后一个元素，就将 nums[i] 追加到 arr1 。否则，将 nums[i] 追加到 arr2 。
+通过连接数组 arr1 和 arr2 形成数组 result 。例如，如果 arr1 == [1,2,3] 且 arr2 == [4,5,6] ，那么 result = [1,2,3,4,5,6] 。
+
+返回数组 result 。
+
+ 
+
+示例 1：
+
+输入：nums = [2,1,3]
+输出：[2,3,1]
+解释：在前两次操作后，arr1 = [2] ，arr2 = [1] 。
+在第 3 次操作中，由于 arr1 的最后一个元素大于 arr2 的最后一个元素（2 > 1），将 nums[3] 追加到 arr1 。
+3 次操作后，arr1 = [2,3] ，arr2 = [1] 。
+因此，连接形成的数组 result 是 [2,3,1] 。
+示例 2：
+
+输入：nums = [5,4,3,8]
+输出：[5,3,4,8]
+解释：在前两次操作后，arr1 = [5] ，arr2 = [4] 。
+在第 3 次操作中，由于 arr1 的最后一个元素大于 arr2 的最后一个元素（5 > 4），将 nums[3] 追加到 arr1 ，因此 arr1 变为 [5,3] 。
+在第 4 次操作中，由于 arr2 的最后一个元素大于 arr1 的最后一个元素（4 > 3），将 nums[4] 追加到 arr2 ，因此 arr2 变为 [4,8] 。
+4 次操作后，arr1 = [5,3] ，arr2 = [4,8] 。
+因此，连接形成的数组 result 是 [5,3,4,8] 。
+ 
+
+提示：
+
+3 <= n <= 50
+1 <= nums[i] <= 100
+nums中的所有元素都互不相同。
+```
+### 题解
+直接写即可 第一个给arr1 , 第二个给arr2, 然后按照arr1[i] > arr2[i]分配
+
+```rust
+impl Solution {
+    pub fn result_array(nums: Vec<i32>) -> Vec<i32> {
+	let mut arr1 = vec![nums[1]];
+	let mut arr2 = vec![nums[2]];
+	for i in 3..nums.len() {
+	    if arr1.last() > arr2.last() {
+		arr1.push(nums[i]);
+		
+	    } else {
+		arr2.push(nums[i]);
+	    }
+	}
+        arr1.append(&mut arr2);
+	arr1
+    }
+}
+
+```
