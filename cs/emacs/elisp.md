@@ -10,8 +10,9 @@
 | alloc   | 堆分配           |   | src/alloc.c   |
 | data    | 数据类型的操作   |   | src/data.c    |
 | syntax  | 语法表解析       |   | src/syntax.c  |
-| buffer  | 缓冲区操作       |   | src/buffer.c              |
-|         |                  |   |               |
+| buffer  | 缓冲区操作       |   | src/buffer.c  |
+| process | 进程相关         |   | src/process.h |
+| fileio  | 文件接口         |   | src/fileio.c              |
 ### elisp库
 | 库      | 作用                     |                             |                           |
 |---------|--------------------------|-----------------------------|---------------------------|
@@ -32,7 +33,16 @@
 | flymake | 实时诊断                 |                             |                           |
 | treesit | tree-sitter官方接口      |                             |                           |
 | syntax  | 语法分析                 |                             | lisp/emacs-lisp/syntax.el |
-## 库介绍
+## 库接口
+### fileio
+#### expand-file-name
+转换`NAME`并规范为绝对路径, 设置一个默认的目录为`DEFAULT-DIRECTORY`
+
+`(expand-file-name NAME &optional DEFAULT-DIRECTORY)`
+
+示例:
+
+`(expand-file-name "init.org" user-emacs-directory)` 得到emacs-home下的init.org
 ### buffer
 #### generate-new-buffer-name
 生成一个不会与现有buffer重名的buffer名称.
@@ -54,6 +64,19 @@
 切换操作到`BUFFER-OR-NAME` buffer. 以便后续的`insert`等操作. 注意 emacs不会切换那个buffer,仅会给elisp用.
 
 `(set-buffer BUFFER-OR-NAME)`
+#### ZV
+当前buffer可访问区域的**末尾**
+
+`#define ZV (current_buffer->zv)`
+#### BEGV
+当前buffer可访问区域的**开头**
+
+`#define BEGV (current_buffer->begv)`
+#### PT
+当前point在buffer的位置, `+0` 是为了让`PT`不能成为左值而被赋值
+
+`#define PT (current_buffer->pt + 0)`
+
 ### editfns
 #### save-restriction
 临时修改当前buffer的可见范围 执行BODY 然后恢复
@@ -311,6 +334,17 @@ Levenshetin距离指的是: 将`STRING1`变换为`STRING2`所需进行的 `删�
 
 `(syntax-ppss &optional POS)`
 
+### process.h
+#### PROCESSP
+判断这个lisp对象是不是进程
+
+`INLINE bool
+PROCESSP (Lisp_Object a)`
+#### XPROCESS
+转换`Lisp_Object`为 `Lisp_Process`
+
+`INLINE struct Lisp_Process *
+XPROCESS (Lisp_Object a)`
 ## Lisp语法
 ### 函数
 ```lisp

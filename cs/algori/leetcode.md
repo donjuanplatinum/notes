@@ -4575,7 +4575,7 @@ impl Solution {
     }
 }
 ```
-#### 贪心二分前缀和
+#### 贪心二分树状数组
 ## 27. 移除元素
 ```
 给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素。元素的顺序可能发生改变。然后返回 nums 中与 val 不同的元素的数量。
@@ -4762,4 +4762,653 @@ impl Solution {
     }
 }
 
+```
+## 3116. 单面值组合的第 K 小金额
+
+```
+给你一个整数数组 coins 表示不同面额的硬币，另给你一个整数 k 。
+
+你有无限量的每种面额的硬币。但是，你 不能 组合使用不同面额的硬币。
+
+返回使用这些硬币能制造的 第 kth 小 金额。
+
+ 
+
+示例 1：
+
+输入： coins = [3,6,9], k = 3
+
+输出： 9
+
+解释：给定的硬币可以制造以下金额：
+3元硬币产生3的倍数：3, 6, 9, 12, 15等。
+6元硬币产生6的倍数：6, 12, 18, 24等。
+9元硬币产生9的倍数：9, 18, 27, 36等。
+所有硬币合起来可以产生：3, 6, 9, 12, 15等。
+
+示例 2：
+
+输入：coins = [5,2], k = 7
+
+输出：12
+
+解释：给定的硬币可以制造以下金额：
+5元硬币产生5的倍数：5, 10, 15, 20等。
+2元硬币产生2的倍数：2, 4, 6, 8, 10, 12等。
+所有硬币合起来可以产生：2, 4, 5, 6, 8, 10, 12, 14, 15等。
+
+ 
+
+提示：
+
+1 <= coins.length <= 15
+1 <= coins[i] <= 25
+1 <= k <= 2 * 109
+coins 包含两两不同的整数。
+```
+### 题解
+我们这么想. 对于一个数x,组成它的coins有多少个. 然后我们用x来二分搜索k.
+
+比如coins=[2,5], k = 10. 我们可以先试x=10 , 发现<=10 的 有2 4 5 6 8 10 只有6个. 
+
+- 如果`count(x) < k` : 那么 第 k个往右边找
+- 如果`count(x) >= k` : 那么 第k个往左边找
+
+只需要O(logk)次 就能搜到k.
+
+于是我们来思考这个`count(x)`怎么算.
+
+比如这个[2,5].
+
+然后 `x = 10`.
+
+我们发现可以组合出 `[2,4,5,6,8,10]`
+
+也就是 $\frac{10}{2} + \frac{10}{5} - \frac{10}{LCM(2)(5)}$
+
+其中LCM为**最小公倍数**.
+
+这实际上就是 **容斥原理**.
+
+所以整个算法流程为
+
+1. 用容斥原理计算 count(x)
+
+2. 二分搜索k
+然后注意两个优化
+
+1. 预处理LCM 将多个子集的LCM先预处理算好
+
+2. 直接删除无用的coin 比如[2,4] 把4删了
+
+```rust
+impl Solution {
+    pub fn find_kth_smallest(mut coins: Vec<i32>, k: i32) -> i64 {
+        // 优化二：删除被其他 coin 完全覆盖的 coin
+        coins.sort_unstable();
+
+        let mut a = Vec::<i64>::new();
+
+        for x in coins {
+            let x = x as i64;
+
+            if a.iter().all(|&y| x % y != 0) {
+                a.push(x);
+            }
+        }
+
+        let n = a.len();
+        let size = 1usize << n;
+
+        // 优化一：预处理每个子集的 LCM
+        let mut subset_lcm = vec![1i64; size];
+
+        fn gcd(mut a: i64, mut b: i64) -> i64 {
+            while b != 0 {
+                let t = a % b;
+                a = b;
+                b = t;
+            }
+            a
+        }
+
+        fn lcm(a: i64, b: i64) -> i64 {
+            a / gcd(a, b) * b
+        }
+
+        for i in 0..n {
+            let bit = 1usize << i;
+
+            for mask in 0..bit {
+                subset_lcm[bit | mask] =
+                    lcm(subset_lcm[mask], a[i]);
+            }
+        }
+
+        // count(x) >= k ?
+        let check = |x: i64| -> bool {
+            let mut cnt = 0i64;
+
+            for mask in 1..size {
+                let c = x / subset_lcm[mask];
+
+                if mask.count_ones() % 2 == 1 {
+                    cnt += c;
+                } else {
+                    cnt -= c;
+                }
+            }
+
+            cnt >= k as i64
+        };
+
+        // 二分答案
+        let mut left = 1i64;
+        let mut right = a[0] * k as i64;
+
+        while left < right {
+            let mid = left + (right - left) / 2;
+
+            if check(mid) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        left
+    }
+}
+```
+## 3622. 判断整除性
+```
+给你一个正整数 n。请判断 n 是否可以被以下两值之和 整除：
+
+n 的 数字和（即其各个位数之和）。
+
+n 的 数字积（即其各个位数之积）。
+
+如果 n 能被该和整除，返回 true；否则，返回 false。
+
+ 
+
+示例 1：
+
+输入： n = 99
+
+输出： true
+
+解释：
+
+因为 99 可以被其数字和 (9 + 9 = 18) 与数字积 (9 * 9 = 81) 之和 (18 + 81 = 99) 整除，因此输出为 true。
+
+示例 2：
+
+输入： n = 23
+
+输出： false
+
+解释：
+
+因为 23 无法被其数字和 (2 + 3 = 5) 与数字积 (2 * 3 = 6) 之和 (5 + 6 = 11) 整除，因此输出为 false。
+
+ 
+
+提示：
+
+1 <= n <= 106
+```
+
+### 题解
+按照写法来即可
+
+```rust
+impl Solution {
+    pub fn check_divisibility(n: i32) -> bool {
+	let mut m = n;
+	let mut nums: Vec<i32> = Vec::with_capacity(8);
+	while m > 0 {
+	    nums.push(m % 10);
+	    m /= 10;
+	}
+	let sum = nums.iter().fold(0,|acc,x| acc + x);
+	let product = nums.iter().fold(1,|acc,x| acc * x);
+        n % (sum + product) == 0
+    }
+}
+```
+## 1927. 求和游戏
+```
+Alice 和 Bob 玩一个游戏，两人轮流行动，Alice 先手 。
+
+给你一个 偶数长度 的字符串 num ，每一个字符为数字字符或者 '?' 。每一次操作中，如果 num 中至少有一个 '?' ，那么玩家可以执行以下操作：
+
+选择一个下标 i 满足 num[i] == '?' 。
+将 num[i] 用 '0' 到 '9' 之间的一个数字字符替代。
+当 num 中没有 '?' 时，游戏结束。
+
+Bob 获胜的条件是 num 中前一半数字的和 等于 后一半数字的和。Alice 获胜的条件是前一半的和与后一半的和 不相等 。
+
+比方说，游戏结束时 num = "243801" ，那么 Bob 获胜，因为 2+4+3 = 8+0+1 。如果游戏结束时 num = "243803" ，那么 Alice 获胜，因为 2+4+3 != 8+0+3 。
+在 Alice 和 Bob 都采取 最优 策略的前提下，如果 Alice 获胜，请返回 true ，如果 Bob 获胜，请返回 false 。
+
+ 
+
+示例 1：
+
+输入：num = "5023"
+输出：false
+解释：num 中没有 '?' ，没法进行任何操作。
+前一半的和等于后一半的和：5 + 0 = 2 + 3 。
+示例 2：
+
+输入：num = "25??"
+输出：true
+解释：Alice 可以将两个 '?' 中的一个替换为 '9' ，Bob 无论如何都无法使前一半的和等于后一半的和。
+示例 3：
+
+输入：num = "?3295???"
+输出：false
+解释：Bob 总是能赢。一种可能的结果是：
+- Alice 将第一个 '?' 用 '9' 替换。num = "93295???" 。
+- Bob 将后面一半中的一个 '?' 替换为 '9' 。num = "932959??" 。
+- Alice 将后面一半中的一个 '?' 替换为 '2' 。num = "9329592?" 。
+- Bob 将后面一半中最后一个 '?' 替换为 '7' 。num = "93295927" 。
+Bob 获胜，因为 9 + 3 + 2 + 9 = 5 + 9 + 2 + 7 。
+ 
+
+提示：
+
+2 <= num.length <= 105
+num.length 是 偶数 。
+num 只包含数字字符和 '?' 。
+```
+### 题解
+实际上这题我们只需要关注 左边与右边的 **差值** 以及`?`的数量与取法能不能填补这个差值.
+
+- 如果 左右两边的问号数量**相同** , 两方可以始终取相等 差值不会变 .判断差值即可.
+
+Diff = 0 则Bob胜 否则Alice胜
+
+- 如果 左右两边的问号数量**不相同**, 左右两边的相同的问号可以抵消. 我们只需要看多出来的问号.
+
+也就是说 我们只需要关注 **多出来的问号**.
+
+如果多出来的问号是**奇数** 那么前面的偶数能抵消 最后Alice可以选. 也就是说 Alice必赢.
+
+如果是偶数次的话 我们看两个人的净增加.
+
+每两个最多形成9的增加. 每两个配对 必然可以控制为9,其他的都不固定.
+
+我们令左边的值为L 右边为R 左边问号为a个 右边为b个
+
+那么判断 |R-L| == 9|b-a| / 2即可
+
+
+
+```rust
+impl Solution {
+    pub fn sum_game(num: String) -> bool {
+	let num = num.as_bytes();
+	let len = num.len();
+	let mut sum = 0_i32;
+	let mut cnt = 0_i32;
+	for i in 0..len/2 {
+	    if num[i] != b'?' {
+		sum += (num[i] - b'0') as i32;
+	    } else {
+		cnt += 1;
+	    }
+	}
+	for i in len/2..len {
+	    if num[i] != b'?' {
+		sum -= (num[i] - b'0') as i32;
+	    } else {
+		cnt -= 1;
+	    }
+	}
+	2 * sum + 9 * cnt != 0
+    }
+}
+```
+## 1872. 石子游戏 VIII
+```
+Alice 和 Bob 玩一个游戏，两人轮流操作， Alice 先手 。
+
+总共有 n 个石子排成一行。轮到某个玩家的回合时，如果石子的数目 大于 1 ，他将执行以下操作：
+
+选择一个整数 x > 1 ，并且 移除 最左边的 x 个石子。
+将 移除 的石子价值之 和 累加到该玩家的分数中。
+将一个 新的石子 放在最左边，且新石子的值为被移除石子值之和。
+当只剩下 一个 石子时，游戏结束。
+
+Alice 和 Bob 的 分数之差 为 (Alice 的分数 - Bob 的分数) 。 Alice 的目标是 最大化 分数差，Bob 的目标是 最小化 分数差。
+
+给你一个长度为 n 的整数数组 stones ，其中 stones[i] 是 从左边起 第 i 个石子的价值。请你返回在双方都采用 最优 策略的情况下，Alice 和 Bob 的 分数之差 。
+
+ 
+
+示例 1：
+
+输入：stones = [-1,2,-3,4,-5]
+输出：5
+解释：
+- Alice 移除最左边的 4 个石子，得分增加 (-1) + 2 + (-3) + 4 = 2 ，并且将一个价值为 2 的石子放在最左边。stones = [2,-5] 。
+- Bob 移除最左边的 2 个石子，得分增加 2 + (-5) = -3 ，并且将一个价值为 -3 的石子放在最左边。stones = [-3] 。
+两者分数之差为 2 - (-3) = 5 。
+示例 2：
+
+输入：stones = [7,-6,5,10,5,-2,-6]
+输出：13
+解释：
+- Alice 移除所有石子，得分增加 7 + (-6) + 5 + 10 + 5 + (-2) + (-6) = 13 ，并且将一个价值为 13 的石子放在最左边。stones = [13] 。
+两者分数之差为 13 - 0 = 13 。
+示例 3：
+
+输入：stones = [-10,-12]
+输出：-22
+解释：
+- Alice 只有一种操作，就是移除所有石子。得分增加 (-10) + (-12) = -22 ，并且将一个价值为 -22 的石子放在最左边。stones = [-22] 。
+两者分数之差为 (-22) - 0 = -22 。
+ 
+
+提示：
+
+n == stones.length
+2 <= n <= 105
+-104 <= stones[i] <= 104
+```
+### 题解
+我们其实根本不要模拟石子的变换, 先 **观察第一次操作**. 
+
+Alice第一次选择前i+1个石子.
+
+$$
+stones[0] + ... + stones[i]
+$$
+
+这些的和记为$S_i$, 然后Alice将自己的价值放回去 也就是说 现在剩下:
+
+$$
+S_i , stones[i+1] , ...
+$$
+所以其实这就变成了一个 **前缀和**. 每次选择 **前缀和**. 但是因为x>1 所以必须选择上一个前缀和 还得拿 **至少一个** 石子.
+
+我们定义 dp[i]为: **轮到当前玩家 从第i个前缀开始考虑 当前玩家能获得的最大分差**
+
+状态转移为:
+
+首先:
+
+$$
+dp[i] = \arg\max_{j >= i} (S_j - dp[j+1])
+$$
+
+这里的$S_j - dp[j+1]$ 代表: 我拿的是S_j$, 然后对手下一步拿dp[j+1]. 所以分差是这个. 
+
+但是目前这个式子为$O(n^2)$
+
+我们再看dp[i+1]
+
+$$
+dp[i+1] = \arg\max_{j>= i+1} (S_j - dp[j+1])
+$$
+
+所以 **从i开始的新选择其实就一个** 
+
+$$
+S_i - dp[i+1]
+$$
+
+其他的被`dp[i+1]`包含了
+
+因此
+
+$$
+dp[i] = max(dp[i+1],S_i - dp[i+1])
+$$
+## 3718. 缺失的最小倍数
+```
+给你一个整数数组 nums 和一个整数 k，请返回从 nums 中缺失的、最小的正整数 k 的倍数。
+
+倍数 指能被 k 整除的任意正整数。
+
+ 
+
+示例 1：
+
+输入： nums = [8,2,3,4,6], k = 2
+
+输出： 10
+
+解释：
+
+当 k = 2 时，其倍数为 2、4、6、8、10、12……，其中在 nums 中缺失的最小倍数是 10。
+
+示例 2：
+
+输入： nums = [1,4,7,10,15], k = 5
+
+输出： 5
+
+解释：
+
+当 k = 5 时，其倍数为 5、10、15、20……，其中在 nums 中缺失的最小倍数是 5。
+
+ 
+
+提示：
+
+1 <= nums.length <= 100
+1 <= nums[i] <= 100
+1 <= k <= 100
+ 
+
+```
+
+### 题解
+
+因为$k \in [1,100]$ 是 给nums数组建 `HashSet` 呢 还是应该 给nums数组**排序**呢?
+
+- `HashSet`: 建表O(n) ,遍历k O(n),  比对O(1),  总的来说O(n)
+- 排序: 排序可以用计数排序 因为nums[i]很小 但是肯定比哈希表 **常数大** 
+
+所以直接HashSet
+
+#### rust
+
+```rust
+    use std::collections::HashSet;
+impl Solution {
+
+    pub fn missing_multiple(nums: Vec<i32>, k: i32) -> i32 {
+        let mut set: HashSet<i32> = nums.into_iter().collect();
+
+        for i in 1.. {
+            let res = k * i;
+            if set.contains(&res) {continue;}
+            else {return res;}
+        }
+        panic!()
+    }
+}
+```
+#### c
+
+```c
+typedef struct
+{
+    int key;
+    UT_hash_handle hh;
+} hash_set;
+
+bool
+contains (hash_set *set, int key)
+{
+    hash_set *entry = NULL;
+
+    HASH_FIND_INT (set, &key, entry);
+
+    return entry != NULL;
+}
+
+void
+insert (hash_set **set, int key)
+{
+    hash_set *entry = NULL;
+
+    if (contains (*set, key))
+        return;
+
+    entry = malloc (sizeof *entry);
+    if (entry == NULL)
+        return;
+
+    entry->key = key;
+
+    HASH_ADD_INT (*set, key, entry);
+}
+
+void
+hash_set_free (hash_set **set)
+{
+    hash_set *entry = NULL;
+    hash_set *tmp = NULL;
+
+    HASH_ITER (hh, *set, entry, tmp)
+    {
+        HASH_DEL (*set, entry);
+        free (entry);
+    }
+}
+
+int
+missingMultiple (int *nums, int numsSize, int k)
+{
+    hash_set *set = NULL;
+
+    for (int i = 0; i < numsSize; ++i)
+        insert (&set, nums[i]);
+
+    int answer = k;
+
+    while (contains (set, answer))
+        answer += k;
+
+    hash_set_free (&set);
+
+    return answer;
+}
+````
+## 2904. 最短且字典序最小的美丽子字符串
+```
+给你一个二进制字符串 s 和一个正整数 k 。
+
+如果 s 的某个子字符串中 1 的个数恰好等于 k ，则称这个子字符串是一个 美丽子字符串 。
+
+令 len 等于 最短 美丽子字符串的长度。
+
+返回长度等于 len 且字典序 最小 的美丽子字符串。如果 s 中不含美丽子字符串，则返回一个 空 字符串。
+
+对于相同长度的两个字符串 a 和 b ，如果在 a 和 b 出现不同的第一个位置上，a 中该位置上的字符严格大于 b 中的对应字符，则认为字符串 a 字典序 大于 字符串 b 。
+
+例如，"abcd" 的字典序大于 "abcc" ，因为两个字符串出现不同的第一个位置对应第四个字符，而 d 大于 c 。
+ 
+
+示例 1：
+
+输入：s = "100011001", k = 3
+输出："11001"
+解释：示例中共有 7 个美丽子字符串：
+1. 子字符串 "100011001" 。
+2. 子字符串 "100011001" 。
+3. 子字符串 "100011001" 。
+4. 子字符串 "100011001" 。
+5. 子字符串 "100011001" 。
+6. 子字符串 "100011001" 。
+7. 子字符串 "100011001" 。
+最短美丽子字符串的长度是 5 。
+长度为 5 且字典序最小的美丽子字符串是子字符串 "11001" 。
+示例 2：
+
+输入：s = "1011", k = 2
+输出："11"
+解释：示例中共有 3 个美丽子字符串：
+1. 子字符串 "1011" 。
+2. 子字符串 "1011" 。
+3. 子字符串 "1011" 。
+最短美丽子字符串的长度是 2 。
+长度为 2 且字典序最小的美丽子字符串是子字符串 "11" 。 
+示例 3：
+
+输入：s = "000", k = 1
+输出：""
+解释：示例中不存在美丽子字符串。
+ 
+
+提示：
+
+1 <= s.length <= 100
+1 <= k <= s.length
+```
+### 题解
+
+我们只需要
+
+1. 使用双指针维护范围. O(n) 时间
+
+2. 若k等于长度 那么可以进行字典序比较. 字典序比较可以用计数排序 radix排序 或者直接字典序排序 O(n)
+
+```rust
+impl Solution {
+    pub fn shortest_beautiful_substring(s: String, k: i32) -> String {
+        let mut l = 0_usize;
+        let s = s.as_bytes();
+        let mut cnt = 0;
+        let mut res: Option<(usize, usize)> = None;
+
+        for r in 0..s.len() {
+            if s[r] == b'1' {
+                cnt += 1;
+            } else {
+                continue;
+            }
+
+            if cnt == k {
+                // 去掉左边多余的 0
+                while s[l] == b'0' {
+                    l += 1;
+                }
+
+                let candidate = &s[l..=r];
+
+                match res {
+                    None => {
+                        res = Some((l, r));
+                    }
+                    Some((rl, rr)) => {
+                        let old = &s[rl..=rr];
+
+                        if candidate.len() < old.len()
+                            || (candidate.len() == old.len() && candidate < old)
+                        {
+                            res = Some((l, r));
+                        }
+                    }
+                }
+
+                // 下一个窗口必须排除当前这个 1
+                l += 1;
+                cnt -= 1;
+            }
+        }
+
+        match res {
+            Some((l, r)) => unsafe {
+                str::from_utf8_unchecked(&s[l..=r]).to_string()
+            },
+            None => String::new(),
+        }
+    }
+}
 ```

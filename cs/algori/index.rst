@@ -7,4 +7,4 @@
    algori
    leetcode
    projecteuler
-   
+   leetgpu

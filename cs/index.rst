@@ -33,3 +33,5 @@
    dl/index
    system/index
    coq
+   hurd/index
+   cuda
