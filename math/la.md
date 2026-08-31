@@ -651,6 +651,10 @@ $$
 T' 就是 T 的 **对偶映射**
 
 对偶映射对应的线性变换 就是 **转置**.
+### Riesz表示定理
+存在一个线性泛函$\phi$, 使得存在唯一向量 $u \in V$ 使得对每个 向量 $v \in V$ 都有 $\phi(v) = \langle v,u \rangle $
+
+这揭示了: 内积与某个线性泛函本质上是对应的.
 ## 基变换
 矩阵/向量 都是依赖于 **基** 的选取. 那么自然的 如何 **更换基** 去表示线性变换 是值得研究的.
 
@@ -726,6 +730,29 @@ $$
 若v非0 而前面的线性映射把v映射到了0
 
 **说明零空间不止有0** 这个线性映射把v **降维了**.
+
+#### 本征值的求解
+我们考虑 **等价条件** 中的 **本征方程**
+
+$$
+(T - \lambda I) v = 0
+$$
+
+即: 一个线性变换 把 **非0向量** v 压缩为了0.
+
+那么这个线性变换的矩阵是 **非满秩** 的.
+
+假设在二维平面 那么这样的线性变换 就会把原来的二维平面的**基向量**压缩到一条 **直线**.
+
+**那么相当于这个线性变换的面积拉伸为0** 也就是说行列式的值为0.
+
+所以求解
+
+$$
+det( T - \lambda I ) = 0
+$$
+
+就可以得到本征值与本征向量
 #### 存在性
 - 复向量空间上的算子都有本征值
 ### 本征向量
@@ -770,4 +797,425 @@ T可对角化 等价于下列条件:
 - V有在T下不变的一维子空间 使得 V = $\U_1 \oplus ... \oplus U_n$
 - T有dim V个不同的本征值
 ## 内积
-内积是点积的 **推广**
+内积是点积的 **推广**. 
+
+内积是一个函数, 将 **两个输入向量** 映射 到 **标量空间**.
+
+内积主要用于讨论两个向量的方向,投影与角度.
+
+对于V上的两个向量u,v  内积的定义为:
+
+- 正性: 所有的 v 都有 $\langle v , v \rangle \geq 0$
+- 定性: $\langle v , v \rangle = 0$ 当且仅当 v = 0
+- 第一个位置的加性: $\langle u + v, w \rangle = \langle v , w \rangle + \langle u , w \rangle$
+- 第一个位置的齐性: $\lambda \in F$ 有 $\langle \lambda u , v \rangle  = \lambda \langle u , v \rangle $
+- 共轭对称性: $\langle u , v \rangle = \overline{\langle v,u \rangle}$
+
+根据内积的定义 我们可以定义一些非常有用的内积
+
+- $F^n$上的 欧几里得内积:
+
+$$
+\langle u,v \rangle = \sum_{j=1}^{n} u_j \overline{v_j}
+$$
+
+在实数情况下 这就是**点积**.
+
+- 函数空间的$L^2$内积
+
+$$
+\langle f , g \rangle = \int_a^b f(x) \overline{g(x)} dx
+$$
+
+**内积空间**就是 向量空间 + 定义的内积
+
+
+内积具有以下性质:
+
+- 0与任何向量内积都是0
+- 第二个位置具有加性: $\langle u , v + w \rangle = \langle u , v \rangle + \langle u , w \rangle$
+
+这是因为:
+
+$$
+\langle u , v + w \rangle = \overline{ \langle v + w , u\rangle } \\
+= \overline{ \langle v , u \rangle + \langle w , u \rangle}
+= \overline{ \langle v , u \rangle} + \overline{\langle w , u \rangle}
+= \langle u , v \rangle  + \langle u , w \rangle
+$$
+
+- 第二个位置的共轭齐性: $\langle u , \lambda v \rangle = \overline{\lambda} \langle u , v \rangle$
+## 范数
+范数用于讨论向量的度量.
+
+对于向量v, v的范数 记作 $\|x\| = \sqrt{\langle v,v \rangle}$
+
+范数具有以下性质:
+
+- $\|v\| = 0 $当且仅当 v = 0
+- 对于 $\lambda \in F $,$\| \lambda v \| = |\lambda| \|v\| $
+
+## 正交
+如果两个向量内积为0 那么称之为这两个向量**正交**.
+
+### 勾股定理
+没错 就是勾股定理.
+
+若u与v**正交**, 则有
+
+$$
+\| u + v \|^2 = \| u \|^2 + \| v \|^2
+$$
+
+是不是很像三角形勾股定理:
+
+$$
+a^2 + b^2 = c^2
+$$
+
+然而 在向量里, c = a + b.
+
+证明也很简单 用第一个位置和第二个位置的加性即可.
+
+$$
+\| u + v \|^2 = \langle u+v , u+v \rangle \\
+= \langle u , u + v \rangle + \langle v , u + v \rangle \\
+= \langle u, u \rangle + \langle v, v \rangle + \langle u ,v \rangle + \langle v, u \rangle
+$$
+
+而$\langle u , v \rangle  = 0$
+### 正交分解
+我们考虑两个不共线的非0向量 u 与 v.
+
+我们想把u 表示为 v的标量倍 加上一个正交于v的向量w.
+
+即
+
+$$
+u = c v + w , c \in F
+$$
+
+我们给两边做v的内积.
+
+$$
+\langle u, v \rangle = c \langle v,v \rangle + \langle w , v \rangle
+$$
+
+而 $\langle v,v \rangle$ 是范数的平方, $\langle w,v\rangle$ 是0.
+
+$$
+c = \frac{\langle u, v \rangle}{\| v \|^2}
+$$
+
+而 w可以表示为 u - cv.
+
+所以, 对于u 正交分解为:
+
+$$
+u = \frac{\langle u,v\rangle}{\|v\|^2} v + (u - \frac{\langle u,v \rangle}{\|v\|^2} v)
+$$
+### cauchy-Schwarz不等式
+柯西-施瓦兹不等式 是数学里极其重要的非常重要的不等式.
+
+$$|\langle u,v \rangle| \leq \| u \| \| v \|$$
+
+因为由正交分解:
+
+$$
+u = \frac{\langle u,v \rangle}{\| v\|^2} v + w
+$$
+
+因为v与w **正交**,由勾股定理
+
+$$
+\| u\|^2 = \| \frac{\langle u,v \rangle}{\|v\|^2}v \|^2 + \|w \|^2 \\
+= \frac{| \langle u , v \rangle |^2}{\| v\|^2} + \| w \|^2 \\
+\geq \frac{| \langle u , v \rangle |^2}{\| v\|^2}
+$$
+### 三角不等式
+
+对于向量 u , v.
+
+$$
+\| u + v \| \leq \|u \| + \| v \|
+$$
+## 规范正交基
+规范正交基是非常重要的基. 
+
+- 若基中的每个向量的**范数都是1** , 而且**两两正交**, 那么就是规范正交基.
+
+任意向量都可以写为规范正交基的线性组合.
+
+$$
+v = \langle v,e_1 \rangle e_1 + \langle v, e_2 \rangle e_2 + ... + \langle v , e_n \rangle e_n
+$$
+
+证明:
+
+首先因为 $e_n$是基, 所以存在标量 $a_n$ 使得:
+
+$$
+v = a_1 e_1 + ... + a_n e_n
+$$
+
+两边都和 $e_j$ 做内积.
+
+$$
+\langle v , e_j \rangle = a_j
+$$
+### Gram-Schmidt正交化
+Gram-Schmidt过程是利用**投影原理** 在已有的正交基上构造新的正交基.
+
+减去别的方向的向量在自己上的投影 实际上就是去除其他的方向.
+
+首先我们取第一个向量 $v_1$.
+
+我们对它归一化: $e_1 = \frac{v_1}{\|v_1 \|}$
+
+我们得到了范数为1的向量$e_1$.
+
+我们取与$v_1$ **线性无关**的向量 $v_2$.
+
+我们想要找到与 $e_1$ 正交的基 $u_2$, 那么: $e_1 + u_2 = v_2$
+
+即 $u_2 = v_2 - \langle v_2,e_1 \rangle e_1$ ,即 $v_2$ 减去 $v_2$在$e_1$上的投影向量.
+
+然后对$u_2$归一化就可以得到$e_2$. 
+
+同理
+
+- $u_3 = v_3 - \langle v_3, e_1 \rangle e_1 - \langle v_3 , e_2 \rangle e_2$
+
+然后对$u_3$归一化得到$e_3$.
+
+重复这个过程最终得到规范正交基
+### Schur定理
+在**复向量空间**,T一定存在关于某个规范正交基的上三角矩阵.
+
+
+
+
+
+## 正交补与极小化
+
+### 正交补
+若U是V的子集, 则U的正交补 就是V中与U中每个向量都正交的向量.
+
+$$
+U^{\prep} = {v \in V : \langle v , u \rangle = 0, \forall u \in U}
+$$
+### 正交投影
+正交投影算子提取正交分解中的分量.
+
+代表向量v在子空间U上的正交投影.
+
+$$
+P_U v = u
+$$
+
+对于U的每个规范正交基$e_1,...,e_m$ 均有:
+
+$$
+P_U v = \langle v,e_1 \rangle e_1 + ... + \langle v,e_m \rangle e_m
+$$
+
+### 极小化
+若U是V的有限维子空间 , $v \in V , u \in U$
+
+那么
+
+$$
+\| v - P_U v \| \leq \| v - u \|
+$$
+
+也就是说: 给定V的子空间U与点v, 那么想要求得u使得 $\| v - u\|$ 最小, 通过取 $u = P_U v$ 就可以解决这个极小化问题.
+
+因为: 
+
+$$
+\| v - P_U v \|^2 \leq \| v - P_U v \|^2 + \| P_U v - u \|^2 \\
+$$
+
+根据勾股定理
+
+$$
+= \| (v - P_U v) + (P_U v - u) \|^2 = \| v - u\|^2
+$$
+
+## 伴随与正规算子
+从这里开始 **线性代数**与**量子力学**的联系会很深. 我们将引入 **Dirac符号** 来表示向量 更好的研究量子力学与线性代数.
+### 共轭转置
+转置+逐元素共轭 就是 共轭转置.
+
+### 伴随
+还记得之前说过: **转置** 对应 **对偶映射**.
+
+而 **共轭转置** 对应 **伴随映射**.
+
+设 $T \in L(V,W)$ . T的伴随 $T^* : W -> V$ 有 $\langle Tv,W \rangle = \langle v, T^* w \rangle$
+
+我们来对照一下对偶映射与伴随映射.
+
+$T \in L(V,W)$
+
+注意, W'与V'代表对偶空间 里面都是线性泛函.
+
+- 对偶映射: $T' \in L(W',V')$, 对于任意**线性泛函** $\phi \in W'$ 有 $T'(\phi) = \phi \circ T$. 也就是说 T' 将作用于W上的线性泛函拉回到V上.
+- 伴随映射: $T^* \in L(W,V)$ ,有 $\langle Tv,w \rangle = \langle v, T^* w \rangle$
+
+
+
+### Dirac符号
+Dirac符号 可以非常方便的表示: **内积** , **共轭转置**, **外积** 等. 会非常直观.
+
+#### Bra-Ket
+Dirac符号最核心的两个符号 就是 `Bra-Ket`.
+
+我们定义向量 v 为: $| v \rangle$. 叫做Ket.
+
+我们定义向量 v 的 对偶向量(线性泛函) 为: $\langle v |$. 叫做Bra.
+
+在Dirac符号中 我们将T的伴随矩阵写为: $T^{\dagger}$.
+
+那么有: $ \langle v | = | v \rangle^{\dagger} $.
+
+也就是说 Bra是Ket的 **伴随**.
+#### 复内积
+`Bra-Ket`非常自然的给出了**复内积**的表示:
+
+$$
+\langle a | b \rangle
+$$
+
+假设 
+
+- $ | a \rangle = \begin{bmatrix} m \\ n\end{bmatrix}$
+- $ | b \rangle = \begin{bmatrix} x \\ y\end{bmatrix}$
+
+那么 $\langle a | = | a \rangle^{\dagger} = (\overline{m} \overline{n})$
+
+$$
+\langle a | b \rangle = (\overline{m} \overline{n}) \begin{bmatrix} x \\ y\end{bmatrix} = \overline{m} x + \overline{n} y
+$$
+#### 外积
+
+假设 
+- $ | a \rangle = \begin{bmatrix} m \\ n\end{bmatrix}$
+- $ | b \rangle = \begin{bmatrix} x \\ y\end{bmatrix}$
+
+那么 $\langle a | = (\overline{m} \overline{n}) $
+
+
+$$
+| b \rangle \langle a | = \begin{bmatrix} x \\ y\end{bmatrix} (\overline{m} \overline{n})
+$$
+
+### 自伴/厄米
+如果 $T = T^{\dagger}$ 那么T称为厄米矩阵 或者 自伴矩阵.
+
+也就是说: $\langle Tv,w \rangle = \langle v,Tw \rangle$
+
+- **厄米矩阵的本征值是实的** , 且 在C上 仅厄米算子才能使 $\langle Tv,v \rangle$是实数.
+
+> 正因为能量必须是实数,所以哈密顿算子必须是厄米的.
+
+设$\lambda$ 是 T的本征值.
+
+有
+
+$$
+T v = \lambda v
+$$
+
+那么 $\langle \lambda v , v \rangle = \lambda \|v \|^2 = \langle Tv , v \rangle = \langle v,Tv \rangle = \langle v ,\lambda v \rangle = \overline{\lambda} \|v\|^2$
+
+也就是说 $\lambda = \overline{\lambda}$
+### 正规
+正规是厄米的泛化.
+
+- 厄米: $T = T^{\dagger}$
+- 正规: $T^{\dagger} T = T T^\dagger$
+
+也就是说, 正规要求: T 与 $T^\dagger$ 的对易子为0. 即它们是**可交换**的.
+
+正规算子还有个很重要的特点: 不同的特征向量是正交的. 这也为谱定理打下铺垫.
+### 酉算子与正交算子
+在实数空间, 若$T^* T = I$ 那么称T为**正交算子**.
+
+在复内积空间, $T^{\dagger} T = I$ 那么称T为 **酉算子**.
+
+它们有个非常好的特性: 在自己的域 **使内积不变**.
+
+$$
+\langle Tv,Tw\rangle = \langle v,w \rangle
+$$
+
+证明为:
+
+我们取伴随.
+
+$$
+\langle Tv , Tw \rangle = \langle v,T^{\dagger} T w \rangle
+$$
+
+而
+
+$$
+\langle Tv,Tw \rangle = \langle v , w \rangle
+$$
+
+所以 $ T T^\dagger = I$
+
+所以酉算子 也是 **正规算子**
+### 辛
+不同于:
+
+- 正交算子保持 实内积
+- 酉算子保持 复内积
+
+辛算子保持 **辛形式**: $S^T J S = J$.
+
+辛形式在物理学中出现的很多, 因为辛变换保持结构不变
+### 等距映射
+**保持范数**的映射是等距映射.
+
+$$ 
+\| T v \| = \| v \|
+$$
+
+显然有: 保持内积肯定也保持范数, 所以酉算子是等距映射.
+## 谱定理
+谱定理是个很有用的东西, 它揭示了 对于正规算子(实数下是厄米算子) **一定**可以找到一个非常好的规范正交基 使得它有个对角矩阵.
+
+有规范正交基的对角矩阵 意味着对角线上的元素全部都是特征值.
+
+因为正规性有个特点: 不同的特征向量是自动正交的.
+
+### 酉对角化
+
+复空间的正规算子可以被酉对角化
+
+$$
+T = U D U^\dagger
+$$
+
+D是对角矩阵
+## 奇异值与极分解
+谱定理告诉我们: 复数空间中的正规矩阵一定可以被酉对角化.
+
+那么如果不是正规算子呢, 于是我们引入SVD奇异值分解.
+
+任意矩阵都可以分解为:
+
+$$
+A = U \sigma V^\dagger
+$$
+
+其中U是酉算子 V也是酉算子.
+
+其实这和**酉对角化**很像:
+
+- 酉对角化是: $A = U D U^\dagger$
+- SVD是: $A = U \sigma V^\dagger$
+
+而SVD矩阵的 $\sigma$的对角线就是**奇异值**.

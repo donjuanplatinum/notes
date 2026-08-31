@@ -114,7 +114,7 @@ Message是**不透明**的 而且可以包含传递给其他`task`的`port right
 
 消息中的某些数据可能是**外部数据**, 也就是对 `memory object`的引用.
 
-当`Task`接收到消息时 
+当`Task`接收到消息时 , 这些`memory object`会被虚拟复制 被映射到`receive`方的 **虚拟地址空间**. 复制的方式为写时复制COW.
 ## Capability
 `Capability`是一种**受保护的引用**. 机制有点类似Rust的所有权.
 

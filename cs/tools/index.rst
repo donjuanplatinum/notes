@@ -28,3 +28,4 @@
    mtr
    systemd
    stty
+   grub

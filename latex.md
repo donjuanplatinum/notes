@@ -18,12 +18,16 @@ $$
 - 下标: $ x_i $ -> x_i
 - 尖帽: $\hat{a}$ -> \hat{a}
 - 均值帽: $\bar{x}$ -> \bar{x}
+- 共轭: $\overline{z}$ -> \overline{z}
+- 共轭转置: $A^\dagger$ -> A^\dagger
 - 波浪帽: $\tilde{C}_t$ -> \tilde{C}_t
 - 哈达玛乘积: $\odot$ -> \odot
 - 直和: $\oplus$ -> \oplus
 - 圈乘: $\circ$ -> \circ
 - 约等于: $\approx$ -> \approx
-- 等价无穷小 $\sim$ -> \sim
+- 等价无穷小: $\sim$ -> \sim
+- Dirac符号: $\langle b | a \rangle$ -> \langle b | a \rangle
+- 正交补: $\prep$ -> \prep
 - 矩阵:
 
 $$
@@ -68,6 +72,7 @@ y_t = C h_t + D x_t
 - 包含: $\supseteq$ -> \supseteq
 - 交集: $\cap$ -> \cap
 - 并集: $\cup$ -> \cup
+- 所有: $\forall$ -> \forall
 - 向下取整: $\lfloor .. \rfloor$ -> \lfloor .. \rfloor
 - 向上取整: $\lceil .. \rceil$ -> \lceil .. \rceil
 - n次开根: $\sqrt[n]{a}$ -> \sqrt[n]{a}
@@ -77,6 +82,7 @@ y_t = C h_t + D x_t
 - 正相关: $\propto$ -> \propto
 - 左右箭头: $\xrightarrow \xleftarrow$ -> \xrightarrow \xleftarrow
 - 组合数: $\binom{x-1}{0}$ -> \binom{x-1}{0}
+
 ## 字体
 - $\mathbb{X}$ -> \mathbb{X}
 - $\mathbf{X}$ ->\mathbf{X}

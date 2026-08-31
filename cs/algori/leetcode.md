@@ -5412,3 +5412,291 @@ impl Solution {
     }
 }
 ```
+## 2948. 交换得到字典序最小的数组
+```
+给你一个下标从 0 开始的 正整数 数组 nums 和一个 正整数 limit 。
+
+在一次操作中，你可以选择任意两个下标 i 和 j，如果 满足 |nums[i] - nums[j]| <= limit ，则交换 nums[i] 和 nums[j] 。
+
+返回执行任意次操作后能得到的 字典序最小的数组 。
+
+如果在数组 a 和数组 b 第一个不同的位置上，数组 a 中的对应元素比数组 b 中的对应元素的字典序更小，则认为数组 a 就比数组 b 字典序更小。例如，数组 [2,10,3] 比数组 [10,2,3] 字典序更小，下标 0 处是两个数组第一个不同的位置，且 2 < 10 。
+
+ 
+
+示例 1：
+
+输入：nums = [1,5,3,9,8], limit = 2
+输出：[1,3,5,8,9]
+解释：执行 2 次操作：
+- 交换 nums[1] 和 nums[2] 。数组变为 [1,3,5,9,8] 。
+- 交换 nums[3] 和 nums[4] 。数组变为 [1,3,5,8,9] 。
+即便执行更多次操作，也无法得到字典序更小的数组。
+注意，执行不同的操作也可能会得到相同的结果。
+示例 2：
+
+输入：nums = [1,7,6,18,2,1], limit = 3
+输出：[1,6,7,18,1,2]
+解释：执行 3 次操作：
+- 交换 nums[1] 和 nums[2] 。数组变为 [1,6,7,18,2,1] 。
+- 交换 nums[0] 和 nums[4] 。数组变为 [2,6,7,18,1,1] 。
+- 交换 nums[0] 和 nums[5] 。数组变为 [1,6,7,18,1,2] 。
+即便执行更多次操作，也无法得到字典序更小的数组。
+示例 3：
+
+输入：nums = [1,7,28,19,10], limit = 3
+输出：[1,7,28,19,10]
+解释：[1,7,28,19,10] 是字典序最小的数组，因为不管怎么选择下标都无法执行操作。
+ 
+
+提示：
+
+1 <= nums.length <= 105
+1 <= nums[i] <= 109
+1 <= limit <= 109
+```
+### 题解
+这题乍一看其实很像 **加个限制的插入排序**
+
+就是相差`limit`的 就可以交换. 想办法把**更小**的往前换.
+
+但其实我们可以发现一个细节: **我们对数组排序 然后把相差limit的放在一起 那么它们最终一定可以升序**.
+
+所以我们只需要 **排序** 然后找到相差limit的连通块 记录连通块的idx 然后对它们排序 填回到原来的idx里.
+
+```rust
+impl Solution {
+    pub fn lexicographically_smallest_array(nums: Vec<i32>, limit: i32) -> Vec<i32> {
+	let mut nums_sorted: Vec<(usize,i32)> = nums.into_iter().enumerate().collect();
+	nums_sorted.sort_unstable_by_key(|i| i.1);
+	// 存放联通的边界 [l,r]
+	let mut set: Vec<(usize,usize)> = vec![];
+	let mut l = 0;
+	for i in 1..nums_sorted.len() {
+	    // i与idx不在一个联通分量了
+	    if nums_sorted[i].1 - nums_sorted[i-1].1 > limit {
+		set.push((l,i - 1));
+		l = i;
+	    }
+	
+	}
+	set.push((l,nums_sorted.len() - 1));
+	
+	let mut res = vec![0;nums_sorted.len()];
+	
+	// 开始对每个边界处理
+	for (l,r) in set.into_iter() {
+		// 将nums_sorted[l,r]的下标取出
+	    let mut idx_set: Vec<usize> = nums_sorted[l..r+1].iter().map(|x| x.0).collect();
+		// 对下标排序
+	    idx_set.sort_unstable();
+		// 计算偏移量填入
+	    for (j,&idx) in idx_set.iter().enumerate() {
+		res[idx] = nums_sorted[l+j].1;
+	    }
+	}
+	
+        res
+    }
+}
+```
+## 2091. 从数组中移除最大值和最小值
+```
+给你一个下标从 0 开始的数组 nums ，数组由若干 互不相同 的整数组成。
+
+nums 中有一个值最小的元素和一个值最大的元素。分别称为 最小值 和 最大值 。你的目标是从数组中移除这两个元素。
+
+一次 删除 操作定义为从数组的 前面 移除一个元素或从数组的 后面 移除一个元素。
+
+返回将数组中最小值和最大值 都 移除需要的最小删除次数。
+
+ 
+
+示例 1：
+
+输入：nums = [2,10,7,5,4,1,8,6]
+输出：5
+解释：
+数组中的最小元素是 nums[5] ，值为 1 。
+数组中的最大元素是 nums[1] ，值为 10 。
+将最大值和最小值都移除需要从数组前面移除 2 个元素，从数组后面移除 3 个元素。
+结果是 2 + 3 = 5 ，这是所有可能情况中的最小删除次数。
+示例 2：
+
+输入：nums = [0,-4,19,1,8,-2,-3,5]
+输出：3
+解释：
+数组中的最小元素是 nums[1] ，值为 -4 。
+数组中的最大元素是 nums[2] ，值为 19 。
+将最大值和最小值都移除需要从数组前面移除 3 个元素。
+结果是 3 ，这是所有可能情况中的最小删除次数。 
+示例 3：
+
+输入：nums = [101]
+输出：1
+解释：
+数组中只有这一个元素，那么它既是数组中的最小值又是数组中的最大值。
+移除它只需要 1 次删除操作。
+ 
+
+提示：
+
+1 <= nums.length <= 105
+-105 <= nums[i] <= 105
+nums 中的整数 互不相同
+```
+
+### 题解
+只有三种情况
+
+1. 全从左边拿走
+2. 全从右边拿走
+3. 左边拿走左边的 右边拿走右边的
+
+```rust
+impl Solution {
+    pub fn minimum_deletions(nums: Vec<i32>) -> i32 {
+	let (mut max_idx,mut min_idx) = (0,0);
+	let len = nums.len();
+	nums.iter().enumerate().for_each(|(idx,n)| {
+	    max_idx = if *n > nums[max_idx] {idx} else {max_idx};
+	    min_idx = if *n < nums[min_idx] {idx} else {min_idx};
+	});
+	// 全左边移走
+	let a = min_idx.max(max_idx) + 1;
+	// 全右边移走
+	let b = len - max_idx.min(min_idx);
+	// 左右拿走
+	let c = len + 1 + min_idx.min(max_idx) - min_idx.max(max_idx);
+	let min = nums[min_idx];
+	let max = nums[max_idx];
+	a.min(b).min(c) as i32
+        
+    }
+}
+```
+## 2058. 找出临界点之间的最小和最大距离
+```
+链表中的 临界点 定义为一个 局部极大值点 或 局部极小值点 。
+
+如果当前节点的值 严格大于 前一个节点和后一个节点，那么这个节点就是一个  局部极大值点 。
+
+如果当前节点的值 严格小于 前一个节点和后一个节点，那么这个节点就是一个  局部极小值点 。
+
+注意：节点只有在同时存在前一个节点和后一个节点的情况下，才能成为一个 局部极大值点 / 极小值点 。
+
+给你一个链表 head ，返回一个长度为 2 的数组 [minDistance, maxDistance] ，其中 minDistance 是任意两个不同临界点之间的最小距离，maxDistance 是任意两个不同临界点之间的最大距离。如果临界点少于两个，则返回 [-1，-1] 。
+
+ 
+
+示例 1：
+
+
+
+输入：head = [3,1]
+输出：[-1,-1]
+解释：链表 [3,1] 中不存在临界点。
+示例 2：
+
+
+
+输入：head = [5,3,1,2,5,1,2]
+输出：[1,3]
+解释：存在三个临界点：
+- [5,3,1,2,5,1,2]：第三个节点是一个局部极小值点，因为 1 比 3 和 2 小。
+- [5,3,1,2,5,1,2]：第五个节点是一个局部极大值点，因为 5 比 2 和 1 大。
+- [5,3,1,2,5,1,2]：第六个节点是一个局部极小值点，因为 1 比 5 和 2 小。
+第五个节点和第六个节点之间距离最小。minDistance = 6 - 5 = 1 。
+第三个节点和第六个节点之间距离最大。maxDistance = 6 - 3 = 3 。
+示例 3：
+
+
+
+输入：head = [1,3,2,2,3,2,2,2,7]
+输出：[3,3]
+解释：存在两个临界点：
+- [1,3,2,2,3,2,2,2,7]：第二个节点是一个局部极大值点，因为 3 比 1 和 2 大。
+- [1,3,2,2,3,2,2,2,7]：第五个节点是一个局部极大值点，因为 3 比 2 和 2 大。
+最小和最大距离都存在于第二个节点和第五个节点之间。
+因此，minDistance 和 maxDistance 是 5 - 2 = 3 。
+注意，最后一个节点不算一个局部极大值点，因为它之后就没有节点了。
+示例 4：
+
+
+
+输入：head = [2,3,3,2]
+输出：[-1,-1]
+解释：链表 [2,3,3,2] 中不存在临界点。
+ 
+
+提示：
+
+链表中节点的数量在范围 [2, 105] 内
+1 <= Node.val <= 105
+```
+### 题解
+直接遍历然后存放 `prev_1` `prev_2` 两个值 用于比较最值.
+
+`min`用于维护 和上一个最值的最小距离
+
+`last`与`first` 就是最大距离
+```rust
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+// 
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+impl Solution {
+    pub fn nodes_between_critical_points(head: Option<Box<ListNode>>) -> Vec<i32> {
+	let first = head.unwrap();
+	let second = first.next.unwrap();
+	let (mut prev_2,mut prev_1 ) = (first.val,second.val);
+	let mut cur_node = second.next.as_ref();
+	let mut min = i32::MAX;
+	let mut first_p: Option<usize> = None;
+	let mut last_p = None;
+	//  second idx  
+	let mut idx = 1;
+	while let Some( cur) = cur_node {
+	    let val = cur.val;
+	    if prev_1 > val && prev_1 > prev_2 || prev_1 < val && prev_1 < prev_2{
+		if let Some(fisrt) = first_p {
+		    if let Some(last) = last_p {
+			min = min.min((idx - last) as i32);
+		    }
+		    last_p = Some(idx);
+		} else {
+		    first_p = Some(idx);
+		    last_p = Some(idx);
+		}
+		
+		
+	    }
+	    idx += 1;
+	    prev_2 = prev_1;
+	    prev_1 = val;
+	    cur_node = cur.next.as_ref();
+	}
+        match (first_p,last_p) {
+	    (Some(first),Some(last)) if first != last  => {
+		vec![min as i32,(last - first) as i32]
+	    },
+	    _=> {
+		vec![-1,-1]
+	    }
+	}
+    }
+}
+
+```
