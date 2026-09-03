@@ -334,7 +334,16 @@ Levenshetin距离指的是: 将`STRING1`变换为`STRING2`所需进行的 `删�
 
 `(syntax-ppss &optional POS)`
 
+### process.c
 ### process.h
+#### Lisp_Process
+进程或者网络连接的信息
+
+```c
+struct Lisp_Process
+```
+
+`Lisp_Process`里面存放有多种进程状态 包括Lisp层 OS层 各种bit-flag
 #### PROCESSP
 判断这个lisp对象是不是进程
 

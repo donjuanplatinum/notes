@@ -132,6 +132,47 @@ Mach的外部分页机制使得 **内存管理与内容管理分离**: Mach负�
 
 > 这个分离对于理解Mach的**外部分页机制**的抽象与理念至关重要
 
+传统Linux的分页是:
+
+```c
+char *p = mmap(file,...);
+x = p[0];
+```
+
+访问`p[0]`时, 如果对应**Page** 不在RAM , 会产生`Page Fault` 然后内核去**文件系统** 再通过io什么的 把数据放进**物理页* 最后建立页表映射.
+
+而Mach的思路不一样.
+
+`vm_map` 把一个 `memory object` 映射到 `Task` 的虚拟地址空间；如果这是第一次映射这个 object，Mach 就通过 Mach IPC 联系管理它的 server，并建立一个 `control capability`，使这个 server 将来能够在发生 page fault 时向 Mach 提供相应的 page。这个机制在使用体验上类似 UNIX 的 `mmap`，但 Mach 的 `memory object` 比 UNIX 的文件抽象更加一般。
+
+当`task`发生faults时, Mach将会去检查是否存在`mem obj`关联这个地址. 如果不存在 则会向`task`抛出exception,该exception会进一步传播为`seg fault`; 如果存在, Mach会检查相应的内存页是否在核心内存中.如果在核心内存中,则会安装该内存页 并恢复任务.然后mach会调用`memory_object_request`方法去找`pager`要`mem obj`. pager受到请求后 使用`memory_object_supply`把页面交给mach.
+
+### 创建与映射mem obj
+Client 向 Server 请求资源 → Server 创建 memory object，并把代表它的 capability 交给 Client → Client 通过 vm_map 把 memory object 请求映射到自己的地址空间 → Mach 第一次看到该 object 时通知 Server，并给 Server 一个 memory control capability → Server 初始化管理状态并通知 Mach memory_object_ready → Mach 建立映射并返回成功。
+
+1. client 向 server 发送 `open` RPC
+2. server 创建 `mem obj` (port receive right), 将它添加到正在监听的`port set`中, 并向client返回一个`capability`(port send right)
+3. client尝试使用`vm_map` RPC将`mem obj`映射到它自己的地址空间
+4. 因为Mach从未见过这个obj,Mach会使用`memory_object_init`在给定port上排队 并附带一个`send right`(memory control port),这个`send right`用于manager向mach发送信息 同时也做为未来交互的身份验证机制: 提供该port也是为了让manager识别obj来自哪个内核.
+5. 服务器将message出队 初始化内部数据结构来管理映射 然后调用`memory_object_ready`控制obj上的方法
+6. 内核看到manager准备就绪 在client在地址空间中设置映射 然后用之前得到的port回复RPC成功
+### page fault
+Client 缺页 → Mach 找到 Pager → Pager 找数据 → 数据变成 page → Pager 把 page 交给 Mach → Mach 映射给 Client。
+
+1. client执行内存访问并发生fault. 内核捕获到fault 并将地址映射到相应的`mm obj`. 然后它调用`capbility`上的`memory_object_request`方法.
+2. manager出队这个消息.然后这个消息被转换为`store_read`函数. storeio server以独立进程启动 但如果server拥有相应权限, 则可以直接联系后端对象.
+3. storeio server会联系某个设备驱动来执行读取操作. 可以是网络设备 文件 或者 mm obj
+4. 设备驱动程序从默认 pager 分配一个匿名page,并将数据读入其中. 操作完成后 将数据返回给client 同时取消地址空间的映射
+5. storeio server将page传输给server. 此时该page仍为匿名页
+6. manager 使用`memory_object_supply` 将page传输到内核. 此时 该page才被视为受管理的page.
+7. 内核cache这个page 将其安装到client的虚拟地址空间 然后恢复客户端
+### paging data out
+Mach 决定paging out page → 暂时把 page 的管理权交给 Default Pager → Mach 通知原来的 Server 返回 page → Server 保存 page 内容并释放它 → Server 通过 storeio 把数据写入 backing store → device driver 完成写入并释放这块内存。
+
+1. 分页策略被mach实现 ,server只需实现机制
+2. 内核一旦选定要paging out的page 就会将manager从server切换到默认的pager. 
+3. mach调用 contro object上的`memory_object_return` 通知服务器
+4. manager将数据传给storeio server,最终由 storeio服务器将数据发送到磁盘.设备驱动程序消耗内存.
 ## Thread
 ## Translator
 

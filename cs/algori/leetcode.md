@@ -5700,3 +5700,546 @@ impl Solution {
 }
 
 ```
+## 128. 最长连续序列
+```
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+
+请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
+
+ 
+
+示例 1：
+
+输入：nums = [100,4,200,1,3,2]
+输出：4
+解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
+示例 2：
+
+输入：nums = [0,3,7,2,5,8,4,6,0,1]
+输出：9
+示例 3：
+
+输入：nums = [1,0,1,2]
+输出：3
+ 
+
+提示：
+
+0 <= nums.length <= 105
+-109 <= nums[i] <= 109
+```
+### 题解
+这题不能用计数排序 因为nums[i]太大了.
+
+我们用HashSet记录数组中的数, 然后先判断n-1在不在里面, 如果n-1在里面 那么说明这个数不是连通区块的开头. 如果是开头的话 一直遍历 直到num不存在于set中为止.
+
+然后注意: 如果res已经比len / 2大了 那么它已经是最大的了 不需要遍历后面的了.
+```rust
+use std::collections::HashSet;
+impl Solution {
+    pub fn longest_consecutive(mut nums: Vec<i32>) -> i32 {
+	nums.dedup();
+	let dedup_len = nums.len() as i32;
+	let set: HashSet<i32> = nums.into_iter().collect();
+	let mut res = 0_i32;
+	
+	for n in &set {
+	    // n - 1 不存在的才是连通区块的开头
+	    if set.contains(&(n-1)) {
+		if 2 * res >= dedup_len {
+		    return res;
+		}
+		continue;
+	    }
+
+	    let mut len = 0;
+	    let mut num = *n;
+
+	    // num 在HashSet里
+	    while set.contains(&num) {
+		len += 1;
+		num += 1;
+	    }
+
+	    res = res.max(len);
+
+	}
+	
+        res
+    }
+}
+
+```
+## 26. 删除有序数组中的重复项
+```
+给你一个 非严格递增排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。元素的 相对顺序 应该保持 一致 。然后返回 nums 中唯一元素的个数。
+
+考虑 nums 的唯一元素的数量为 k。去重后，返回唯一元素的数量 k。
+
+nums 的前 k 个元素应包含 排序后 的唯一数字。下标 k - 1 之后的剩余元素可以忽略。
+
+判题标准:
+
+系统会用下面的代码来测试你的题解:
+
+int[] nums = [...]; // 输入数组
+int[] expectedNums = [...]; // 长度正确的期望答案
+
+int k = removeDuplicates(nums); // 调用
+
+assert k == expectedNums.length;
+for (int i = 0; i < k; i++) {
+    assert nums[i] == expectedNums[i];
+}
+如果所有断言都通过，那么您的题解将被 通过。
+
+ 
+
+示例 1：
+
+输入：nums = [1,1,2]
+输出：2, nums = [1,2,_]
+解释：函数应该返回新的长度 2 ，并且原数组 nums 的前两个元素被修改为 1, 2 。不需要考虑数组中超出新长度后面的元素。
+示例 2：
+
+输入：nums = [0,0,1,1,1,2,2,3,3,4]
+输出：5, nums = [0,1,2,3,4,_,_,_,_,_]
+解释：函数应该返回新的长度 5 ， 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4 。不需要考虑数组中超出新长度后面的元素。
+ 
+
+提示：
+
+1 <= nums.length <= 3 * 104
+-100 <= nums[i] <= 100
+nums 已按 非递减 顺序排列。
+```
+### 题解
+
+其实可以直接标准库偷懒
+
+```rust
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+	nums.dedup();
+	nums.len() as i32
+        
+    }
+}
+
+```
+
+这是不偷懒的**双指针**写法
+
+因为write是已经不重复的. 如果nums[read] = nums[write - 1] 代表重复了.
+```rust
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+        let (mut read,mut write) = (1,1);
+	let len = nums.len();
+	while read < len {
+	    // 若read与前面重复 直接跳过
+	    if nums[read] == nums[write - 1] {
+		read += 1;
+	    } else {
+		// 不重复 write写入
+		nums[write] = nums[read];
+		read += 1;
+		write += 1;
+	    }
+	
+	}
+	
+	write as i32
+    }
+}
+```
+## 1091. 二进制矩阵中的最短路径
+```
+给你一个 n x n 的二进制矩阵 grid 中，返回矩阵中最短 畅通路径 的长度。如果不存在这样的路径，返回 -1 。
+
+二进制矩阵中的 畅通路径 是一条从 左上角 单元格（即，(0, 0)）到 右下角 单元格（即，(n - 1, n - 1)）的路径，该路径同时满足下述要求：
+
+路径途经的所有单元格的值都是 0 。
+路径中所有相邻的单元格应当在 8 个方向之一 上连通（即，相邻两单元之间彼此不同且共享一条边或者一个角）。
+畅通路径的长度 是该路径途经的单元格总数。
+
+ 
+
+示例 1：
+
+
+输入：grid = [[0,1],[1,0]]
+输出：2
+示例 2：
+
+
+输入：grid = [[0,0,0],[1,1,0],[1,1,0]]
+输出：4
+示例 3：
+
+输入：grid = [[1,0,0],[1,1,0],[1,1,0]]
+输出：-1
+ 
+
+提示：
+
+n == grid.length
+n == grid[i].length
+1 <= n <= 100
+grid[i][j] 为 0 或 1
+```
+### 题解
+直接使用BFS即可.
+```rust
+use std::collections::VecDeque;
+impl Solution {
+    pub fn shortest_path_binary_matrix(grid: Vec<Vec<i32>>) -> i32 {
+	let n = grid.len();
+	if grid[0][0] == 1 || grid[n - 1][n - 1] == 1 {
+	    return -1;
+	}
+	let dirs = [
+	    (-1,-1), (-1,0),(-1,1),
+	    (0,-1),         (0,1),
+	    (1,-1), (1,0) , (1,1),
+	];
+	// ((坐标),距离)
+	let mut queue: VecDeque<((usize,usize),i32)> = VecDeque::new();
+	// 初始坐标(0,0) 距离0
+	queue.push_back(((0,0),1));
+	// 已访问节点
+	let mut visited = vec![vec![false;n];n];
+	visited[0][0] = true;
+
+	while let Some(((x,y),dist)) = queue.pop_front() {
+	    if x == n - 1 && y == n - 1 {return dist;}
+	    for &(dx,dy) in &dirs {
+		let nx = x as i32 + dx;
+		let ny = y as i32 + dy;
+		if nx < 0 || nx >= n as i32 || ny < 0 || ny >= n as i32 {continue;}
+		let nx = nx as usize;
+		let ny = ny as usize;
+
+		// 不畅通或已访问
+		if grid[nx][ny] == 1 || visited[nx][ny] {
+		    continue;
+		}
+		visited[nx][ny] = true;
+		queue.push_back(((nx,ny),dist + 1));
+	    }
+	}
+	
+	-1
+    }
+}
+```
+## 3875. 构造奇偶一致的数组 I
+```
+给你一个长度为 n 的数组 nums1，其中包含 互不相同 的整数。
+
+你需要构造另一个长度为 n 的数组 nums2，使得 nums2 中的元素要么全部为 奇数，要么全部为 偶数。
+
+对于每个下标 i，你必须从以下两种选择中 任选其一（顺序不限）：
+
+nums2[i] = nums1[i]
+nums2[i] = nums1[i] - nums1[j]，其中 j != i
+如果能够构造出满足条件的数组，则返回 true；否则，返回 false。
+
+ 
+
+示例 1：
+
+输入： nums1 = [2,3]
+
+输出： true
+
+解释：
+
+选择 nums2[0] = nums1[0] - nums1[1] = 2 - 3 = -1。
+选择 nums2[1] = nums1[1] = 3。
+nums2 = [-1, 3]，两个元素均为奇数。因此答案为 true。
+示例 2：
+
+输入： nums1 = [4,6]
+
+输出： true
+
+解释：​​​​​​​
+
+选择 nums2[0] = nums1[0] = 4。
+选择 nums2[1] = nums1[1] = 6。
+nums2 = [4, 6]，两个元素均为偶数。因此答案为 true。
+ 
+
+提示：
+
+1 <= n == nums1.length <= 100
+1 <= nums1[i] <= 100
+nums1 中的所有整数互不相同。
+```
+### 题解
+这个第二个条件其实挺宽松的 我们来分类以下.
+
+也就是说: nums1[i] - nums1[j] 是奇数或者偶数即可.
+
+只有奇数 - 偶数 等于 奇数. 那么也就是说:如果nums1[i]是奇数 那么 只要其他位置有一个奇数 那就可以是偶数.
+
+也就是说: nums1数组 只要有一个奇数和一个偶数. nums2就可以所有位置奇偶性相同.
+
+```rust
+impl Solution {
+    pub fn uniform_array(nums1: Vec<i32>) -> bool {
+        true
+    }
+}
+```
+## 80. 删除有序数组中的重复项 II
+```
+给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使得出现次数超过两次的元素只出现两次 ，返回删除后数组的新长度。
+
+不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+
+ 
+
+说明：
+
+为什么返回数值是整数，但输出的答案是数组呢？
+
+请注意，输入数组是以「引用」方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。
+
+你可以想象内部操作如下:
+
+// nums 是以“引用”方式传递的。也就是说，不对实参做任何拷贝
+int len = removeDuplicates(nums);
+
+// 在函数里修改输入数组对于调用者是可见的。
+// 根据你的函数返回的长度, 它会打印出数组中 该长度范围内 的所有元素。
+for (int i = 0; i < len; i++) {
+    print(nums[i]);
+}
+ 
+
+示例 1：
+
+输入：nums = [1,1,1,2,2,3]
+输出：5, nums = [1,1,2,2,3]
+解释：函数应返回新长度 length = 5, 并且原数组的前五个元素被修改为 1, 1, 2, 2, 3。 不需要考虑数组中超出新长度后面的元素。
+示例 2：
+
+输入：nums = [0,0,1,1,1,1,2,3,3]
+输出：7, nums = [0,0,1,1,2,3,3]
+解释：函数应返回新长度 length = 7, 并且原数组的前七个元素被修改为 0, 0, 1, 1, 2, 3, 3。不需要考虑数组中超出新长度后面的元素。
+ 
+
+提示：
+
+1 <= nums.length <= 3 * 104
+-104 <= nums[i] <= 104
+nums 已按升序排列
+```
+### 题解
+其实不需要用cnt保存数量, 因为它是**有序**的 所以直接看write的前2个即可
+
+因为write是已经不重复的. 如果nums[read] = nums[write - 2] 代表重复了.
+
+```rust
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+	let n = nums.len();
+	if n <= 2 {return n as i32;}
+	// 第0个元素保留 所以从1开始
+	let (mut read, mut write) = (2,2);
+	
+
+	while read < n {
+	    if nums[read] != nums[write - 2] {
+		nums[write] = nums[read];
+		read += 1;
+		write += 1;
+	    } else {read += 1;}
+		
+	}
+        write as i32
+    }
+}
+
+```
+## 283. 移动零
+```
+给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+
+ 
+
+示例 1:
+
+输入: nums = [0,1,0,3,12]
+输出: [1,3,12,0,0]
+示例 2:
+
+输入: nums = [0]
+输出: [0]
+ 
+
+提示:
+
+1 <= nums.length <= 104
+-231 <= nums[i] <= 231 - 1
+ 
+
+进阶：你能尽量减少完成的操作次数吗？
+```
+### 题解
+直接双指针即可 read往前读 write写 最后填入0
+```rust
+impl Solution {
+    pub fn move_zeroes(nums: &mut Vec<i32>) {
+	let mut write = 0;
+        for read in 0..nums.len() {
+	    // 当前位置是0 跳过 write不变
+	    if nums[read] == 0 {
+		continue;
+	    } else {
+		// 写入write位置
+		nums[write] = nums[read];
+		write += 1;
+	    }
+	}
+	while write < nums.len() {
+	    nums[write] = 0;
+	    write += 1;
+	}
+    }
+}
+
+```
+## 169. 多数元素
+
+```
+给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+ 
+
+示例 1：
+
+输入：nums = [3,2,3]
+输出：3
+示例 2：
+
+输入：nums = [2,2,1,1,1,2,2]
+输出：2
+ 
+
+提示：
+n == nums.length
+1 <= n <= 5 * 104
+-109 <= nums[i] <= 109
+输入保证数组中一定有一个多数元素。
+ 
+
+进阶：尝试设计时间复杂度为 O(n)、空间复杂度为 O(1) 的算法解决此问题。
+```
+### 题解
+使用Boyer-Moore 投票算法: 不同元素互相抵消 留下的一定是众数.
+
+```rust
+impl Solution {
+    pub fn majority_element(nums: Vec<i32>) -> i32 {
+	let mut candidate = 0;
+	let mut cnt = 0;
+	for num in nums {
+	    if cnt == 0 {
+		candidate = num;
+	    }
+	    if num == candidate {
+		cnt += 1;
+	    } else {
+		cnt -= 1;
+	    }
+	}
+        candidate
+    }
+}
+
+```
+## 189. 轮转数组
+```
+189. 轮转数组
+已解答
+中等
+相关标签
+premium lock icon
+相关企业
+提示
+给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
+
+ 
+
+示例 1:
+
+输入: nums = [1,2,3,4,5,6,7], k = 3
+输出: [5,6,7,1,2,3,4]
+解释:
+向右轮转 1 步: [7,1,2,3,4,5,6]
+向右轮转 2 步: [6,7,1,2,3,4,5]
+向右轮转 3 步: [5,6,7,1,2,3,4]
+示例 2:
+
+输入：nums = [-1,-100,3,99], k = 2
+输出：[3,99,-1,-100]
+解释: 
+向右轮转 1 步: [99,-1,-100,3]
+向右轮转 2 步: [3,99,-1,-100]
+ 
+
+提示：
+
+1 <= nums.length <= 105
+-231 <= nums[i] <= 231 - 1
+0 <= k <= 105
+ 
+
+进阶：
+
+尽可能想出更多的解决方案，至少有 三种 不同的方法可以解决这个问题。
+你可以使用空间复杂度为 O(1) 的 原地 算法解决这个问题吗？
+```
+### 题解
+我们采用**手摇旋转**算法.
+
+```rust
+impl Solution {
+    pub fn rotate(nums: &mut Vec<i32>, k: i32) {
+        let n = nums.len();
+        if n <= 1 {
+            return;
+        }
+
+        let k = k as usize % n;
+        if k == 0 {
+            return;
+        }
+
+        let k = k - 1;
+
+        // 整体翻转
+        for i in 0..n / 2 {
+            nums.swap(i, n - 1 - i);
+        }
+
+        // 翻转前 k + 1 个
+        for i in 0..(k + 1) / 2 {
+            nums.swap(i, k - i);
+        }
+
+        // 翻转剩余部分
+        for i in 0..(n - 1 - k) / 2 {
+            nums.swap(k + 1 + i, n - 1 - i);
+        }
+    }
+}
+```
+

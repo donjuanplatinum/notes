@@ -365,6 +365,36 @@ pub struct Dsu {
 
 
 
+## 数组操作算法
+### 绝对众数算法
+绝对众数算法就是计算数组里的 **出现最多的元素**.
+
+出现最多的元素还有个特征 就是数量大于$\frac{n}{2}$.
+
+这个算法存在一个时间复杂度`O(n)` 空间复杂度`O(1)`的算法: Boyer-Moore投票算法.
+
+Boyer-Moore算法的核心是: 不同的元素互相抵消 因为绝对众数超过一半 所以最终一定留下.
+
+```rust
+impl Solution {
+    pub fn majority_element(nums: Vec<i32>) -> i32 {
+	let mut candidate = 0;
+	let mut cnt = 0;
+	for num in nums {
+	    if cnt == 0 {
+		candidate = num;
+	    }
+	    if num == candidate {
+		cnt += 1;
+	    } else {
+		cnt -= 1;
+	    }
+	}
+        candidate
+    }
+}
+
+```
 ## 图
 图有两种元素: G = (V,E)
 
