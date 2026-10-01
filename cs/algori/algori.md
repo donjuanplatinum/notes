@@ -1,133 +1,125 @@
 # 算法
-## 基本算法
-### TODO旋转算法
-旋转算法主要有这几种
-
-- 手摇(三次)旋转
-- 临时空间
-- 循环置换(juggling/gcd)
-- 块交换
-
-我们来看Rust标准库的实现
-```rust
-type BufType = [usize; 32];
-#[inline]
-pub(super) const unsafe fn ptr_rotate<T>(left: usize, mid: *mut T, right: usize) {
-	// 边界条件处理
-    if T::IS_ZST {
-        return;
-    }
-    if (left == 0) || (right == 0) {
-        return;
-    }
-	
-    if !cfg!(feature = "optimize_for_size")
-        && core::cmp::min(left, right) <= size_of::<BufType>() / size_of::<T>()
-    {
-		// 当有left或right有一个块小到足以装进BufType规定的缓冲区时 使用memmove
-        unsafe { ptr_rotate_memmove(left, mid, right) };
-    } else if !cfg!(feature = "optimize_for_size")
-		// 当左和右一共<24时 也就是旋转的总规模很小时 使用GCD算法
-        && ((left + right < 24) || (size_of::<T>() > size_of::<[usize; 4]>()))
-    {
-	
-        unsafe { ptr_rotate_gcd(left, mid, right) }
-    } else {
-        unsafe { ptr_rotate_swap(left, mid, right) }
-    }
-}
-```
-
-### TODO贪心算法
-每一步只做当前看起来最好的选择（局部最优），并期望这些局部最优能累积成全局最优。
-
-贪心算法通常有两个特质:
-
-1. 贪心选择性质: 全局最优可以通过局部最优选择来达到.
-
-2. 最优子结构: 一个问题的最优解包含其字问题的最优解.
-
-接下来我会给出各种贪心算法的证明
-#### 交换论证
-我们需要证明 贪心解不差于最优解.
-
-假设存在一个最优解 每一步的选择是
-
-$$
-(o_1,o_2,...,o_m)
-$$
-
-而贪心解每一步的选择是 
-
-$$
-(g_1,g_2,..,g_m)
-$$
-
-那么我们选择其中一步 i
-
-- 若 $o_i = g_i$ 则两者一致 我们递归或者归纳的处理剩下的
-
-- 若 $o_i != g_i$ 那我们用$g_i$ 替换 $o_i$ 证明替换后的 $o_1,o_2,...,g_i,...,o_m$ 不差于原来的
-#### 区间覆盖
-1. 对于任意最短路径 如果第一步没有走到当前能到达的最远点 那么把第一步替换成最远点 不会增加后续步数
-### DP动态规划
-动态规划的本质只有一件事
-
-> 把重复计算的搜索 变成**状态复用**的递推
-
-$$
-dp[state] = min/max/\sum dp[sub_state] + cost
-$$
-### TODO搜索算法
-#### BFS
-广度优先搜索.
-
-直观的来说 就是浅显的访问同一层的所有节点 然后再去下一层.
-
-用二叉树来直观的看 就是: 先访问一层的所有兄弟节点 然后再往儿子节点去.
-
-用矩阵来直观的看: 先访问上下左右的四个邻居 然后再访问这四个邻居的邻居...
-
-在实现上 BFS使用一个**队列**来记录已经遍历了哪些.
-
-那么BFS具有一个非常好的性质: 
-
-> BFS 算法找到的路径是从起点开始的 最短 合法路
-
-- 遍历二叉树
-
-```rust
-#[derive(Debug,PartialEq,Eq)]
-pub struct TreeNode<T> {
-	pub val: T,
-	pub left: Option<Box<TreeNode<T>>>,
-	pub right: Option<Box<TreeNode<T>>>,
-}
-
-use std::collections::VecDeque;
-
-pub fn bfs(root: TreeNode<T>) -> Vec<T> {
-    let mut queue = VecDeque::new();
-    let mut result = Vec::new();
-    queue.push_back(root);
-    while let Some(node) = queue.pop_front() {
-        result.push(node.val);
-        if let Some(left) = node.left {
-            queue.push_back(*left);
-        }
-        if let Some(right) = node.right {
-            queue.push_back(*right);
-        }
-    }
-    result
-}
-
-```
-	
-#### DFS
-
-
 ## 数据结构
+### 基本数据结构
+最基本的数据结构.
+#### 背包
+基本所有的数据结构都是背包.
+
+背包的定义为:
+
+1. 可以往里面放对象
+2. 不规定顺序的取出对象
+#### stack
+栈是最基本的数据结构之一. 操作系统的内存模型中 栈有很大一部分比例.
+
+可以把栈理解为 **堆盘子**. 你只能往**最上面**放盘子 也只能从**最上面**拿盘子.
+
+所以栈的访问顺序是LIFO(last in first out) **后进先出**.
+
+rust的`Vec<T>`如果只使用`pop()`与`push()` 那么就是个栈.
+
+#### queue
+队列与栈不同 队列是FIFO(first in first out) 先进先出.
+
+队列就是最基础的人类的排队. 先来的先处理
+
+#### linkedlist
+链表和数组类似 但是链表的插入与删除是`O(1)` 不过查询却是`O(n)`. 但是由于链表在内存里 通常不像数组是**连续**的, 所以缓存命中率没数组高.
+
+但是我们可以加个`HashMap` 来让 插入 删除 查询都是`O(1)`.
+
+标准库的实现是
+```rust
+pub struct LinkedList<
+    T,
+    #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
+> {
+    head: Option<NonNull<Node<T>>>,
+    tail: Option<NonNull<Node<T>>>,
+    len: usize,
+    alloc: A,
+    marker: PhantomData<Box<Node<T>, A>>,
+}
+
+struct Node<T> {
+    next: Option<NonNull<Node<T>>>,
+    prev: Option<NonNull<Node<T>>>,
+    element: T,
+}
+```
+
+这其中, `LinkedList<T,A>`是链表, `Node<T>`是其中的节点.
+- `head`: 指向双向链表的头
+- `tail`: 指向双向链表的尾
+- `len`: 双向链表的长度
+- `next`: 指向下一个节点的指针
+- `prev`: 指向上一个节点的指针
+- `element`: 存储的元素
+##### 与哈希表结合
+如果链表是 **可侵入**的, 也就是说 在这个编程语言里, 它的节点的接口是暴露且可访问的. 
+
+那么可以使用`HashMap`存放节点 并在`O(1)`时间访问到链表的任意节点.
+
+但是我们rust标准库的`LinkedList`是不暴露Node接口的.所以rust需要手动实现.
+
+具体而言
+
+只需要维护一个额外的`HashMap`.
+
+```rust
+HashMap<K,Node>
+```
+
+那么通过K可以直接得到这个节点. 并方便的插入修改链表
+#### 哈希表
+哈希表的实现要灵活很多 有很多不同的哈希算法 需要针对不同的场景选择.
+
+哈希表可以通过KV(key-value)查询.
+
+插入O(1) 查询(1).
+
+它是通过 一个 **数学函数** `f` ,将可hash化的K 映射为索引.
+
+然后直接在索引里去O(1)查找.
+
+
+
+### 并查集
+并查集能很好的处理**连通性**问题.
+
+并查集可以快速的解决两个问题: **查询与合并**.
+
+并查集其实和树结构极其类似 但是: **它更注重于子节点最终属于谁**
+```rust
+/// 并查集
+pub struct Dsu {
+	/// 父节点指针
+	parent: Vec<usize>,
+	/// 
+	rank: Vec<usize>,
+}
+```
+#### 一个示例
+
+```
+假设有4而城市: 1 2 3 4
+
+一开始每个城市都是独立的 用数组 parent[u]来表示 城市u 的上级
+
+```
+
+那么并查集在这里的**查询**就是: `parent[u]`
+
+而合并操作为: 给定一条道路 比如(1,2) 意味着1与2联通了
+
+
+### 维护序关系的数据结构
+很多时候 对象是有 **序** 的. 在我们rust里叫 实现了`Ord`与`Eq`.
+
+那么我们可以通过利用它们的序关系 来优化数据结构 使得时间复杂度降低.
+
+#### 单调栈
+
 ### 区间数据结构
 对区间进行操作的数据结构.
 
@@ -334,36 +326,9 @@ $$
 4. ... 知道 i 超过了n为止.
 
 然后给这些节点都修改即可. 这些区间刚好包含arr[5].
-### 并查集
-并查集能很好的处理**连通性**问题.
 
-并查集可以快速的解决两个问题: **查询与合并**.
-
-并查集其实和树结构极其类似 但是: **它更注重于子节点最终属于谁**
-```rust
-/// 并查集
-pub struct Dsu {
-	/// 父节点指针
-	parent: Vec<usize>,
-	/// 
-	rank: Vec<usize>,
-}
-```
-#### 一个示例
-
-```
-假设有4而城市: 1 2 3 4
-
-一开始每个城市都是独立的 用数组 parent[u]来表示 城市u 的上级
-
-```
-
-那么并查集在这里的**查询**就是: `parent[u]`
-
-而合并操作为: 给定一条道路 比如(1,2) 意味着1与2联通了
-
-
-
+### 树
+树的用途挺多的 树也是图的一种
 
 ## 数组操作算法
 ### 绝对众数算法
@@ -395,6 +360,40 @@ impl Solution {
 }
 
 ```
+### 旋转算法
+我们一般使用三次旋转算法 使用`O(n)`时间, `O(1)`空间.
+
+我们来看Rust标准库的实现
+```rust
+type BufType = [usize; 32];
+#[inline]
+pub(super) const unsafe fn ptr_rotate<T>(left: usize, mid: *mut T, right: usize) {
+	// 边界条件处理
+    if T::IS_ZST {
+        return;
+    }
+    if (left == 0) || (right == 0) {
+        return;
+    }
+	
+    if !cfg!(feature = "optimize_for_size")
+        && core::cmp::min(left, right) <= size_of::<BufType>() / size_of::<T>()
+    {
+		// 当有left或right有一个块小到足以装进BufType规定的缓冲区时 使用memmove
+        unsafe { ptr_rotate_memmove(left, mid, right) };
+    } else if !cfg!(feature = "optimize_for_size")
+		// 当左和右一共<24时 也就是旋转的总规模很小时 使用GCD算法
+        && ((left + right < 24) || (size_of::<T>() > size_of::<[usize; 4]>()))
+    {
+	
+        unsafe { ptr_rotate_gcd(left, mid, right) }
+    } else {
+        unsafe { ptr_rotate_swap(left, mid, right) }
+    }
+}
+```
+
+
 ## 图
 图有两种元素: G = (V,E)
 
@@ -779,3 +778,10 @@ $$
 区间最大/最小值
 
 
+## 二进制
+### 2的幂
+如果一个数是2的幂 那么它的二进制最高位是1 其他位数是0. 也就是说:
+
+$$
+n & (n-1) = 0
+$$

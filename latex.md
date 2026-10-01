@@ -11,6 +11,7 @@ $$
 $$
 
 ## 公式
+- 极限: $\lim_{n\to\infty} a_n$ -> \lim_{n\to\infty} a_n
 - 求和: $ \sum_{i=0}^{n}(i)$  -> \sum_{i=0}^{n}(i)
 - 乘法: $\times$ -> \times
 - 小于/大于等于:  $ \leq \geq $  -> \leq \geq

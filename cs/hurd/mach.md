@@ -173,6 +173,21 @@ Mach 决定paging out page → 暂时把 page 的管理权交给 Default Pager �
 2. 内核一旦选定要paging out的page 就会将manager从server切换到默认的pager. 
 3. mach调用 contro object上的`memory_object_return` 通知服务器
 4. manager将数据传给storeio server,最终由 storeio服务器将数据发送到磁盘.设备驱动程序消耗内存.
-## Thread
+## vfs
+Hurd的路径名解析 使用的是 **分布式的** 协议. 
+
+`Translator`被用来 `attach` 到这个路径 然后由这个`Translator`做解析. 使用`fs.defs:file_set_translator`.
+
+当一个进程去解析 绝对路径,它去请求自己的`root filesystem server`,调用root directory capability的`fs.defs:dir_lookup`方法.
+
+文件系统server会在自己负责的范围内尽可能的解析路径 当它遇到一个translator时 它告诉客户端: 我已经解析到了这里 接下来请去这个translator那里继续解析. 这个过程不断重复 直到整个路径解析完成或者错误.
+
+相对路径也一样 只不过起点使用的是另一个capacity.
 ## Translator
+Translator把一个Hurd的文件系统节点 `翻译`成某种用户态对象/服务.
+
+Translator充当object server并参与hurd的分布式vfs. 它通常会导出文件系统. 它将数据结构的某种表示形式转换为另一种表示形式.
+
+`settrans`命令就是将translator注册到特定文件系统节点的命令.
+
 

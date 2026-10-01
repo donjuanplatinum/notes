@@ -35,4 +35,5 @@
    coq
    hurd/index
    cuda
+   ee
    

@@ -33,7 +33,52 @@
 | flymake | 实时诊断                 |                             |                           |
 | treesit | tree-sitter官方接口      |                             |                           |
 | syntax  | 语法分析                 |                             | lisp/emacs-lisp/syntax.el |
+| calc    | calc子系统的接口         | 数值计算之类的              | lisp/calc                 |
 ## 库接口
+### calc系列
+#### calc-binary-op
+取出calc栈顶的两个操作数 然后得到一个结果 压回栈. 这是逆波兰的基础操作.
+
+`(calc-binary-op NAME FUNC ARG &optional IDENT UNARY FUNC2)`
+
+- `NAME`: 运算符的名字
+- `FUNC`: 二元运算符实际调用的函数
+- `ARG`: 当前command的prefix arg
+- `IDENT`: 可选的用于处理空栈,缺少操作数时候的操作
+- `UNHARY`: 是否/如何支持一元形式
+- `FUNC2`: 二元运算的另一个实现函数
+
+示例:
+
+`(calc-binary-op "+" 'calcFunc-add arg 0 nil '+)`
+#### math-numberp
+判断是不是calc的数字类型
+
+`(math-numberp A)`
+#### math-reject-arg
+在calc计算器中拒绝参数
+
+`(math-reject-arg &optional A P OPTION)`
+
+- A: 出问题的参数
+- P: 要求满足的predicate
+- option: 额外错误原因
+#### math-with-extra-prec
+临时拓展精度 执行body.
+
+`(math-with-extra-prec DELTA &rest BODY)`
+
+- `DELTA`: 要拓展的位数
+- `BODY`: 执行的操作
+#### math-normalize
+将A规范化 至于规范化的标准 查看`calc.md`
+
+`(math-normalize A)`
+
+
+#### math-zerop
+判断是不是0
+
 ### fileio
 #### expand-file-name
 转换`NAME`并规范为绝对路径, 设置一个默认的目录为`DEFAULT-DIRECTORY`
@@ -270,6 +315,12 @@ Levenshetin距离指的是: 将`STRING1`变换为`STRING2`所需进行的 `删�
 `(string-distance STRING1 STRING2 BYTECOMPARE)`
 
 - 若BYTECOMPARE为nil或忽略 则以字符为单位计算距离 否则以字节
+#### mapcar
+相当于rust的 `Iterator.map(|x| f).collect::<List>()`
+
+`(mapcar FUNCTION SEQUENCE)`
+
+对序列`SEQUENCE`中的每个元素应用`FUNCTION` 然后返回一个List.
 ### alloc
 #### make-vector
 创建向量 长度`length` 初始化为`init`

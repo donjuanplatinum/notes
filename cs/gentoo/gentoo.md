@@ -2,7 +2,12 @@
 
 
 <a id="org2af0dd7"></a>
+### 0.技巧
+如果硬盘空间不足 可以用环境变量将build的目录设置到其他位置
 
+```
+PORTAGE_TMPDIR=/mnt/tmp
+```
 ### 1.挂载
 
 将根磁盘挂载到/mnt/genoo

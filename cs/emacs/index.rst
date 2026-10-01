@@ -15,3 +15,4 @@ emacs
    rgrep
    gnus
    vterm
+   calc

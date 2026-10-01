@@ -12,3 +12,5 @@ Linux
    serial
    hw/index
    ccf
+   config
+   sched_and_irq

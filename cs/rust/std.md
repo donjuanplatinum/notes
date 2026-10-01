@@ -25,6 +25,39 @@ Rust核心库是Rust标准库的无依赖基础 它没有链接到上游库 没�
 
 - `then(self, f: F)`: 如果是true 则返回f 否则None
 - `then_some(self, t: T)`: 如果是true 则返回T 否则None
+#### pointer
+裸指针 `*const T` 与 `*mut T`.
+
+注意, `*ptr = data`操作会在原来地址上的值上调用`drop()` 所以如果原来的内存没有**初始化**的化 这是个未定义行为. 这个时候我们可以使用`core::ptr::write()` 这个方法不会调用原来地址的`drop()`
+
+1. 创建裸指针的方法:
+
+- 对于栈上的 可以从 **引用转换而来**.
+
+```rust
+let a: i32 = 10;
+let ptr: *const i32 = &a;
+```
+
+- 对于堆上的 可以 **解引用** `Box`. 但是注意 这并不会获得Box在堆上的所有权, Box的所有权仍然会在超出作用域drop, 这个时候用ptr会未定义行为.
+```rust
+let a: Box<i32> = Box::new(10);
+let ptr: *const i32 = &*a;
+```
+
+2. 消费box
+
+box的`into_raw()`函数会消费自己 并返回裸指针. 但是注意: **那个数据还在堆上 我们需要手动管理它的所有权**.
+
+```rust
+let a: Box<i32> = Box::new(1);
+let a_ptr: *mut i32 = Box::into_raw(a);
+
+unsafe {
+	drop(Box::from_raw(a));
+}
+```
+
 ### iter
 迭代器
 
@@ -60,6 +93,42 @@ fn fold<B,F>(self,init: B,f: F) -> B
 ```
 
 init为初始值 f为累加的闭包
+
+- 举例: 0..101的和
+
+```rust
+let sum = (0..101).into_iter().fold(0,|acc,x| acc + x);
+```
+##### filter
+过滤器 , 将满足条件的元素返回成一个迭代器.
+
+```rust
+fn filter<P>(self,predicate: P) -> Filter<Self,P> 
+where
+	self: Sized,
+	P: FnMut(&self::Item) -> bool,
+```
+
+举例: 0..101的偶数的和
+
+```rust
+let sum = (0..101).into_iter().filter(|i| i % 2 == 0).fold(0,|acc,x| acc + x);
+```
+##### map
+给迭代器的每个元素应用一个操作 然后返回作用后的迭代器.
+
+```rust
+fn map<B,F>(self, f:F) -> Map<Self,F>
+where
+	Self: Sized,
+	F: FnMut(Self::Item) -> B
+```
+
+举例: 将(0..101)的每个数对9取余.
+
+```rust
+(0..101).into_iter().map(|i| i % 9)
+```
 ### ops
 可重载运算符
 
@@ -132,9 +201,67 @@ Release保证此操作之前的读取与写入不会被排到此操作后
 
 - `SeqCst`: 最严格的约束 在AcqRel的基础上要求 所有线程看到的SeqCst的操作顺序必须一致
 
+
 ### cmp
 比较模块
 #### Ordering
 两个值比较的结果
 
 - `then(self, other: Ordering) -> Ordering`: 链接两个排序.若self不是`Equal` 则返回self. 否则返回`other`
+
+### ptr
+裸指针
+
+#### NonNull
+非0且协变的`*mut T`. 
+
+由于`NonNull`是**covariant**的， 所以如果我们自己抽象的类型需要**invariant** 那么我们需要`PhantomData`调整variance.
+
+方法
+- `dangling()`: 创建悬垂指针
+- `new_unchecked(ptr: *mut T) -> Self`: 从`*mut T`创建`NonNull<T>`, 这里假定ptr**一定非空**.
+- `new(ptr: *mut T) -> Option<Self>`: 与`new_unchecked`的区别在于 会先检查是否是空
+- `as_ptr(self) -> *mut T`: 获取底层 `*mut`指针
+
+
+## std
+rust的全功能**标准库**. 包括了 `Vec<T>`, 操作系统I/O, 多线程等
+### boxed
+在rust里 ,`Box<T>`的使命类似于C的`malloc`,`free` 即在堆上分配与管理对象.
+
+而`Box<T>`具有堆上对象的所有权. 它是一个 **智能指针**.
+
+
+### collections
+数据结构.
+
+#### LinkedList
+双向链表
+
+```rust
+pub struct LinkedList<
+    T,
+    #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
+> {
+    head: Option<NonNull<Node<T>>>,
+    tail: Option<NonNull<Node<T>>>,
+    len: usize,
+    alloc: A,
+    marker: PhantomData<Box<Node<T>, A>>,
+}
+
+struct Node<T> {
+    next: Option<NonNull<Node<T>>>,
+    prev: Option<NonNull<Node<T>>>,
+    element: T,
+}
+```
+
+
+- `new()`: 创建空的链表
+- `append(&mut self,other: &mut LinkedList<T,Global>)`: 将另一个链表`other`插入到self的后面
+- `push_back(&mut self,elt: T)`: 将元素追加到尾部
+- `push_front(&mut self,elt: T)`: 将元素追加到前面
+- `pop_front(&mut self,elt: T)`: 将最前面元素弹出
+- `pop_back(&mut self,elt: T)`: 将最后面元素弹出
+
