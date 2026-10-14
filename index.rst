@@ -23,7 +23,8 @@ GPG: 1C9E EEE5 4C8E D5A8 3039  1C87 A9F6 8632 D259 40E6
    todo/index
    latex
    principle
-  
+   music/index
+   
 友链
 ====
 

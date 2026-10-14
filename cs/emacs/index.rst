@@ -16,3 +16,5 @@ emacs
    gnus
    vterm
    calc
+   specpdl
+   intervals

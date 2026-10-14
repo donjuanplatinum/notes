@@ -5,7 +5,7 @@ Linux
 	      
    kernel
    syscall
-   fs
+   procfs
    inotify
    selinux
    man
