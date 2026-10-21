@@ -17,6 +17,7 @@ GPG: 1C9E EEE5 4C8E D5A8 3039  1C87 A9F6 8632 D259 40E6
 .. toctree::
    :maxdepth: 1
 
+   life/index
    cs/index
    math/index
    blog/index
@@ -34,6 +35,14 @@ GPG: 1C9E EEE5 4C8E D5A8 3039  1C87 A9F6 8632 D259 40E6
    :width: 80px
    :alt: 0xa7973908
 
+----
+
+**SignalChan** - `krgm.moe <https://krgm.moe>`_
+
+.. image:: _static/avatars/prcups.png
+   :width: 80px
+   :alt: prcups
+   
 ----
 
 **JFZC** - `jfzc.barrensea.org <https://jfzc.barrensea.org>`_

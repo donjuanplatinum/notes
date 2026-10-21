@@ -400,6 +400,14 @@ Levenshetin距离指的是: 将`STRING1`变换为`STRING2`所需进行的 `删�
 创建向量 长度`length` 初始化为`init`
 
 `(make-vector length init)`
+#### cons
+`(cons CAR CDR)`
+
+创建一个cons cell. 具体关于cons cell,请看数据结构篇章.
+#### make-list
+`(make-list LENGTH INIT)`
+
+相当于rust的 `let list = [INIT;LENGTH]`
 ### data
 #### eq
 若两个对象是相同的Lisp对象 则返回t

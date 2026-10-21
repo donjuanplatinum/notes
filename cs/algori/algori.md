@@ -91,28 +91,37 @@ HashMap<K,Node>
 
 并查集可以快速的解决两个问题: **查询与合并**.
 
-并查集其实和树结构极其类似 但是: **它更注重于子节点最终属于谁**
+并查集其实和树结构极其类似 但是: **它更注重于子节点最终属于谁**.
+
+两个核心操作是
+- `find(x)`: 查询某个元素所属的集合. 用于判断两个元素是否属于一个集合. `find(x) ?= find(y)`
+- `union(x,y)`: 合并两个元素所属集合.
+
+然后还有几个小优化:
+
+1. 路径压缩: 在`find`的过程中 顺便把沿途节点直接指向根节点.
+2. 额外维护一个`rank`数组, 表示树高的上界, 合并的时候先找到根 然后比较根的rank.
+
+要合并的两个节点中, 我们找到rank更小的节点, 把rank更小的节点挂到更大的节点下面.
+
+这样做的原因是: rank不同的时候 低rank的根挂到高rank的根下面 这样树高不会增加很多.
+
+在rank优化的情况下 树高最高为 $O(\log n)$ .
+
+在这两个优化的情况下, `find`和`union`的时间复杂度**均摊**为 $O(\alpha (n))$
+
+其中 $\alpha (n)$为 **反阿克曼函数** 这个函数的增长速度**非常非常非常的慢**.
+
 ```rust
 /// 并查集
 pub struct DSU {
 	/// 父节点指针
 	parent: Vec<usize>,
-	/// 
+	/// 秩
 	rank: Vec<usize>,
 }
 ```
-#### 一个示例
 
-```
-假设有4而城市: 1 2 3 4
-
-一开始每个城市都是独立的 用数组 parent[u]来表示 城市u 的上级
-
-```
-
-那么并查集在这里的**查询**就是: `parent[u]`
-
-而合并操作为: 给定一条道路 比如(1,2) 意味着1与2联通了
 
 
 ### 维护序关系的数据结构
@@ -771,6 +780,73 @@ pub(super) const unsafe fn ptr_rotate<T>(left: usize, mid: *mut T, right: usize)
 ```
 
 
+## 搜索算法
+用于在状态空间中找到最优解.
+
+| 算法     | 要求与用途 | 时间复杂度 | 空间复杂度 |
+|----------|------------|------------|------------|
+| 二分搜索 | 有序序列   | O(logn)    | O(1)       |
+|      |        |            |            |
+### 二分搜索
+利用序列 **有序** 的性质 通过对搜索的 左右边界进行二分 使得在 O(logn)时间可以求解.
+
+我们这里采用linux内核的二分搜索实现.
+
+- 这里通过 `num >> 1` 进行二分 避免了除法
+- `base`维护左边的边界, `num`维护剩余元素数量
+- `num--` 代表把pivot的当前元素去掉. 也就是说 每次缩小的范围是**前闭后开**区间, `[base,pivot)`
+```c
+static __always_inline
+void *__inline_bsearch(const void *key, const void *base, size_t num, size_t size, cmp_func_t cmp)
+{
+	const char *pivot;
+	int result;
+
+	while (num > 0) {
+		pivot = base + (num >> 1) * size;
+		result = cmp(key, pivot);
+
+		if (result == 0)
+			return (void *)pivot;
+
+		if (result > 0) {
+			base = pivot + size;
+			num--;
+		}
+		num >>= 1;
+	}
+
+	return NULL;
+}
+```
+
+下面是rust写法
+```rust
+#[inline]
+pub fn bsearch<T, F>(slice: &[T], key: &T, cmp: F) -> Result<usize, usize>
+where
+    F: Fn(&T, &T) -> Ordering,
+{
+    let mut num = slice.len();
+    let mut base = 0;
+    while num > 0 {
+        let pivot = base + (num >> 1);
+        match cmp(key, &slice[pivot]) {
+            Ordering::Equal => {
+                return Ok(pivot);
+            }
+            Ordering::Greater => {
+                base = pivot + 1;
+                num -= 1;
+            }
+            _ => {}
+        }
+        num >>= 1;
+    }
+    Err(base)
+}
+
+```
 ## 调度器算法
 调度器是操作系统最重要的算法之一,用于进程的调度.
 

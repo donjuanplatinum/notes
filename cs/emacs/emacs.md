@@ -22,6 +22,8 @@ Emacs是一款基于ELisp(Emacs Lisp)的编辑器: 你可以通过Lisp做到几�
 | C-d             | 删除光标的字符             | delete-char                                        |
 | M-d             | 删除后面的单词             | kill-word                                          |
 | M-backspace     | 删除前面的词               | backward-kill-word                                 |
+| C-x n n         | 窄化缓冲区到选中区域       | narrow-to-region                                   |
+| C-x n w         | 恢复窄化                   | widen                                                   |
 ## 选择
 | Key                       | Mean                                                            | Command                 |
 |---------------------------|-----------------------------------------------------------------|-------------------------|
@@ -29,4 +31,4 @@ Emacs是一款基于ELisp(Emacs Lisp)的编辑器: 你可以通过Lisp做到几�
 | C-x C-x                   | 光标移动到选择区的开头和结尾                                    | exchange-point-and-mark |
 | C-x SPC/C-c m(自己加的)   | 选择矩形区域                                                    | rectangle-mark-mode     |
 | M-w                       | 复制                                                            | kill-ring-save          |
-| C-y                       | 粘贴                                                            | yank                        |
+| C-y                       | 粘贴                                                            | yank                    |

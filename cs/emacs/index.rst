@@ -17,4 +17,5 @@ emacs
    vterm
    calc
    specpdl
+   structure
    intervals
