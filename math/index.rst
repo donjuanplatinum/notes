@@ -6,3 +6,5 @@
    
    la
    funcs
+   comb
+   calculus

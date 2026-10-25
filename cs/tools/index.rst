@@ -29,3 +29,4 @@
    systemd
    stty
    grub
+   smartmontools
