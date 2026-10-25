@@ -32,8 +32,8 @@ $$
 我们对$\Gamma(z)$ 使用对t的**分部积分**.
 
 $$
-\Gamma(z) = & \int_{0}^{\infty} e^{-t} t^{z-1} dt \
- = & [-e^{-t} t^{z-1}]^{\infty}_0 - \int_{0}^{\infty} - e^{-t} (z-1) t^{z-2} dt \
+\Gamma(z) = \int_{0}^{\infty} e^{-t} t^{z-1} dt \\
+ =  [-e^{-t} t^{z-1}]^{\infty}_0 - \int_{0}^{\infty} - e^{-t} (z-1) t^{z-2} dt \
 $$
 
 左边的极限等于0 右边是 $(z-1) \Gamma(z-1)$
@@ -71,14 +71,16 @@ $$
 
 这个函数很特殊 我们定义它叫做: Digamma函数 即 $\psi(z)$.
 
+$$
 \boxed{
 \psi(z) = \frac{\Gamma'(z)}{\Gamma(z)}
 }
+$$
 
 我们求第二次导.
 
 $$
-\frac{d}{dx} \frac{\Gamma'(z)}{\Gamma(z)} = \
+\frac{d}{dx} \frac{\Gamma'(z)}{\Gamma(z)} = \\
 \frac{\Gamma''(z) \Gamma(z) - [\Gamma'(x)]^2}{\Gamma^2(x)}
 
 $$
