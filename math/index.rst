@@ -7,4 +7,4 @@
    la
    funcs
    comb
-   calculus
+   ana

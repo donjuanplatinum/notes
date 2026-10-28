@@ -980,59 +980,72 @@ KMP算法是先预处理一个`pattern`数组 它记录了: 如果匹配到这�
 
 比如
 ```
+str:
+0 1 2 3 4 5 6
 a b a b a b c
-match
+
+pattern:
+0 1 2 3 4
 a b a b c
 ```
 
-我们注意到第一次的abab匹配完后 其实可以直接把ab跳了 注意 不能把abab都跳了.
+其实 当第四个位置 a与c不匹配的时候 我们不需要在这个位置把pattern回退到0 我们可以直接让它回退到2,
 
-而KMP算法是求出它的pattern数组 也就是对应跳转多少
+因为 如果是c不匹配 那么前面的`abab`是**匹配的**, 在c**前面**已经有两个ab, 而**开头**也有两个ab, 所以这个ab是不用重复匹配的.
 
-```
-a b a b c
-match
-a b a b
+这个从头开始的ab叫**前缀** 从c前面的ab叫**后缀**.
 
--> 
-a b a b c
-match
-    a b a b
-```
+KMP算法就是通过 找到 **最长的 相等的前缀与后缀** 这样就可以不用回退j到开头了.
 
-我们发现 当前缀ab和后缀ab相等时可以跳.
+最长公共前后缀算法叫LPS. 我们求出pattern的LPS数组 就求出了匹配失败的时候 j回退的位置.
 
-所以这个pattern其实就是前缀与后缀的最长相等长度.
+##### LPS
+若 `s[i] == s[j]` 就给`j + 1` 因为最长LPS 可以变长.
 
-我们可以引入前缀函数的概念了
-
-> 前缀函数的值为 最长的前缀与后缀的相等的长度.
-#### 前缀函数算法
-KMP的问题转换为了对前缀函数的快速求解问题.
-
-朴素的算法为: 从前往后 和 从后往前匹配
-
+若 不等于 那么j回退到lps[j-1] 然后继续看看能不能变长.
 ```rust
-pub fn prefix_func(s: String) {
-	let s = s.bytes();
-	let len = s.len();
-	let mut prefix_func_arr = vec![0;len];
-	for i in 0..len {
-		let mut max = 0;
-		for k in (1..i+1).rev() {
-			let prefix = &s[0..k];
-			let suffix = &s[i+1-k..i+1];
-			if prefix == suffix {
-				prefix_func_arr[i] = k;
-				break;
-			}
-		}
+pub fn lps(s: &[u8]) -> Vec<usize> {
+    let mut lps = vec![0;s.len()];
+    let mut j = 0;
+
+    for i in 1..s.len() {
+	while j > 0 && s[i] != s[j] {
+	    j = lps[j-1];
 	}
+	if s[i] == s[j] {j += 1;}
+	lps[i] = j;
+    }
+    lps
 }
 ```
 
+在获得了LPS后 我们可以实现KMP算法了
+
+```rust
+pub fn kmp(s: &str, p: &str) -> Option<usize> {
+    let (s, p) = (s.as_bytes(), p.as_bytes());
+    let lps = lps(p);
+    let mut j = 0;
+
+    for i in 0..s.len() {
+		// 不匹配 根据j = lps[j-1]回退j
+        while j > 0 && s[i] != p[j] {
+            j = lps[j - 1];
+        }
+		// 直到匹配 或者 j = 0为止.
+        if s[i] == p[j] {
+            j += 1;
+        }
+        if j == p.len() {
+            return Some(i + 1 - p.len());
+        }
+    }
+    None
+}
+```
 ### Manacher算法
 在 $O(N)$ 时间复杂度下 求出以每个位置为回文中心的回文半径.
+
 ## 数学算法
 ### 快速幂
 用于在 $\Theta(logn)$时间计算$a^n$的算法.
@@ -1269,10 +1282,6 @@ $$
 所以实际上 **二进制串** 是 $x \in GF(2)$ 的**向量空间**
 
 我们记元素为二进制的长为n的向量为 $GF(2)^n$
-## RMQ
-区间最大/最小值
-
-
 ## 二进制
 ### 2的幂
 如果一个数是2的幂 那么它的二进制最高位是1 其他位数是0. 也就是说:
